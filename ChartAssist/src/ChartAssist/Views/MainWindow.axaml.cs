@@ -21,7 +21,16 @@ public partial class MainWindow : Window
         InitializeComponent();
     }
 
+    private AbgleichWindow? _sessionWindow;
+
     private MainWindowViewModel ViewModel => (MainWindowViewModel)DataContext!;
+
+    protected override void OnClosed(EventArgs e)
+    {
+        // Das Abgleichfenster hat keinen Besitzer und würde sonst allein weiterlaufen
+        _sessionWindow?.Close();
+        base.OnClosed(e);
+    }
 
     protected override async void OnOpened(EventArgs e)
     {
@@ -125,7 +134,11 @@ public partial class MainWindow : Window
                 new UpdateOverviewWindow(import.UpdatedCharts).Show(this);
             }
         };
-        window.Show(this);
+        _sessionWindow = window;
+        window.Closed += (_, _) => _sessionWindow = null;
+
+        // Ohne Besitzer: Ein Klick ins Abgleichfenster holt sonst auch das Hauptfenster vor den Browser
+        window.Show();
     }
 
     private void OnDatabaseChanged()
