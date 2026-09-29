@@ -1,0 +1,13 @@
+# Entwicklung unter Linux: LF für alle Textdateien
+* text=auto eol=lf
+
+# Binärdateien
+*.png binary
+*.jpg binary
+*.ico binary
+*.icns binary
+*.pdf binary
+
+# XML-Fixtures der Datenbank-Tests unverändert lassen: .ChartButler.xml wird
+# immer mit CRLF geschrieben und byteweise verglichen (docs/TECHNISCHE-BASIS.md, 4.3)
+ChartAssist/tests/**/Fixtures/*.xml -text

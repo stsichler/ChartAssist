@@ -1,0 +1,19 @@
+# Build-Ausgaben (in jeder Tiefe)
+bin/
+obj/
+publish/
+TestResults/
+.vs/
+*.user
+
+# VS Code: nur die gemeinsam genutzten Einstellungen einchecken
+**/.vscode/*
+!**/.vscode/launch.json
+!**/.vscode/tasks.json
+!**/.vscode/extensions.json
+!**/.vscode/settings.json
+
+# Echte DFS-Seiten und Karten: dürfen wegen §11 der DFS-Nutzungsbedingungen
+# nicht ins Repository (siehe ChartAssist/docs/IMPORT-MODUS.md, Abschnitt 4)
+/ChartAssist/testdata/
+/ChartAssist/testcharts/
