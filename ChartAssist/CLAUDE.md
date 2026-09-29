@@ -9,7 +9,7 @@ ChartAssist ist der Nachfolger von ChartButlerCS: eine Desktop-Anwendung für Wi
 Der grundlegende Unterschied zu ChartButlerCS: **ChartAssist greift selbst nie auf die DFS zu.** Der Benutzer ruft die Seiten im Browser auf und speichert sie mit Strg+S in einen Import-Ordner. ChartAssist wertet diese Dateien aus ("Import-Modus"). Grund sind die Nutzungsbedingungen der DFS, §2, siehe `docs/ENTSCHEIDUNGEN.md`.
 
 - UI-Texte, Kommentare, Dokumentation und Commit-Messages sind **deutsch**.
-- **Status:** Die Planung ist abgeschlossen, Code gibt es noch keinen. Das Projekt wird zusammen mit dem Benutzer von Grund auf aufgebaut. Phase 0 ist erledigt, als Nächstes kommt Phase 1 (`docs/TECHNISCHE-BASIS.md`, Abschnitt 11).
+- **Status:** Die Planung ist abgeschlossen. Das Projekt wird zusammen mit dem Benutzer von Grund auf aufgebaut. Phase 0 ist erledigt, Phase 1 (Grundgerüst und Pipeline) läuft (`docs/TECHNISCHE-BASIS.md`, Abschnitt 11).
 
 ## Vor der Arbeit lesen
 
@@ -35,8 +35,8 @@ Der grundlegende Unterschied zu ChartButlerCS: **ChartAssist greift selbst nie a
 
 - Git-Root `~/Entwicklung/ChartAssist/` enthält nur README und was Git/GitHub brauchen (`.gitignore`, `.gitattributes`, später `LICENSE`, `.github/`). Der gesamte Quellcode liegt in `ChartAssist/`. VS Code wird in `ChartAssist/` geöffnet.
 - Zeilenenden **LF** (`.gitattributes`). Ausnahme: XML-Fixtures der Datenbanktests (`-text`).
-- Geplante Projekte: `src/ChartAssist.Core` (UI-frei, testbar), `src/ChartAssist` (Avalonia), `tests/ChartAssist.Core.Tests` (xUnit). `Nullable` und `ImplicitUsings` aktiv.
-- Umgebung: Linux, .NET SDK 10.0.112 unter `/usr/lib/dotnet`. Bauen, testen, starten im Verzeichnis `ChartAssist/`: `dotnet build`, `dotnet test`, `dotnet run --project src/ChartAssist`.
+- Projekte: `src/ChartAssist.Core` (UI-frei, testbar), `src/ChartAssist` (Avalonia 12), `tests/ChartAssist.Core.Tests` (xunit v3). Gemeinsame Einstellungen in `Directory.Build.props`, Paketversionen nur in `Directory.Packages.props`. `Nullable` und `ImplicitUsings` aktiv.
+- Umgebung: Linux, .NET SDK 10.0.112 unter `/usr/lib/dotnet`, Avalonia-Templates installiert. Bauen, testen, formatieren, starten im Verzeichnis `ChartAssist/`: `dotnet build`, `dotnet test`, `dotnet format`, `dotnet run --project src/ChartAssist`.
 
 ## Referenz: ChartButlerCS
 

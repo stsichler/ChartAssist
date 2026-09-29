@@ -48,7 +48,8 @@ Kernidee: **Fachlogik und UI trennen.** Die Fachlogik liegt in einer UI-unabhän
 ├── .github/workflows/                (build.yml, release.yml, siehe 9)
 └── ChartAssist/                      (gesamter Quellcode; dieses Verzeichnis in VS Code öffnen)
     ├── CLAUDE.md                     (Hinweise für Claude Code)
-    ├── ChartAssist.sln
+    ├── ChartAssist.slnx
+    ├── global.json, Directory.Build.props, Directory.Packages.props
     ├── .editorconfig
     ├── .vscode/
     │   ├── extensions.json
@@ -56,6 +57,7 @@ Kernidee: **Fachlogik und UI trennen.** Die Fachlogik liegt in einer UI-unabhän
     │   ├── tasks.json
     │   └── settings.json
     ├── docs/                         (TECHNISCHE-BASIS.md, IMPORT-MODUS.md, ENTSCHEIDUNGEN.md)
+    ├── packaging/macos/Info.plist    (Vorlage für das .app-Bundle)
     ├── src/
     │   ├── ChartAssist.Core/         (net10.0, Class Library, keine UI-Abhängigkeit)
     │   │   ├── Data/ChartDatabase.cs       (eigenes Datenmodell, ersetzt das typisierte DataSet, siehe 4.3)
@@ -76,7 +78,7 @@ Kernidee: **Fachlogik und UI trennen.** Die Fachlogik liegt in einer UI-unabhän
     │       ├── ViewModels/
     │       └── Assets/ Icon.ico, Icon.png, ChartAssist.icns
     ├── tests/
-    │   └── ChartAssist.Core.Tests/   (xUnit)
+    │   └── ChartAssist.Core.Tests/   (xunit v3)
     │       └── Fixtures/             (synthetische DFS-Seiten, siehe 11 – keine echten DFS-Inhalte)
     ├── testdata/                     (lokal, nicht eingecheckt: gespeicherte DFS-Seiten)
     └── testcharts/                   (lokal, nicht eingecheckt: Kopie eines echten Kartenverzeichnisses)
@@ -91,61 +93,25 @@ Aufbau wie bei ChartButlerCS: Das Git-Root enthält nur die README (zugleich Git
 
 ## 3. Projektdateien (SDK-Stil)
 
-### `src/ChartAssist.Core/ChartAssist.Core.csproj`
+Angelegt in Phase 1. Maßgeblich sind die Dateien selbst, hier nur der Aufbau und die Gründe:
 
-```xml
-<Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <TargetFramework>net10.0</TargetFramework>
-    <Nullable>enable</Nullable>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <LangVersion>latest</LangVersion>
-    <IsTrimmable>true</IsTrimmable>
-  </PropertyGroup>
-  <ItemGroup>
-    <PackageReference Include="PDFsharp" Version="6.*" />
-    <PackageReference Include="SkiaSharp" Version="<gleiche Version wie von Avalonia verwendet>" />
-  </ItemGroup>
-</Project>
-```
+| Datei | Inhalt |
+|---|---|
+| `global.json` | SDK 10.0.100 mit `rollForward: latestFeature`; `dotnet test` läuft über die **Microsoft Testing Platform** (MTP), die xunit v3 direkt unterstützt |
+| `Directory.Build.props` | Für alle Projekte: `net10.0`, `Nullable`, `ImplicitUsings`, `LangVersion latest`, `InvariantGlobalization` (4.1), Produkt, Copyright und `Version` 1.0.0.0. `EnforceCodeStyleInBuild` prüft die Regeln aus `.editorconfig` beim Bauen, in CI (`CI=true`) gelten Warnungen als Fehler |
+| `Directory.Packages.props` | Zentrale, feste Paketversionen (Central Package Management). Die Projekte nennen nur den Paketnamen |
+| `ChartAssist.slnx` | Solution im neuen XML-Format, Standard von `dotnet new sln` ab .NET 10 |
+| `src/ChartAssist.Core/ChartAssist.Core.csproj` | `IsTrimmable`. PDFsharp und SkiaSharp kommen in Phase 2 dazu, wenn sie gebraucht werden |
+| `src/ChartAssist/ChartAssist.csproj` | Avalonia-App: `WinExe`, Icon, `app.manifest` (nur Windows), Compiled Bindings, Pakete Avalonia, Avalonia.Desktop, Avalonia.Themes.Fluent, Avalonia.Fonts.Inter, CommunityToolkit.Mvvm |
+| `tests/ChartAssist.Core.Tests/…csproj` | xunit v3 (`OutputType Exe`). v3 kann Tests zur Laufzeit überspringen (`Assert.Skip`), das braucht es für die Tests gegen `testdata/` und `testcharts/` |
+| `packaging/macos/Info.plist` | Vorlage für das `.app`-Bundle (9) |
 
-Da der Code neu entsteht, können `Nullable` und `ImplicitUsings` von Anfang an aktiv sein.
+**Versionen** (Stand 29.09.2026): Avalonia 12.1.3, CommunityToolkit.Mvvm 8.4.2, xunit.v3 4.0.1, für Phase 2 vorgemerkt PDFsharp 6.2.4 und **SkiaSharp 3.119.4**. SkiaSharp muss genau der Version entsprechen, die `Avalonia.Skia` verwendet. Auf NuGet gibt es bereits SkiaSharp 4.x, das passt aber nicht zu Avalonia 12.1.
 
-### `src/ChartAssist/ChartAssist.csproj`
-
-```xml
-<Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <OutputType>WinExe</OutputType>
-    <TargetFramework>net10.0</TargetFramework>
-    <Nullable>enable</Nullable>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <AssemblyName>ChartAssist</AssemblyName>
-    <RootNamespace>ChartAssist</RootNamespace>
-    <Version>1.0.0.0</Version>                 <!-- vierstellig, siehe ReleaseCheck; neue Zählung, siehe 13 -->
-    <Product>ChartAssist</Product>
-    <Copyright>Copyright © 2016-2026 Jörg Pauly / Stefan Sichler</Copyright>
-    <ApplicationIcon>Assets\Icon.ico</ApplicationIcon>
-    <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
-    <BuiltInComInteropSupport>false</BuiltInComInteropSupport>
-  </PropertyGroup>
-  <ItemGroup>
-    <AvaloniaResource Include="Assets\**" />
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="Avalonia" Version="11.*" />
-    <PackageReference Include="Avalonia.Desktop" Version="11.*" />
-    <PackageReference Include="Avalonia.Themes.Fluent" Version="11.*" />
-    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.*" />
-    <PackageReference Include="Avalonia.Diagnostics" Version="11.*" Condition="'$(Configuration)' == 'Debug'" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\ChartAssist.Core\ChartAssist.Core.csproj" />
-  </ItemGroup>
-</Project>
-```
-
-Die Versionen oben sind Platzhalter. Beim Start die aktuellen stabilen Versionen von Avalonia und PDFsharp festlegen und fest eintragen, statt Wildcards zu verwenden. Das Grundgerüst am besten per Template erzeugen: `dotnet new install Avalonia.Templates`, dann `dotnet new avalonia.mvvm -n ChartAssist`.
+**Abweichungen von der Planung:**
+- **Avalonia 12** statt 11: Beim Start war 12.1 die aktuelle stabile Version, das Template (`Avalonia.Templates` 12.1) erzeugt sie.
+- **Keine DevTools im Debug-Build.** `Avalonia.Diagnostics` gibt es für Avalonia 12 nicht mehr. Das Template bindet stattdessen `AvaloniaUI.DiagnosticsSupport` ein, das eine Verbindung zu einem externen, nicht quelloffenen DevTools-Programm von AvaloniaUI aufbaut. Das passt nicht zur Regel "keine Netzwerkverbindungen außer der Versionsprüfung" und wurde entfernt.
+- Der `ViewLocator` des Templates wurde entfernt. Er arbeitet mit Reflection (Hindernis für Trimming, 8), und die Fenster werden ohnehin direkt erzeugt.
 
 Die Versionsprüfung gegen GitHub vergleicht wie bisher `"v" + Assembly.GetName().Version` mit dem Tag des neuesten Releases, jetzt im **neuen** Repository. `<Version>` muss deshalb vierstellig bleiben.
 
@@ -409,12 +375,15 @@ Ziel ist, dass Anwender **nichts installieren müssen**. ChartButlerCS lief unte
 ```bash
 dotnet publish src/ChartAssist -c Release -r win-x64   --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:EnableCompressionInSingleFile=true
 dotnet publish src/ChartAssist -c Release -r linux-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:EnableCompressionInSingleFile=true
-dotnet publish src/ChartAssist -c Release -r osx-arm64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:EnableCompressionInSingleFile=true
-dotnet publish src/ChartAssist -c Release -r osx-x64   --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:EnableCompressionInSingleFile=true
+dotnet publish src/ChartAssist -c Release -r osx-arm64 --self-contained true
+dotnet publish src/ChartAssist -c Release -r osx-x64   --self-contained true
 ```
 
+- **macOS ohne Single-File:** Dort ist die eine Datei das `.app`-Bundle. Die Publish-Ausgabe kommt vollständig nach `Contents/MacOS/`. So liegen die nativen Bibliotheken signiert im Bundle, statt beim Start aus einer Single-File-Datei in ein Temp-Verzeichnis entpackt zu werden, wo Gatekeeper und die Signaturprüfung auf Apple Silicon Probleme machen können.
+- Die Release-Pipeline setzt zusätzlich `-p:DebugType=none` (keine `.pdb` neben der Datei) und `-p:Version=<aus dem Tag>`.
+
 - **Warum pro Plattform:** Runtime und Avalonias native Bibliotheken (Skia, HarfBuzz) sind je Betriebssystem und Architektur verschieden. Außerdem erzeugt nur ein plattformspezifischer Build eine direkt startbare Datei (`ChartAssist.exe`, `ChartAssist`, `.app`).
-- **Größe:** Das ist der Preis von self-contained. Die Datei enthält Runtime, Avalonia und Skia. Eine grobe Schätzung ohne Messung: mehrere zehn MB, mit Kompression weniger. Der erste CI-Build (Abschnitt 11, Phase 1) liefert echte Zahlen.
+- **Größe:** Das ist der Preis von self-contained. Die Datei enthält Runtime, Avalonia und Skia. Gemessen in Phase 1 (leeres Hauptfenster, ohne Trimming): `linux-x64` Single-File mit Kompression **49 MB**. Die Zahlen aller Plattformen schreibt die Release-Pipeline in die Zusammenfassung des Laufs.
 - **Trimming** (`-p:PublishTrimmed=true`) verkleinert die Datei deutlich. Voraussetzungen:
   - Compiled Bindings in Avalonia (5.1),
   - kein reflection-basierter Code im Core (DataSet und `XmlSerializer` werden deshalb vermieden, 4.3),
@@ -429,11 +398,15 @@ dotnet publish src/ChartAssist -c Release -r osx-x64   --self-contained true -p:
 ## 9. CI und Release-Automatisierung (GitHub Actions)
 
 - Beide Workflows liegen im Git-Root und setzen `defaults: run: working-directory: ChartAssist`, weil der Quellcode im Unterverzeichnis liegt (Abschnitt 2).
-- **`.github/workflows/build.yml`**, bei jedem Push und Pull Request: Matrix `windows-latest`, `ubuntu-latest`, `macos-latest` → `dotnet build` + `dotnet test`. So fallen plattformspezifische Probleme früh auf.
+- **`.github/workflows/build.yml`**, bei jedem Push und Pull Request: Matrix `windows-latest`, `ubuntu-latest`, `macos-latest` → `dotnet build` + `dotnet test`, unter Linux zusätzlich `dotnet format --verify-no-changes`. So fallen plattformspezifische Probleme früh auf.
 - **`.github/workflows/release.yml`**, ausgelöst durch einen Tag `v*`:
   - Matrix: `windows-latest` → `win-x64`, `ubuntu-latest` → `linux-x64`, `macos-latest` → `osx-arm64` und `osx-x64`.
   - Schritte: `actions/setup-dotnet` (10.0.x) → `dotnet test` → `dotnet publish` (siehe 8) → auf macOS `.app`-Bundle zusammenstellen und signieren (ad-hoc oder Developer-ID + Notarisierung) → Archiv erstellen → an das GitHub-Release anhängen.
-  - Asset-Namen z. B. `ChartAssist-win-x64.zip`, `ChartAssist-linux-x64.tar.gz`, `ChartAssist-macos-arm64.zip`, `ChartAssist-macos-x64.zip`.
+  - Asset-Namen `ChartAssist-win-x64.zip`, `ChartAssist-linux-x64.tar.gz`, `ChartAssist-macos-arm64.zip`, `ChartAssist-macos-x64.zip`.
+  - Der Tag muss eine vierstellige Version haben (`v1.0.0.0`), sonst bricht der Lauf ab. Die Version aus dem Tag wird in die Programmversion und ins `Info.plist` übernommen.
+  - `osx-x64` wird auf dem Apple-Silicon-Runner (`macos-latest`) quer gebaut.
+  - Die `.icns`-Datei entsteht im Lauf mit `sips` und `iconutil` aus `Assets/Icon.png` (256 × 256).
+  - Das Release wird als **Entwurf** angelegt, mit Standardtext (Downloads, Gatekeeper-Hinweis, KI-Hinweis). Veröffentlicht wird es von Hand, bei Tests als Pre-release. Erst ein veröffentlichtes, reguläres Release ist für `releases/latest` und die Versionsprüfung sichtbar.
 - **`README.md`** des neuen Repositorys: Download-Links pro Plattform, Systemvoraussetzungen (Windows 10+, keine Runtime-Installation), Beschreibung des Ablaufs mit Browser und Import-Ordner, Hinweis auf die DFS-Nutzungsbedingungen. Die README kann auch hier als GitHub-Pages-Seite dienen.
 
 ---
@@ -471,7 +444,7 @@ Jede Phase endet mit einem baubaren, getesteten Stand. Die Phasen 3 und 4 setzen
 
 0. **Repository anlegen** (klein)
    - **Erledigt am 29.09.2026:**
-     - lokales Repository `~/Entwicklung/ChartAssist` (Branch `main`, noch ohne Commit und ohne GitHub-Remote),
+     - lokales Repository `~/Entwicklung/ChartAssist` (Branch `main`),
      - `.gitignore` und `.gitattributes` im Git-Root, README-Platzhalter,
      - `ChartAssist/CLAUDE.md`,
      - die Konzeptdokumente in `ChartAssist/docs/`,
@@ -490,6 +463,9 @@ Jede Phase endet mit einem baubaren, getesteten Stand. Die Phasen 3 und 4 setzen
    - Solution mit `ChartAssist.Core`, `ChartAssist.Core.Tests` und der Avalonia-App per Template anlegen. Die App zeigt zunächst nur ein leeres Hauptfenster.
    - `build.yml` und `release.yml` einrichten und ein erstes Test-Release auf allen drei Plattformen erzeugen: Startet die Datei per Doppelklick? Wie groß ist sie? Wie verhält sich Gatekeeper?
    - So früh, weil Paketierung und Signatur die größten Unbekannten sind und sich nicht am Ende stauen sollen.
+   - **Stand 29.09.2026:**
+     - erledigt: Solution (`ChartAssist.slnx`), zentrale Build-Dateien, Core mit `DfsUrls` und ersten Tests, Avalonia-App mit leerem Hauptfenster (Icon, Versionsnummer), `build.yml`, `release.yml`. Lokal unter Linux gebaut, getestet, gestartet und als Single-File veröffentlicht (3, 8),
+     - offen: erster Lauf beider Workflows auf GitHub, Test-Release (Tag `v0.1.0.0`) auf echten Rechnern mit Windows, Linux und macOS prüfen.
 
 2. **Core-Basis** (mittel)
    - Datenmodell mit XML-Reader/-Writer (4.3) und Round-Trip-Tests gegen die echte `.ChartButler.xml`. Die Tests mit echten Daten laufen nur lokal, die Datei liegt in `testdata/`. Für CI eine synthetische, anonymisierte Datei gleichen Aufbaus einchecken.

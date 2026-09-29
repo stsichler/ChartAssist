@@ -1,0 +1,24 @@
+<Project>
+  <!-- Gemeinsame Einstellungen aller Projekte -->
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <LangVersion>latest</LangVersion>
+
+    <!-- Datumsformate werden explizit festgelegt, daher keine Abhängigkeit von libicu (TECHNISCHE-BASIS 4.1) -->
+    <InvariantGlobalization>true</InvariantGlobalization>
+
+    <!-- Regeln aus .editorconfig auch beim Bauen prüfen; in CI (GitHub setzt CI=true) sind Warnungen Fehler -->
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+    <TreatWarningsAsErrors Condition="'$(CI)' == 'true'">true</TreatWarningsAsErrors>
+
+    <Authors>Stefan Sichler</Authors>
+    <Product>ChartAssist</Product>
+    <Copyright>Copyright © 2016-2026 Jörg Pauly / Stefan Sichler</Copyright>
+
+    <!-- Vierstellig, weil ReleaseCheck "v" + Version mit dem Release-Tag vergleicht.
+         Die Release-Pipeline überschreibt sie mit der Version aus dem Tag. -->
+    <Version>1.0.0.0</Version>
+  </PropertyGroup>
+</Project>

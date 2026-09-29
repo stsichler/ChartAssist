@@ -1,0 +1,25 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:ChartAssist.ViewModels"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        x:Class="ChartAssist.Views.MainWindow"
+        x:DataType="vm:MainWindowViewModel"
+        Icon="/Assets/Icon.ico"
+        Width="800" Height="500"
+        Title="ChartAssist">
+
+  <Design.DataContext>
+    <!-- Nur für die Vorschau in der IDE; zur Laufzeit setzt App.axaml.cs den DataContext -->
+    <vm:MainWindowViewModel />
+  </Design.DataContext>
+
+  <!-- Phase 1: nur ein leeres Hauptfenster mit der Versionsnummer -->
+  <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="8">
+    <Image Source="/Assets/Icon.png" Width="96" Height="96" />
+    <TextBlock HorizontalAlignment="Center" FontSize="20" Text="ChartAssist" />
+    <TextBlock HorizontalAlignment="Center" Opacity="0.7" Text="{Binding Version, StringFormat='Version {0}'}" />
+  </StackPanel>
+
+</Window>

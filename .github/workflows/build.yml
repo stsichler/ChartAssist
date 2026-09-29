@@ -1,0 +1,39 @@
+# Bauen und testen auf allen drei Plattformen (docs/TECHNISCHE-BASIS.md, 9)
+name: Build
+
+on:
+  push:
+    branches: ['**']
+  pull_request:
+
+permissions:
+  contents: read
+
+defaults:
+  run:
+    working-directory: ChartAssist
+    shell: bash
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Bauen
+        run: dotnet build -c Release
+
+      - name: Testen
+        run: dotnet test -c Release --no-build
+
+      - name: Formatierung prüfen
+        if: runner.os == 'Linux'
+        run: dotnet format --verify-no-changes
