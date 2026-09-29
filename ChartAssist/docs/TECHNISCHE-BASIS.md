@@ -398,6 +398,8 @@ dotnet publish src/ChartAssist -c Release -r osx-x64   --self-contained true
   - `System.Text.Json` mit Source-Generator.
 
   Trimming erst aktivieren, wenn die App läuft, und danach alle Fenster einmal testen, denn Trimming-Fehler zeigen sich oft erst zur Laufzeit.
+
+  **Aktiv seit 29.09.2026** (`PublishTrimmed` in `ChartAssist.csproj`): keine Trimming-Warnungen; Linux-Datei 23 MB statt 49 MB. Geprüft mit einem getrimmten Headless-Testlauf: Einstellungen (JSON), Übernahme aus ChartButlerCS, XML-Round-Trip, Import echter Seiten, TripKit, alle Fenster, Versionsprüfung.
 - **`InvariantGlobalization`** (4.1) spart unter Linux die `libicu`-Abhängigkeit und etwas Größe.
 - **Runtime-Updates:** Eine mitgelieferte Runtime wird nicht über Windows Update o. ä. aktualisiert. Sicherheitsrelevante .NET-Patches erreichen die Anwender nur über ein neues Release. Bei einer Anwendung, deren einziger Netzzugriff die GitHub-Versionsprüfung ist, ist das Risiko gering. Die Release-Pipeline (9) macht ein Neu-Release aber billig.
 

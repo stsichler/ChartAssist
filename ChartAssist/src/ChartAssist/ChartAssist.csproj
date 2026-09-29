@@ -7,6 +7,8 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
     <BuiltInComInteropSupport>false</BuiltInComInteropSupport>
+    <!-- Nur beim Veröffentlichen wirksam; halbiert die Download-Größe (TECHNISCHE-BASIS 8) -->
+    <PublishTrimmed>true</PublishTrimmed>
   </PropertyGroup>
   <ItemGroup>
     <!-- Icon.svg ist nur die Vorlage für die Icons -->
