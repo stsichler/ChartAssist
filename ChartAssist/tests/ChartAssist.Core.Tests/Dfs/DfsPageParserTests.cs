@@ -88,6 +88,15 @@ public class DfsPageParserTests
     }
 
     [Theory]
+    [InlineData(2026, 9, 17, "17 SEP 2026")]
+    [InlineData(2026, 3, 5, "05 MAR 2026")]
+    public void FormatDate_SchreibweiseDerDfs(int year, int month, int day, string expected)
+    {
+        Assert.Equal(expected, DfsPageParser.FormatDate(new DateOnly(year, month, day)));
+        Assert.Equal(new DateOnly(year, month, day), DfsPageParser.CreateDateFromString(expected));
+    }
+
+    [Theory]
     [InlineData("")]
     [InlineData("17 Sep 2026")]
     [InlineData("31 FEB 2026")]

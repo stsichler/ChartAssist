@@ -146,6 +146,9 @@ public static partial class DfsPageParser
         return day <= DateTime.DaysInMonth(year, month) && day >= 1 ? new DateOnly(year, month, day) : null;
     }
 
+    /// <summary>Datum in der Schreibweise der DFS, z. B. "17 SEP 2026" wie in "Effective: 17 SEP 2026".</summary>
+    public static string FormatDate(DateOnly date) => $"{date.Day:00} {Months[date.Month - 1]} {date.Year}";
+
     private static readonly string[] Months = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
 
     private static string ParsePermalink(string html)

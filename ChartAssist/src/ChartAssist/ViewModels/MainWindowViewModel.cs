@@ -3,6 +3,7 @@ using System.Globalization;
 using Avalonia.Media.Imaging;
 using ChartAssist.Core;
 using ChartAssist.Core.Data;
+using ChartAssist.Core.Dfs;
 using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace ChartAssist.ViewModels;
@@ -210,7 +211,7 @@ public partial class MainWindowViewModel : ViewModelBase
             && DateOnly.FromDateTime(DateTime.Today) >= NextEdition(last))
         {
             string expected = Format(NextEdition(last));
-            Show(BannerKind.UpdateRequired, $"Seit {expected} ist eine neue Ausgabe der BasicVFR zu erwarten. Hier klicken für den Kartenabgleich.");
+            Show(BannerKind.UpdateRequired, $"Neue Ausgabe der BasicVFR erwartet (Effective: {expected}). Hier klicken für den Kartenabgleich.");
         }
         else if (NewRelease != null)
         {
@@ -230,19 +231,18 @@ public partial class MainWindowViewModel : ViewModelBase
         }
         else if (Database.AipLastUpdate is not DateOnly edition)
         {
-            StatusText = "Kartenstand: noch kein vollständiger Kartenabgleich";
+            StatusText = "Effective: – (noch kein vollständiger Kartenabgleich)";
         }
         else
         {
             DateOnly next = NextEdition(edition);
-            string nextText = DateOnly.FromDateTime(DateTime.Today) >= next
-                ? $"Neue Ausgabe seit {Format(next)} erwartet"
-                : $"Nächste Ausgabe voraussichtlich am {Format(next)}";
-            StatusText = $"Kartenstand: Ausgabe vom {Format(edition)}  ·  {nextText}";
+            string due = DateOnly.FromDateTime(DateTime.Today) >= next ? "fällig" : "voraussichtlich";
+            StatusText = $"Effective: {Format(edition)}  ·  Nächste Ausgabe: {Format(next)} ({due})";
         }
     }
 
-    private static string Format(DateOnly date) => date.ToString("dd.MM.yyyy", CultureInfo.InvariantCulture);
+    /// <summary>Ausgaben in der Schreibweise der DFS ("Effective: 17 SEP 2026").</summary>
+    private static string Format(DateOnly date) => DfsPageParser.FormatDate(date);
 
     partial void OnSelectedNodeChanged(TreeNodeViewModel? value)
     {

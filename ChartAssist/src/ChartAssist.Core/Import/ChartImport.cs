@@ -1,5 +1,4 @@
 using System.Diagnostics;
-using System.Globalization;
 using ChartAssist.Core.Data;
 using ChartAssist.Core.Dfs;
 using ChartAssist.Core.TripKit;
@@ -154,7 +153,7 @@ public sealed class ChartImport
             {
                 DfsPageKind.AirfieldPage => ApplyAirfieldPage(DfsPageParser.ParseAirfieldPage(html)),
                 DfsPageKind.ChartPage => ApplyChartPage(DfsPageParser.ParseChartPage(html)),
-                _ => new ImportResult(ImportOutcome.Processed, $"Ausgabe vom {Format(Effective!.Value)} erkannt. Bitte jetzt die Flugplatzseiten speichern."),
+                _ => new ImportResult(ImportOutcome.Processed, $"Effective: {Format(Effective!.Value)} erkannt. Bitte jetzt die Flugplatzseiten speichern."),
             };
         }
         catch (DfsPageException e)
@@ -187,7 +186,7 @@ public sealed class ChartImport
             {
                 State = ImportSessionState.NothingToDo;
                 return new ImportResult(ImportOutcome.Processed,
-                    $"Keine Aktualisierung notwendig: Die Karten entsprechen der Ausgabe vom {Format(effective)}.");
+                    $"Keine Aktualisierung notwendig: Die Karten sind aktuell (Effective: {Format(effective)}).");
             }
             return null;
         }
@@ -196,7 +195,7 @@ public sealed class ChartImport
         {
             State = ImportSessionState.Aborted;
             return new ImportResult(ImportOutcome.Processed,
-                $"Die DFS hat während des Abgleichs eine neue Ausgabe veröffentlicht ({Format(effective)}). Bitte den Abgleich neu starten.");
+                $"Die DFS hat während des Abgleichs eine neue Ausgabe veröffentlicht (Effective: {Format(effective)}). Bitte den Abgleich neu starten.");
         }
         return null;
     }
@@ -411,5 +410,5 @@ public sealed class ChartImport
             ? link
             : DfsUrls.ChartPage(effective, entry.Hash);
 
-    private static string Format(DateOnly date) => date.ToString("dd.MM.yyyy", CultureInfo.InvariantCulture);
+    private static string Format(DateOnly date) => DfsPageParser.FormatDate(date);
 }
