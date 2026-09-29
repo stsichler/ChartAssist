@@ -181,6 +181,9 @@ public sealed class ChartImportTests : IDisposable
         Assert.Equal(Chart1, File.ReadAllBytes(ChartPath("EDXA AD 2-1.png")));
         Assert.Equal(Chart2, File.ReadAllBytes(ChartPath("EDXA Musterstadt 1.png")));
         Assert.Equal(ImportSessionState.Completed, import.State);
+        Assert.Empty(import.PendingCharts);
+        Assert.Equal(["EDXA AD 2-1.png", "EDXA Musterstadt 1.png"], import.CompletedCharts.Select(c => c.ChartName));
+        Assert.Equal([1, 0], import.CompletedCharts.Select(c => c.Position)); // Stelle auf der Flugplatzseite
     }
 
     [Fact]
