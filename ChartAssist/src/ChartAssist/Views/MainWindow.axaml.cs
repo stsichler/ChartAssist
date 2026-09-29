@@ -3,7 +3,9 @@ using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.VisualTree;
 using ChartAssist.Core;
+using ChartAssist.Core.Data;
 using ChartAssist.Core.Import;
+using ChartAssist.Core.TripKit;
 using ChartAssist.ViewModels;
 
 namespace ChartAssist.Views;
@@ -101,12 +103,31 @@ public partial class MainWindow : Window
             return;
         }
         bool folderChanged = options.ChartFolder != ViewModel.Settings.ChartFolder;
+        bool tripKitChanged = options.CreateTripKit != ViewModel.Settings.CreateTripKit;
+        if (tripKitChanged && !options.CreateTripKit
+            && !await MessageDialog.ConfirmAsync(this, "TripKit abschalten", "Die vorhandenen TripKit-PDFs werden gelöscht."))
+        {
+            tripKitChanged = false;
+        }
+
         ViewModel.Settings.ChartFolder = options.ChartFolder;
         ViewModel.Settings.ImportFolder = options.ImportFolder;
+        if (tripKitChanged)
+        {
+            ViewModel.Settings.CreateTripKit = options.CreateTripKit;
+        }
         await SaveSettingsAsync();
         if (folderChanged)
         {
             await LoadDatabaseAsync();
+        }
+        if (tripKitChanged && ViewModel.Folder is ChartFolder folder)
+        {
+            bool create = ViewModel.Settings.CreateTripKit;
+            ChartDatabase database = ViewModel.Database;
+            await Task.Run(() => TripKitBuilder.UpdateAll(folder, database, create));
+            TrySaveDatabase();
+            ViewModel.Refresh();
         }
     }
 
@@ -124,7 +145,7 @@ public partial class MainWindow : Window
             return;
         }
 
-        var import = new ChartImport(vm.Folder, vm.Database, AppInfo.VersionText, mode);
+        var import = new ChartImport(vm.Folder, vm.Database, AppInfo.VersionText, mode, vm.Settings.CreateTripKit);
         var session = new AbgleichViewModel(import, new ImportFolderScanner(vm.Settings.EffectiveImportFolder), OnDatabaseChanged);
         var window = new AbgleichWindow { DataContext = session };
         vm.IsSessionOpen = true;

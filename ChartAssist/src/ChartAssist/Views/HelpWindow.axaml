@@ -36,6 +36,9 @@
             <TextBlock Classes="heading" Text="Hauptfenster" />
             <TextBlock Text="Doppelklick auf eine Karte öffnet sie. Rechtsklick auf einen Flugplatz: löschen." />
 
+            <TextBlock Classes="heading" Text="Optionen" />
+            <TextBlock Text="Kartenverzeichnis, Import-Ordner und ob je Flugplatz ein TripKit-PDF mit allen Karten entstehen soll." />
+
             <TextBlock Classes="heading" Text="Kartenverzeichnis" />
             <TextBlock Text="Karten und Datenbank liegen zusammen im Kartenverzeichnis. Sie können es kopieren oder synchronisieren und unter Windows, Linux und macOS verwenden. Kartenverzeichnisse von ChartButlerCS funktionieren weiter." />
           </StackPanel>

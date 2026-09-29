@@ -18,6 +18,9 @@ public sealed class Settings
     /// <summary>Import-Ordner für gespeicherte DFS-Seiten; leer bedeutet <c>&lt;Kartenverzeichnis&gt;/Import</c> (IMPORT-MODUS 5.3).</summary>
     public string ImportFolder { get; set; } = "";
 
+    /// <summary>Je Flugplatz ein TripKit-PDF mit allen Karten erzeugen.</summary>
+    public bool CreateTripKit { get; set; } = true;
+
     /// <summary>Version des rechtlichen Hinweises, die der Benutzer bestätigt hat.</summary>
     public string LegalNoticeAccepted { get; set; } = "";
 

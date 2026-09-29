@@ -132,12 +132,7 @@ public static class TripKitBuilder
 
         if (images.Count == 0)
         {
-            File.Delete(pdfPath);
-            File.Delete(previewPath);
-            if (tripKit != null)
-            {
-                database.Charts.Remove(tripKit);
-            }
+            Remove(folder, database, airfield);
             return null;
         }
 
@@ -152,6 +147,38 @@ public static class TripKitBuilder
             database.Charts.Add(entry);
         }
         return entry;
+    }
+
+    /// <summary>Entfernt das TripKit eines Flugplatzes aus Kartenverzeichnis und Datenbank.</summary>
+    /// <returns>true, wenn es eines gab.</returns>
+    public static bool Remove(ChartFolder folder, ChartDatabase database, Airfield airfield)
+    {
+        var entry = new Chart { Icao = airfield.Icao, Name = FileName(airfield.Icao) };
+        string pdfPath = Utility.BuildChartPath(folder.Path, airfield, entry);
+        bool existed = File.Exists(pdfPath) || database.FindChart(entry.Name) != null;
+        File.Delete(pdfPath);
+        File.Delete(Utility.BuildChartPreviewPath(folder.Path, airfield, entry, "jpg"));
+        database.Charts.RemoveAll(c => c.Name == entry.Name);
+        return existed;
+    }
+
+    /// <summary>
+    /// Erzeugt die TripKits aller Flugplätze neu oder entfernt sie alle, z. B. nach Änderung der Einstellung.
+    /// Einträge unter "Aktualisierungen" entstehen dabei nicht.
+    /// </summary>
+    public static void UpdateAll(ChartFolder folder, ChartDatabase database, bool create)
+    {
+        foreach (Airfield airfield in database.Airfields)
+        {
+            if (create)
+            {
+                Update(folder, database, airfield);
+            }
+            else
+            {
+                Remove(folder, database, airfield);
+            }
+        }
     }
 
     private static void DrawPreview(SKCanvas canvas, byte[] imageData, bool isLandscape, int half)

@@ -83,4 +83,13 @@ public sealed class SettingsTests : IDisposable
         Assert.Equal(Path.Combine("/karten", "Import"), new Settings { ChartFolder = "/karten" }.EffectiveImportFolder);
         Assert.Equal("/anders", new Settings { ChartFolder = "/karten", ImportFolder = "/anders" }.EffectiveImportFolder);
     }
+
+    [Fact]
+    public void CreateTripKit_IstOhneEintragEingeschaltet()
+    {
+        string path = Path.Combine(_root, "Settings.json");
+        File.WriteAllText(path, "{ \"ChartFolder\": \"/karten\" }");
+
+        Assert.True(Settings.Load(path).CreateTripKit);
+    }
 }
