@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!-- Vorlage für das .app-Bundle; @VERSION@ ersetzt die Release-Pipeline -->
+<plist version="1.0">
+<dict>
+  <key>CFBundleName</key>
+  <string>ChartAssist</string>
+  <key>CFBundleDisplayName</key>
+  <string>ChartAssist</string>
+  <key>CFBundleIdentifier</key>
+  <string>io.github.stsichler.chartassist</string>
+  <key>CFBundleExecutable</key>
+  <string>ChartAssist</string>
+  <key>CFBundleIconFile</key>
+  <string>ChartAssist.icns</string>
+  <key>CFBundlePackageType</key>
+  <string>APPL</string>
+  <key>CFBundleVersion</key>
+  <string>@VERSION@</string>
+  <key>CFBundleShortVersionString</key>
+  <string>@VERSION@</string>
+  <key>NSHighResolutionCapable</key>
+  <true/>
+  <key>NSHumanReadableCopyright</key>
+  <string>Copyright © 2016-2026 Jörg Pauly / Stefan Sichler</string>
+</dict>
+</plist>

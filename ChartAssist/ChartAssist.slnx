@@ -1,0 +1,9 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/ChartAssist.Core/ChartAssist.Core.csproj" />
+    <Project Path="src/ChartAssist/ChartAssist.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/ChartAssist.Core.Tests/ChartAssist.Core.Tests.csproj" />
+  </Folder>
+</Solution>

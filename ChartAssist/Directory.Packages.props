@@ -1,0 +1,22 @@
+<Project>
+  <!-- Zentrale Paketversionen, fest eingetragen statt Wildcards (TECHNISCHE-BASIS 3) -->
+  <PropertyGroup>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+    <AvaloniaVersion>12.1.3</AvaloniaVersion>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageVersion Include="Avalonia" Version="$(AvaloniaVersion)" />
+    <PackageVersion Include="Avalonia.Desktop" Version="$(AvaloniaVersion)" />
+    <PackageVersion Include="Avalonia.Themes.Fluent" Version="$(AvaloniaVersion)" />
+    <PackageVersion Include="Avalonia.Fonts.Inter" Version="$(AvaloniaVersion)" />
+    <PackageVersion Include="CommunityToolkit.Mvvm" Version="8.4.2" />
+
+    <!-- Ab Phase 2 (TripKit). SkiaSharp muss exakt der Version entsprechen, die Avalonia.Skia
+         verwendet (bei 12.1.3: 3.119.4), sonst passen die nativen Bibliotheken nicht zusammen.
+         Nicht auf 4.x aktualisieren, solange Avalonia das nicht tut. -->
+    <PackageVersion Include="SkiaSharp" Version="3.119.4" />
+    <PackageVersion Include="PDFsharp" Version="6.2.4" />
+
+    <PackageVersion Include="xunit.v3" Version="4.0.1" />
+  </ItemGroup>
+</Project>
