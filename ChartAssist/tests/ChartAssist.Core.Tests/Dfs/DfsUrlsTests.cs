@@ -10,13 +10,13 @@ public class DfsUrlsTests
     [InlineData(2026, 5, 28, "2026MAY28")]
     public void EditionFolder_EntsprichtOrdnernamenDerDfs(int year, int month, int day, string expected)
     {
-        Assert.Equal(expected, DfsUrls.EditionFolder(new DateTime(year, month, day)));
+        Assert.Equal(expected, DfsUrls.EditionFolder(new DateOnly(year, month, day)));
     }
 
     [Fact]
     public void ChartPage_BildetAbsolutenLinkAusEffectiveUndHash()
     {
-        Uri url = DfsUrls.ChartPage(new DateTime(2026, 9, 17), "758fd4e2");
+        Uri url = DfsUrls.ChartPage(new DateOnly(2026, 9, 17), "758fd4e2");
 
         Assert.Equal("https://aip.dfs.de/BasicVFR/2026SEP17/pages/758fd4e2.html", url.AbsoluteUri);
     }

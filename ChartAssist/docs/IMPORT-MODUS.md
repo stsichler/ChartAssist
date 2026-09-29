@@ -4,7 +4,7 @@ Dieses Dokument beschreibt den Nachfolger von ChartButlerCS. Er stellt **selbst 
 
 Weil das im Grunde ein Neuschreiben ist, entsteht der Nachfolger als **eigenständige Neuentwicklung in einem neuen Repository**, direkt auf moderner Basis (.NET 10, Avalonia, Entwicklung unter Linux mit VS Code). Diese technische Basis beschreibt [TECHNISCHE-BASIS.md](TECHNISCHE-BASIS.md). Sie kommt zuerst, der Import-Modus baut darauf auf. Der vorgeschlagene Name des Nachfolgers ist **ChartAssist** (Hintergrund in TECHNISCHE-BASIS.md).
 
-Status: **Konzept, noch nicht umgesetzt.** Grundlage: ChartButlerCS 2.0.1.1 (Commit `ba93927`), aus dem die Fachlogik übernommen wird.
+Status: **Core umgesetzt (Phase 3), Oberfläche folgt (Phase 4).** Grundlage: ChartButlerCS 2.0.1.1 (Commit `ba93927`), aus dem die Fachlogik übernommen wird.
 
 ---
 
@@ -225,7 +225,8 @@ Die Klasse arbeitet auf dem geladenen `ChartDatabase`-Modell und dem Kartenverze
 1. **Flugplatz zuordnen:**
    - Zuerst über den Permalink: ein Flugplatz, dessen Karten diesen `AirfieldPermalink` haben.
    - Sonst über den ICAO-Code. Dann gilt, wie bisher, die Warnung "Permalink hat sich verändert".
-   - Sonst ist es ein neuer Flugplatz. Nach Rückfrage in der UI wird er angelegt und sein Verzeichnis erstellt. Dabei werden keine Einträge in `Updates` erzeugt, entsprechend `init = true` in ChartButlerCS.
+   - Sonst ist es ein neuer Flugplatz. Nach Rückfrage in der UI wird er angelegt. Dabei werden keine Einträge in `Updates` erzeugt, entsprechend `init = true` in ChartButlerCS.
+   - Umgesetzt: Verzeichnis und Datenbankeintrag entstehen erst mit der ersten übernommenen Karte. Bricht der Benutzer vorher ab, bleibt kein leerer Flugplatz zurück.
 2. **Jede Karte** wird mit dem Algorithmus aus `DFS_DownloadAndCheckChart` geprüft: Karte über Permalink und Namen bzw. über den Dateinamen (`Cname`) suchen und die Vorschau-Bytes mit der lokalen Vorschaudatei vergleichen. Bei einer Abweichung wird die Karte **als ausstehend gemerkt statt heruntergeladen**.
 3. **Verwaiste Karten entfernen** (bisher `DFS_RemoveOrphanCharts`), allerdings nur bei nicht-leerer Kartenliste (5.2).
 4. **Abschluss:**
@@ -252,6 +253,7 @@ Wichtig: **Die Vorschau wird erst geschrieben, wenn die Karte selbst übernommen
 
 Inhalt:
 - Kurze Anleitung: "Eintrag doppelklicken → Seite im Browser mit Strg+S in den Import-Ordner speichern (empfohlen: 'Webseite, nur HTML')".
+- Wird eine Seite als "komplett" gespeichert (erkennbar am Ordner `<Name>_files`, `ImportFolderScanner.IsSavedComplete`), erscheint ein kurzer Tipp: "Speichern Sie als 'Webseite, nur HTML'." Grund: "komplett" ist das vom Browser dargestellte DOM, das Erweiterungen wie Dark Reader verändern; "nur HTML" ist der Originalquelltext. "Komplett" bleibt trotzdem unterstützt, weil es in Firefox der Standard ist.
 - Aufgabenliste (`TreeView` oder `ListBox`) mit Aufgabe und Status. Karten erscheinen eingerückt unter ihrem Flugplatz.
 - Buttons "Im Browser öffnen" (öffnet genau den markierten Eintrag über `Launcher.LaunchUriAsync`, TECHNISCHE-BASIS.md 5.4), "Import-Ordner öffnen" und "Schließen".
 - Umschalter "Immer im Vordergrund" (`Topmost`), damit das Fenster neben dem Browser sichtbar bleibt.

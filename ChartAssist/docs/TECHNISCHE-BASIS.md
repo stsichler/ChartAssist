@@ -475,7 +475,7 @@ Jede Phase endet mit einem baubaren, getesteten Stand. Die Phasen 3 und 4 setzen
      - erledigt: Solution (`ChartAssist.slnx`), zentrale Build-Dateien, Core mit `DfsUrls` und ersten Tests, Avalonia-App mit leerem Hauptfenster (Icon, Versionsnummer), `build.yml`, `release.yml`. Lokal unter Linux gebaut, getestet, gestartet und als Single-File veröffentlicht (3, 8),
      - beide Workflows laufen auf GitHub grün, Release-Entwurf `v0.1.0.0` mit allen vier Paketen erzeugt,
      - Linux auf echtem Rechner geprüft, dazu Startmenü-Eintrag und Desktop-Verknüpfung (6). **Phase 1 abgeschlossen.**
-     - offen: Windows auf echtem Rechner, macOS (Gatekeeper), sobald ein Mac verfügbar ist.
+     - Windows auf echtem Rechner geprüft. Offen: macOS (Gatekeeper), sobald ein Mac verfügbar ist.
 
 2. **Core-Basis** (mittel)
    - Datenmodell mit XML-Reader/-Writer (4.3) und Round-Trip-Tests gegen die echte `.ChartButler.xml`. Die Tests mit echten Daten laufen nur lokal, die Datei liegt in `testdata/`. Für CI eine synthetische, anonymisierte Datei gleichen Aufbaus einchecken.
@@ -490,6 +490,7 @@ Jede Phase endet mit einem baubaren, getesteten Stand. Die Phasen 3 und 4 setzen
 3. **Import-Modus im Core** (mittel), siehe IMPORT-MODUS 5.2–5.4
    - `DfsPageParser` mit Tests gegen **synthetische Fixtures**: von Hand geschriebene Minimalseiten mit derselben HTML-Struktur wie die DFS-Seiten, jeweils als "nur HTML" und "komplett", mit kleinen generierten PNGs statt echter Karten. Zusätzlich Tests gegen `testdata/`, die übersprungen werden, wenn der Ordner fehlt.
    - `ChartImport` und `ImportFolderScanner` mit Tests in einem temporären Kartenverzeichnis: neuer Flugplatz, unverändert, geänderte Karte, entfallene Karte, leere Kartenliste.
+   - **Erledigt am 29.09.2026.** Synthetische Seiten erzeugt `tests/…/Dfs/DfsTestPages.cs` in beiden Formaten ("komplett" mit Dark-Reader-Attributen). Gegen die echten Daten bestätigt: beide Formate liefern dieselben Karten und Vorschauen; EDFM ist "alles aktuell" ohne Dateiänderung; ohne Vorschau wird die Karte angefordert, danach sind PNG und Vorschau identisch mit dem Original und das TripKit ist neu erzeugt.
 
 4. **Oberfläche** (groß)
    - `MessageDialog`, dann `MainWindow` (Baum, Vorschau, Banner, Buttons), `AbgleichWindow`, `OptionsWindow`, `UpdateOverviewWindow`, `HelpWindow`.
