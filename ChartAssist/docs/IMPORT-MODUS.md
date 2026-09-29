@@ -257,6 +257,7 @@ Inhalt:
 - Aufgabenliste (`TreeView` oder `ListBox`) mit Aufgabe und Status. Karten erscheinen eingerückt unter ihrem Flugplatz.
 - Buttons "Im Browser öffnen" (öffnet genau den markierten Eintrag über `Launcher.LaunchUriAsync`, TECHNISCHE-BASIS.md 5.4), "Import-Ordner öffnen" und "Schließen".
 - Umschalter "Immer im Vordergrund" (`Topmost`), damit das Fenster neben dem Browser sichtbar bleibt.
+- Das Fenster hat keinen Besitzer. Sonst käme beim Klick hinein auch das Hauptfenster vor den Browser. Es schließt sich mit dem Hauptfenster.
 - Statuszeile mit der letzten Meldung.
 
 Verhalten:
