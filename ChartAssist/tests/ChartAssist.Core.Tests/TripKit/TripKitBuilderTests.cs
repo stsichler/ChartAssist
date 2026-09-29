@@ -92,6 +92,26 @@ public sealed partial class TripKitBuilderTests : IDisposable
     }
 
     [Fact]
+    public void UpdateAll_ErzeugtUndEntferntAlleTripKits()
+    {
+        (ChartFolder folder, ChartDatabase database, Airfield airfield) = CreateAirfield(
+            ("EDXA Musterstadt 1.png", Portrait, new DateOnly(2026, 3, 19)));
+
+        TripKitBuilder.UpdateAll(folder, database, create: true);
+        Chart tripKit = database.FindChart("EDXA_TripKit_Charts.pdf")!;
+        string pdfPath = Utility.BuildChartPath(folder.Path, airfield, tripKit);
+        string previewPath = Utility.BuildChartPreviewPath(folder.Path, airfield, tripKit, "jpg");
+        Assert.True(File.Exists(pdfPath));
+
+        TripKitBuilder.UpdateAll(folder, database, create: false);
+
+        Assert.Null(database.FindChart("EDXA_TripKit_Charts.pdf"));
+        Assert.False(File.Exists(pdfPath));
+        Assert.False(File.Exists(previewPath));
+        Assert.Single(database.Charts);
+    }
+
+    [Fact]
     public void EchteKarten_GleicheSeitenzahlWieChartButlerCS()
     {
         string copy = Path.Combine(_root, "testcharts");

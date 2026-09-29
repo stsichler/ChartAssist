@@ -21,6 +21,9 @@
     </Grid>
     <TextBlock Text="Hierhin speichern Sie die Seiten der DFS aus dem Browser." TextWrapping="Wrap" Opacity="0.7" FontSize="12" />
 
+    <CheckBox x:Name="TripKitBox" Content="TripKit-PDF je Flugplatz erzeugen" Margin="0,12,0,0" />
+    <TextBlock Text="Fasst alle Karten eines Flugplatzes in einem PDF zum Ausdrucken zusammen." TextWrapping="Wrap" Opacity="0.7" FontSize="12" />
+
     <TextBlock x:Name="ErrorText" Foreground="DarkRed" TextWrapping="Wrap" IsVisible="False" Margin="0,8,0,0" />
 
     <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8" Margin="0,16,0,0">

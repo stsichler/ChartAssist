@@ -93,16 +93,19 @@ public sealed class ChartImport
     private readonly ChartFolder _folder;
     private readonly ChartDatabase _database;
     private readonly string _programVersion;
+    private readonly bool _createTripKit;
     private readonly List<AirfieldTask> _airfields = [];
     private readonly List<PendingChart> _pendingCharts = [];
     private readonly List<UpdatedChart> _updatedCharts = [];
 
     /// <param name="programVersion">Vierstellige Programmversion; eine andere Version in der Datenbank erzwingt einen vollständigen Abgleich.</param>
-    public ChartImport(ChartFolder folder, ChartDatabase database, string programVersion, ImportMode mode)
+    /// <param name="createTripKit">TripKit-PDF erzeugen (Einstellung). Ist es aus, wird ein vorhandenes TripKit entfernt, statt zu veralten.</param>
+    public ChartImport(ChartFolder folder, ChartDatabase database, string programVersion, ImportMode mode, bool createTripKit = true)
     {
         _folder = folder;
         _database = database;
         _programVersion = programVersion;
+        _createTripKit = createTripKit;
         Mode = mode;
 
         if (mode == ImportMode.UpdateCharts)
@@ -364,6 +367,12 @@ public sealed class ChartImport
 
     private void UpdateTripKit(AirfieldTask task)
     {
+        if (!_createTripKit)
+        {
+            TripKitBuilder.Remove(_folder, _database, task.Airfield);
+            return;
+        }
+
         Chart? tripKit = TripKitBuilder.Update(_folder, _database, task.Airfield);
         if (tripKit == null)
         {
@@ -379,6 +388,11 @@ public sealed class ChartImport
     private void CompleteAirfield(AirfieldTask task)
     {
         task.Status = AirfieldTaskStatus.Done;
+        if (!_createTripKit)
+        {
+            // Auch bei aktuellen Karten: Ein nicht mehr gepflegtes TripKit würde unbemerkt veralten
+            TripKitBuilder.Remove(_folder, _database, task.Airfield);
+        }
 
         if (Mode == ImportMode.AddAirfield)
         {

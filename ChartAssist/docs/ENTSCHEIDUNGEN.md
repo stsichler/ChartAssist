@@ -49,7 +49,7 @@ Ziel: ein Werkzeug, das dem Piloten die Verwaltung der Karten abnimmt, ohne selb
 ## 4. Noch offen
 
 - Ob die Datenbankdatei `.ChartButler.xml` umbenannt wird (TECHNISCHE-BASIS.md, Abschnitt 13).
-- Ob das TripKit wegen §8 (abgeleitete Werke) optional wird.
+- Ob das TripKit wegen §8 (abgeleitete Werke) optional wird. Umgesetzt im Branch `feature/tripkit-optional`; der Benutzer sieht §8 nicht verletzt und entscheidet noch über die Übernahme.
 - Test mit Chrome/Edge (IMPORT-MODUS.md, Abschnitt 4, Frage 9).
 
 ## 5. Bereits geprüft

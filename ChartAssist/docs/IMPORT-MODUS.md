@@ -330,7 +330,7 @@ Die Logik (Parser, Import, Datenbank) wird mit xUnit getestet (TECHNISCHE-BASIS.
 | Thema | Vorschlag |
 |---|---|
 | Ort des Import-Ordners | Standard `<Kartenverzeichnis>/Import`, konfigurierbar. Alternative: ein eigener Ordner außerhalb, falls das Kartenverzeichnis z. B. auf ein Tablet synchronisiert wird. |
-| TripKit optional machen (§8, abgeleitete Werke) | Einstellung im `OptionsWindow`; Standard offen lassen, bis die Rechtslage klarer ist |
+| TripKit optional machen (§8, abgeleitete Werke) | Umgesetzt im Branch `feature/tripkit-optional`, noch nicht in `main`: Einstellung "TripKit-PDF je Flugplatz erzeugen" in den Optionen, Standard an. Beim Ausschalten werden vorhandene TripKits nach Rückfrage gelöscht, weil ein nicht gepflegtes TripKit unbemerkt veralten würde; beim Einschalten werden alle sofort erzeugt. |
 | Fortschritt über Programmneustarts hinweg merken | Zunächst nicht. Eine Sitzung dauert nur Minuten. Später optional, z. B. über ein zusätzliches Element `LastChecked` je Flugplatz. Vorher prüfen, ob ChartButlerCS 2.0.x eine Datei mit unbekannten Elementen noch liest (TECHNISCHE-BASIS.md 4.3, Rückwärtskompatibilität). |
 | GAT24-Altbestände | Keine Migration mehr. Nutzer alter GAT24-Datenbanken abonnieren ihre Plätze neu. |
 | Kartenaufgaben mit direktem Link | Umsetzen (Abschnitt 4, Frage 5). Das URL-Schema für "nur HTML" beruht auf einer einzigen Ausgabe. Schlägt der Link fehl, klickt der Benutzer die Karte in der Flugplatzseite an. |

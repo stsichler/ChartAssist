@@ -18,11 +18,14 @@ public partial class OptionsWindow : Window
     {
         ChartFolderBox.Text = settings.ChartFolder;
         ImportFolderBox.Text = settings.ImportFolder;
+        TripKitBox.IsChecked = settings.CreateTripKit;
     }
 
     public string ChartFolder => ChartFolderBox.Text?.Trim() ?? "";
 
     public string ImportFolder => ImportFolderBox.Text?.Trim() ?? "";
+
+    public bool CreateTripKit => TripKitBox.IsChecked == true;
 
     private async void OnBrowseChartFolder(object? sender, RoutedEventArgs e)
     {

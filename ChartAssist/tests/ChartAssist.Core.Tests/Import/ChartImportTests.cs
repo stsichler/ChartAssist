@@ -301,6 +301,31 @@ public sealed class ChartImportTests : IDisposable
         Assert.Equal(2, _database.ChartsOf(_airfield).Count(c => !c.IsTripKit));
     }
 
+    [Fact]
+    public void OhneTripKit_KeinTripKitUndVorhandenesWirdEntfernt()
+    {
+        var import = new ChartImport(_folder, _database, Version, ImportMode.UpdateCharts, createTripKit: false);
+        import.Import(AirfieldPage(NewEdition, ("EDXA Musterstadt 1", "h1", Preview2), ("AD 2-1", "h2", Preview2)));
+
+        import.Import(DfsTestPages.ChartPage(NewEdition, "h1", "EDXA Musterstadt 1", null, Chart2, SaveFormat.HtmlOnly));
+
+        Assert.Null(_database.FindChart("EDXA_TripKit_Charts.pdf"));
+        Assert.False(File.Exists(ChartPath("EDXA_TripKit_Charts.pdf")));
+        Assert.Equal(["EDXA Musterstadt 1.png"], import.UpdatedCharts.Select(c => c.Name));
+    }
+
+    [Fact]
+    public void OhneTripKit_AuchBeiAktuellenKartenEntfernt()
+    {
+        var import = new ChartImport(_folder, _database, Version, ImportMode.UpdateCharts, createTripKit: false);
+
+        import.Import(AirfieldPage(NewEdition, ("EDXA Musterstadt 1", "h1", Preview1), ("AD 2-1", "h2", Preview2)));
+
+        Assert.Null(_database.FindChart("EDXA_TripKit_Charts.pdf"));
+        Assert.False(File.Exists(ChartPath("EDXA_TripKit_Charts.pdf")));
+        Assert.Equal(ImportSessionState.Completed, import.State);
+    }
+
     // Lokale Tests gegen echte Daten (IMPORT-MODUS 5.2)
 
     [Theory]
