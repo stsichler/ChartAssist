@@ -132,9 +132,6 @@ public sealed class ChartImport
 
     public IReadOnlyList<UpdatedChart> UpdatedCharts => _updatedCharts;
 
-    /// <summary>Eine sonstige DFS-Seite (Flugplatzverzeichnis oder Startseite) wurde gespeichert.</summary>
-    public bool OtherPageImported { get; private set; }
-
     public bool IsFinished => State is ImportSessionState.NothingToDo or ImportSessionState.Completed or ImportSessionState.Aborted;
 
     /// <summary>Wertet eine gespeicherte Seite aus.</summary>
@@ -184,11 +181,10 @@ public sealed class ChartImport
         return CheckCharts(task, page, warning: null);
     }
 
-    private ImportResult ApplyOtherPage()
-    {
-        OtherPageImported = true;
-        return new ImportResult(ImportOutcome.Processed, $"Effective: {Format(Effective!.Value)} erkannt. Bitte jetzt die Flugplatzseiten speichern.");
-    }
+    /// <summary>Startseite oder Flugplatzverzeichnis: liefert nur das Effective-Datum, sonst wird die Seite nicht gebraucht.</summary>
+    private ImportResult ApplyOtherPage() => new(ImportOutcome.Processed, Mode == ImportMode.AddAirfield
+        ? "Diese Seite wird nicht gebraucht. Bitte im Browser zum Flugplatz wechseln und dessen Seite speichern."
+        : $"Effective: {Format(Effective!.Value)} erkannt. Bitte jetzt die Flugplatzseiten speichern.");
 
     private ImportResult? CheckEffectiveDate(DateOnly effective)
     {

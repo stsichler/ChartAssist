@@ -223,7 +223,6 @@ public sealed class ChartImportTests : IDisposable
 
         Assert.Equal(ImportOutcome.Processed, result.Outcome);
         Assert.Equal(NewEdition, import.Effective);
-        Assert.True(import.OtherPageImported);
         Assert.Equal(AirfieldTaskStatus.Open, import.Airfields.Single().Status);
     }
 

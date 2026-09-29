@@ -155,18 +155,20 @@ public partial class AbgleichViewModel : ViewModelBase
 
     /// <summary>
     /// Baut die Aufgabenliste neu auf und markiert den nächsten offenen Eintrag, ohne ihn zu öffnen (Leitplanke 3).
-    /// Regel für alle Einträge: abgehakt, sobald die Seite, auf die der Link zeigt, übernommen ist.
+    /// Regel für alle Aufgaben: abgehakt, sobald die Seite, auf die der Link zeigt, übernommen ist.
     /// </summary>
     public void RebuildItems()
     {
         Items.Clear();
 
-        // Das Flugplatzverzeichnis beim Hinzufügen, und beim Abgleich für Flugplätze ohne bekannten Permalink
+        // Das Flugplatzverzeichnis ist nur ein Einstieg, um im Browser zum Flugplatz zu navigieren. Es muss nicht
+        // gespeichert werden und wird deshalb nie abgehakt. Beim Hinzufügen, und beim Abgleich für Flugplätze
+        // ohne bekannten Permalink.
+        TaskItemViewModel? directory = null;
         if (Import.Mode == ImportMode.AddAirfield || Import.Airfields.Any(t => t.Link == null))
         {
-            bool saved = Import.OtherPageImported;
-            Items.Add(new TaskItemViewModel(saved ? "✓" : "○", "Flugplatzverzeichnis", DfsUrls.AirfieldDirectory,
-                isOpen: !saved && !Import.IsFinished, isChart: false));
+            directory = new TaskItemViewModel("→", "Flugplatzverzeichnis öffnen", DfsUrls.AirfieldDirectory, isOpen: false, isChart: false);
+            Items.Add(directory);
         }
 
         foreach (AirfieldTask task in Import.Airfields)
@@ -191,7 +193,6 @@ public partial class AbgleichViewModel : ViewModelBase
             }
         }
 
-        SelectedItem = Items.FirstOrDefault(i => i.IsOpen && i.Link != null && i.Link != DfsUrls.AirfieldDirectory)
-            ?? Items.FirstOrDefault(i => i.IsOpen);
+        SelectedItem = Items.FirstOrDefault(i => i.IsOpen && i.Link != null) ?? directory ?? Items.FirstOrDefault(i => i.IsOpen);
     }
 }
