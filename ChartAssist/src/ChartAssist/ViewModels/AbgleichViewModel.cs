@@ -159,7 +159,9 @@ public partial class AbgleichViewModel : ViewModelBase
         Items.Clear();
         if (Import.Mode == ImportMode.AddAirfield)
         {
-            Items.Add(new TaskItemViewModel("→", "Flugplatzverzeichnis", DfsUrls.AirfieldDirectory, isOpen: true, isChart: false));
+            // Erledigt, sobald die Seite eines Flugplatzes übernommen ist; bleibt für weitere Plätze anklickbar
+            bool found = Import.Airfields.Count > 0;
+            Items.Add(new TaskItemViewModel(found ? "✓" : "○", "Flugplatzverzeichnis", DfsUrls.AirfieldDirectory, isOpen: !found, isChart: false));
         }
 
         foreach (AirfieldTask task in Import.Airfields)
@@ -173,10 +175,16 @@ public partial class AbgleichViewModel : ViewModelBase
             Items.Add(new TaskItemViewModel(symbol, $"{task.Icao} – {task.Name}", task.Link ?? DfsUrls.AirfieldDirectory,
                 task.Status == AirfieldTaskStatus.Open && !Import.IsFinished, isChart: false));
 
-            foreach (PendingChart chart in Import.PendingCharts.Where(p => p.Icao == task.Icao))
+            // Übernommene Karten bleiben abgehakt stehen, in der Reihenfolge der Flugplatzseite
+            var charts = Import.CompletedCharts.Where(c => c.Icao == task.Icao).Select(c => (Chart: c, Done: true))
+                .Concat(Import.PendingCharts.Where(p => p.Icao == task.Icao).Select(p => (Chart: p, Done: false)))
+                .OrderBy(c => c.Chart.Position);
+            foreach ((PendingChart chart, bool done) in charts)
             {
-                Items.Add(new TaskItemViewModel("○", "Bitte speichern: " + Path.GetFileNameWithoutExtension(chart.ChartName),
-                    chart.Link, isOpen: !Import.IsFinished, isChart: true));
+                string name = Path.GetFileNameWithoutExtension(chart.ChartName);
+                Items.Add(done
+                    ? new TaskItemViewModel("✓", name, chart.Link, isOpen: false, isChart: true)
+                    : new TaskItemViewModel("○", "Bitte speichern: " + name, chart.Link, isOpen: !Import.IsFinished, isChart: true));
             }
         }
 

@@ -76,7 +76,8 @@ public sealed class AirfieldTask
 }
 
 /// <summary>Aufgabe "Bitte speichern: Karte", zugeordnet über den Hash der Kartenseite.</summary>
-public sealed record PendingChart(string Icao, string ChartName, string ServerName, string AirfieldPermalink, string Hash, Uri Link, byte[] Preview);
+/// <param name="Position">Stelle auf der Flugplatzseite, für die Reihenfolge in der Aufgabenliste.</param>
+public sealed record PendingChart(string Icao, string ChartName, string ServerName, string AirfieldPermalink, string Hash, Uri Link, byte[] Preview, int Position);
 
 /// <summary>In dieser Sitzung aktualisierte Karte, für die Übersicht am Ende.</summary>
 public sealed record UpdatedChart(string Name, string Path);
@@ -94,6 +95,7 @@ public sealed class ChartImport
     private readonly string _programVersion;
     private readonly List<AirfieldTask> _airfields = [];
     private readonly List<PendingChart> _pendingCharts = [];
+    private readonly List<PendingChart> _completedCharts = [];
     private readonly List<UpdatedChart> _updatedCharts = [];
 
     /// <param name="programVersion">Vierstellige Programmversion; eine andere Version in der Datenbank erzwingt einen vollständigen Abgleich.</param>
@@ -124,6 +126,9 @@ public sealed class ChartImport
     public IReadOnlyList<AirfieldTask> Airfields => _airfields;
 
     public IReadOnlyList<PendingChart> PendingCharts => _pendingCharts;
+
+    /// <summary>In dieser Sitzung angeforderte und übernommene Karten; sie bleiben abgehakt in der Aufgabenliste.</summary>
+    public IReadOnlyList<PendingChart> CompletedCharts => _completedCharts;
 
     public IReadOnlyList<UpdatedChart> UpdatedCharts => _updatedCharts;
 
@@ -234,8 +239,9 @@ public sealed class ChartImport
         _pendingCharts.RemoveAll(p => p.Icao == airfield.Icao);
 
         var serverNames = new HashSet<string>(StringComparer.Ordinal);
-        foreach (DfsChartEntry entry in page.Charts)
+        for (int position = 0; position < page.Charts.Count; position++)
         {
+            DfsChartEntry entry = page.Charts[position];
             string serverName = entry.Name.StartsWith(airfield.Icao, StringComparison.Ordinal) ? entry.Name : airfield.Icao + " " + entry.Name;
             serverNames.Add(serverName);
 
@@ -258,8 +264,9 @@ public sealed class ChartImport
                 && Utility.FileEquals(Utility.BuildChartPreviewPath(_folder.Path, airfield, probe, "png"), entry.PreviewPng);
             if (!isCurrent)
             {
+                _completedCharts.RemoveAll(c => c.Icao == airfield.Icao && c.ChartName == chartName);
                 _pendingCharts.Add(new PendingChart(airfield.Icao, chartName, serverName, page.Permalink, entry.Hash,
-                    ChartLink(entry, page.Effective), entry.PreviewPng));
+                    ChartLink(entry, page.Effective), entry.PreviewPng, position));
             }
         }
 
@@ -332,6 +339,7 @@ public sealed class ChartImport
         }
 
         _pendingCharts.Remove(pending);
+        _completedCharts.Add(pending);
         _updatedCharts.Add(new UpdatedChart(chart.Name, chartPath));
 
         int remaining = _pendingCharts.Count(p => p.Icao == airfield.Icao);
