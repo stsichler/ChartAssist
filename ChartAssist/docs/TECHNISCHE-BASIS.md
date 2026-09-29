@@ -391,7 +391,7 @@ dotnet publish src/ChartAssist -c Release -r osx-x64   --self-contained true
 - Die Release-Pipeline setzt zusätzlich `-p:DebugType=none` (keine `.pdb` neben der Datei) und `-p:Version=<aus dem Tag>`.
 
 - **Warum pro Plattform:** Runtime und Avalonias native Bibliotheken (Skia, HarfBuzz) sind je Betriebssystem und Architektur verschieden. Außerdem erzeugt nur ein plattformspezifischer Build eine direkt startbare Datei (`ChartAssist.exe`, `ChartAssist`, `.app`).
-- **Größe:** Das ist der Preis von self-contained. Die Datei enthält Runtime, Avalonia und Skia. Gemessen in Phase 1 (leeres Hauptfenster, ohne Trimming), Download-Archive: `win-x64` 42 MB, `linux-x64` 40 MB, `macos-arm64` 43 MB, `macos-x64` 45 MB. Entpackt ist die Linux-Datei 49 MB groß.
+- **Größe:** Das ist der Preis von self-contained. Die Datei enthält Runtime, Avalonia und Skia. Gemessen in Phase 1 (leeres Hauptfenster, ohne Trimming), Download-Archive: `win-x64` 42 MB, `linux-x64` 40 MB, `macos-arm64` 43 MB, `macos-x64` 45 MB. Entpackt ist die Linux-Datei 49 MB groß. Mit Trimming (v0.2.0.0, vollständige App): `win-x64` 17 MB, `linux-x64` 16 MB, `macos-arm64` 20 MB, `macos-x64` 21 MB.
 - **Trimming** (`-p:PublishTrimmed=true`) verkleinert die Datei deutlich. Voraussetzungen:
   - Compiled Bindings in Avalonia (5.1),
   - kein reflection-basierter Code im Core (DataSet und `XmlSerializer` werden deshalb vermieden, 4.3),
