@@ -133,8 +133,13 @@ public partial class MainWindow : Window
             vm.IsSessionOpen = false;
             vm.Refresh();
 
-            // Das Hauptfenster liegt meist noch hinter dem Browser
+            // Das Hauptfenster liegt meist noch hinter dem Browser. Activate allein genügt nicht immer: GNOME lehnt
+            // es ab, wenn ChartAssist gerade nicht aktiv ist (automatisches Schließen), und zeigt nur eine Meldung.
+            // Kurz "immer im Vordergrund" ändert dagegen nur die Stapelreihenfolge.
             Activate();
+            Topmost = true;
+            await Task.Delay(TimeSpan.FromMilliseconds(300));
+            Topmost = false;
             if (import.UpdatedCharts.Count > 0)
             {
                 new UpdateOverviewWindow(import.UpdatedCharts).Show(this);

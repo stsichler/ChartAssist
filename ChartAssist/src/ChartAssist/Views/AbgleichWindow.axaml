@@ -31,7 +31,7 @@
     <Button DockPanel.Dock="Bottom" Content="Im Browser öffnen" Click="OnOpenInBrowser" HorizontalAlignment="Left" Margin="0,8,0,0" />
 
     <ListBox x:Name="TaskList" ItemsSource="{Binding Items}" SelectedItem="{Binding SelectedItem}"
-             Tapped="OnTaskTapped" KeyDown="OnTaskKeyDown">
+             Tapped="OnTaskTapped">
       <ListBox.ItemTemplate>
         <DataTemplate DataType="vm:TaskItemViewModel">
           <StackPanel Orientation="Horizontal" Spacing="8" Classes.chart="{Binding IsChart}">
