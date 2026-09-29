@@ -1,11 +1,17 @@
 # ChartAssist
 
-**In Entwicklung.** ChartAssist ist der Nachfolger von [ChartButlerCS](https://github.com/stsichler/ChartButlerCS).
+**In Entwicklung.** Nachfolger von [ChartButlerCS](https://github.com/stsichler/ChartButlerCS).
 
-ChartAssist verwaltet VFR-Anflugkarten der BasicVFR AIP der DFS in einem lokalen Kartenverzeichnis und erzeugt pro Flugplatz ein TripKit-PDF. Anders als ChartButlerCS greift ChartAssist dabei **nicht selbst auf die Server der DFS zu**: Sie rufen die Seiten wie gewohnt im Browser auf und speichern sie, ChartAssist übernimmt den Rest.
+ChartAssist hilft Ihnen, die VFR-Anflugkarten der BasicVFR AIP der DFS aktuell zu halten: Es behält den Überblick über Ihre lokal gespeicherten Karten, zeigt Ihnen, welche Seiten Sie aufrufen müssen, übernimmt die gespeicherten Karten und erzeugt pro Flugplatz ein TripKit-PDF.
 
-Läuft unter Windows, Linux und macOS. Bestehende Kartenverzeichnisse von ChartButlerCS können weiterverwendet werden.
+## Sie rufen die Seiten selbst auf – mit Absicht
+
+Die Nutzungsbedingungen der DFS verbieten den Zugriff auf die AIP mit automatisierten Tools. Deshalb greift ChartAssist **nie selbst** auf die DFS zu: Sie öffnen jede Seite im Browser und speichern sie mit Strg+S, den Rest erledigt ChartAssist.
+
+ChartButlerCS hat die Karten noch automatisch geladen und wird deshalb nicht weiterentwickelt. ChartAssist ersetzt es. Ihr bisheriges Kartenverzeichnis können Sie weiterverwenden.
+
+Läuft unter Windows, Linux und macOS.
 
 ## Entstehung mit KI-Unterstützung
 
-ChartAssist wird mit Unterstützung von KI entwickelt (Claude Code von Anthropic). Quellcode, Kommentare und Dokumentation sind ganz oder teilweise KI-generiert, unter Anleitung des Autors, der die fachlichen und technischen Entscheidungen trifft. Commits mit KI-Beteiligung sind mit einer `Co-Authored-By`-Zeile gekennzeichnet. Einzelheiten stehen in der [LICENSE](LICENSE).
+ChartAssist wird mit KI entwickelt (Claude Code von Anthropic). Quellcode und Dokumentation sind ganz oder teilweise KI-generiert. Details: [LICENSE](LICENSE).
