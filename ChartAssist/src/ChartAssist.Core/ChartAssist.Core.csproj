@@ -2,4 +2,8 @@
   <PropertyGroup>
     <IsTrimmable>true</IsTrimmable>
   </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="PDFsharp" />
+    <PackageReference Include="SkiaSharp" />
+  </ItemGroup>
 </Project>
