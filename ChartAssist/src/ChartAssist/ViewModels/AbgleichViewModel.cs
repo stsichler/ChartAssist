@@ -177,7 +177,8 @@ public partial class AbgleichViewModel : ViewModelBase
             Items.Add(new TaskItemViewModel(pageSaved ? "✓" : "○", text, task.Link,
                 isOpen: !pageSaved && !Import.IsFinished, isChart: false));
 
-            // Übernommene Karten bleiben abgehakt stehen, in der Reihenfolge der Flugplatzseite
+            // Übernommene Karten bleiben abgehakt stehen, in der Reihenfolge der Flugplatzseite. "Bitte speichern:"
+            // nur bei geänderten Karten; bei einem neuen Flugplatz ist ohnehin klar, dass alle zu speichern sind
             var charts = Import.CompletedCharts.Where(c => c.Icao == task.Icao).Select(c => (Chart: c, Done: true))
                 .Concat(Import.PendingCharts.Where(p => p.Icao == task.Icao).Select(p => (Chart: p, Done: false)))
                 .OrderBy(c => c.Chart.Position);
@@ -186,7 +187,7 @@ public partial class AbgleichViewModel : ViewModelBase
                 string name = Path.GetFileNameWithoutExtension(chart.ChartName);
                 Items.Add(done
                     ? new TaskItemViewModel("✓", name, chart.Link, isOpen: false, isChart: true)
-                    : new TaskItemViewModel("○", "Bitte speichern: " + name, chart.Link, isOpen: !Import.IsFinished, isChart: true));
+                    : new TaskItemViewModel("○", task.IsNew ? name : "Bitte speichern: " + name, chart.Link, isOpen: !Import.IsFinished, isChart: true));
             }
         }
 

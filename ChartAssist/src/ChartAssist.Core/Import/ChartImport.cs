@@ -72,7 +72,7 @@ public sealed class AirfieldTask
     internal Airfield Airfield { get; }
 
     /// <summary>Neu abonniert: alle Karten werden übernommen, ohne Einträge unter "Aktualisierungen".</summary>
-    internal bool IsNew { get; }
+    public bool IsNew { get; }
 }
 
 /// <summary>Aufgabe "Bitte speichern: Karte", zugeordnet über den Hash der Kartenseite.</summary>
