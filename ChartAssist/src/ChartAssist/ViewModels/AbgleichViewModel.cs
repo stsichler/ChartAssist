@@ -14,7 +14,7 @@ public sealed class TaskItemViewModel(string symbol, string text, Uri? link, boo
 
     public string Text { get; } = text;
 
-    /// <summary>Die eine Seite, die ein Doppelklick im Browser öffnet.</summary>
+    /// <summary>Die eine Seite, die ein Klick im Browser öffnet.</summary>
     public Uri? Link { get; } = link;
 
     public bool IsOpen { get; } = isOpen;
@@ -48,10 +48,10 @@ public partial class AbgleichViewModel : ViewModelBase
     public string Title => Import.Mode == ImportMode.AddAirfield ? "Flugplatz hinzufügen" : "Kartenabgleich";
 
     public string Instructions =>
-        "Doppelklick auf einen Eintrag öffnet die Seite im Browser. Speichern Sie sie dort mit Strg+S "
+        "Klick auf einen Eintrag öffnet die Seite im Browser. Speichern Sie sie dort mit Strg+S "
         + "als „Webseite, nur HTML“ in den Import-Ordner. Den Rest erledigt ChartAssist.";
 
-    public string ImportFolderText => "Import-Ordner: " + Scanner.Folder;
+    public string ImportFolder => Scanner.Folder;
 
     public ObservableCollection<TaskItemViewModel> Items { get; } = [];
 
