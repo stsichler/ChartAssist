@@ -39,6 +39,12 @@ Ziel: ein Werkzeug, das dem Piloten die Verwaltung der Karten abnimmt, ohne selb
 9. **ChartButlerCS wird nicht weiterentwickelt**, auch Fehler werden dort nicht mehr behoben. Der Download bleibt verfügbar: Die Software weist auf die Nutzungsbedingungen hin, die Entscheidung über die Nutzung liegt beim Anwender. Ein letztes Release im alten Repository ist vorgemerkt (TECHNISCHE-BASIS.md, Abschnitt 11, Phase 6). Es verweist die Anwender über die vorhandene Versionsprüfung auf ChartAssist, ganz ohne Codeänderung.
 
 10. **Lizenz: "Alle Rechte vorbehalten"**, wie bisher bei ChartButlerCS, keine Open-Source-Lizenz (`LICENSE` im Git-Root). Das Programm ist frei erhältlich, der Quellcode öffentlich einsehbar. Hintergrund: Die Idee und die Originalversion stammen von Jörg Pauly, ChartButlerCS entstand mit seiner Genehmigung unter "alle Rechte vorbehalten". Eine Open-Source-Lizenz würde vorher seine Zustimmung erfordern, soweit Code oder Texte übernommen werden. Das GitHub-Repository ist öffentlich.
+11. **Offene Kennzeichnung der KI-Unterstützung.** ChartAssist wird mit Claude Code entwickelt. Weil die rechtlichen Fragen zu KI-generierten Inhalten (Urheberrecht, Kennzeichnung) noch nicht vollständig geklärt sind, wird das freiwillig und sichtbar ausgewiesen, in Anlehnung an die Transparenzpflichten der EU-KI-Verordnung (Art. 50), die Quellcode nicht ausdrücklich erfasst. Orte:
+    - README (Abschnitt "Entstehung mit KI-Unterstützung") und LICENSE,
+    - `Co-Authored-By`-Zeile in jedem Commit mit KI-Beteiligung, damit ist die Kennzeichnung je Änderung maschinenlesbar in der Git-Historie,
+    - Hilfe-Fenster der Anwendung (Reiter mit den Programminformationen) und Release-Notes.
+
+    Kopfzeilen in jeder Quelldatei gibt es nicht: Sie stünden in jeder Datei und brächten gegenüber dem zentralen Hinweis keine zusätzliche Information. In der LICENSE steht außerdem, dass der Vorbehalt der Rechte nur gilt, soweit Schutzrechte bestehen. Rein KI-generierte Teile sind nach deutschem Recht mangels menschlicher Schöpfung möglicherweise nicht geschützt.
 
 ## 4. Noch offen
 

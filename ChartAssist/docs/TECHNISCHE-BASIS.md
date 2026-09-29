@@ -300,7 +300,7 @@ public sealed class Chart
 | `AbgleichWindow` + ViewModel | – (neu) | Aufgabenliste des Import-Modus, `Topmost` umschaltbar, Import-Timer über `DispatcherTimer`. Details: IMPORT-MODUS 5.5 |
 | `UpdateOverviewWindow` | `dlgUpdateOverview` | `ListView` → `ListBox`. "Alle kopieren" nutzt `StorageProvider.OpenFolderPickerAsync`. "Sofort drucken" öffnet die Datei, also Launcher |
 | `OptionsWindow` | `frmOptions` | Kartenverzeichnis und neu der Import-Ordner über `StorageProvider.OpenFolderPickerAsync()` + `IStorageFolder.TryGetLocalPath()` |
-| `HelpWindow` | `frmHelp` | `TabControl` bleibt. Links als `HyperlinkButton` |
+| `HelpWindow` | `frmHelp` | `TabControl` bleibt. Links als `HyperlinkButton`. Die Programminformationen enthalten den Hinweis auf die Entwicklung mit KI-Unterstützung (ENTSCHEIDUNGEN.md, 3.11) |
 | `MessageDialog` | `MessageBox.Show` | Avalonia hat keine eingebaute MessageBox. Ein kleines eigenes Fenster (OK, OK/Abbrechen, Ja/Nein, Standard-Button) oder NuGet `MessageBox.Avalonia` |
 
 Entfallen: `dlgStatus` (kein Worker mehr) und `InputBox` (neue Flugplätze werden über die gespeicherte Seite erkannt, IMPORT-MODUS 3.3).
@@ -481,7 +481,7 @@ Jede Phase endet mit einem baubaren, getesteten Stand. Die Phasen 3 und 4 setzen
      - zwei `ChartButlerCS.config` als Testdateien in `testdata/` (siehe unten),
      - erster Commit.
    - **Offen:**
-     - GitHub-Repository `stsichler/ChartAssist` (öffentlich) anlegen und verbinden.
+     - keiner mehr (GitHub-Repository `stsichler/ChartAssist`, öffentlich, verbunden am 29.09.2026).
    - **Testdateien `ChartButlerCS.config`** für die Übernahme der Einstellungen (10, Phase 2):
      - `testdata/ChartButlerCS.config`: echte Datei aus `~/.config`, unverändert. UTF-8 **mit BOM**, LF, ohne Zeilenumbruch am Ende. `ChartFolder` ist leer, enthält aber Leerraum (`<value>` + Zeilenumbruch + Einrückung + `</value>`), also beim Lesen trimmen. Enthält noch den veralteten Schlüssel `ServerUsername`, der ignoriert werden muss.
      - `testdata/ChartButlerCS_Kartenverzeichnis.config`: im selben Format, `ChartFolder` zeigt auf das lokale `testcharts/`. Für CI in Phase 2 eine synthetische Kopie mit einem Pfad in einem Temp-Verzeichnis anlegen, die Datei enthält keine DFS-Inhalte.

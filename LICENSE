@@ -6,6 +6,12 @@ Weiterentwicklung mit freundlicher Genehmigung von Jörg Pauly.
 
 Alle Rechte vorbehalten.
 
+Hinweis zur Entstehung: ChartAssist wird mit Unterstützung von KI entwickelt
+(Claude Code von Anthropic). Quellcode, Kommentare und Dokumentation sind ganz
+oder teilweise KI-generiert, unter Anleitung des Autors. Commits mit
+KI-Beteiligung sind mit einer "Co-Authored-By"-Zeile gekennzeichnet. Der
+Vorbehalt der Rechte gilt, soweit Schutzrechte bestehen.
+
 Das Programm ist frei erhältlich und darf kostenlos genutzt werden.
 
 Der Quellcode wird zur Einsicht veröffentlicht. Er steht nicht unter einer

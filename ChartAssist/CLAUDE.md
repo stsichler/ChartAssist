@@ -9,7 +9,7 @@ ChartAssist ist der Nachfolger von ChartButlerCS: eine Desktop-Anwendung für Wi
 Der grundlegende Unterschied zu ChartButlerCS: **ChartAssist greift selbst nie auf die DFS zu.** Der Benutzer ruft die Seiten im Browser auf und speichert sie mit Strg+S in einen Import-Ordner. ChartAssist wertet diese Dateien aus ("Import-Modus"). Grund sind die Nutzungsbedingungen der DFS, §2, siehe `docs/ENTSCHEIDUNGEN.md`.
 
 - UI-Texte, Kommentare, Dokumentation und Commit-Messages sind **deutsch**.
-- **Status:** Die Planung ist abgeschlossen, Code gibt es noch keinen. Das Projekt wird zusammen mit dem Benutzer von Grund auf aufgebaut. Phase 0 ist bis auf das GitHub-Repository erledigt, als Nächstes kommt Phase 1 (`docs/TECHNISCHE-BASIS.md`, Abschnitt 11).
+- **Status:** Die Planung ist abgeschlossen, Code gibt es noch keinen. Das Projekt wird zusammen mit dem Benutzer von Grund auf aufgebaut. Phase 0 ist erledigt, als Nächstes kommt Phase 1 (`docs/TECHNISCHE-BASIS.md`, Abschnitt 11).
 
 ## Vor der Arbeit lesen
 
@@ -28,6 +28,7 @@ Der grundlegende Unterschied zu ChartButlerCS: **ChartAssist greift selbst nie a
   - `testcharts/`: Kopie eines echten Kartenverzeichnisses, geschrieben von ChartButlerCS 2.0.1.1.
 
   Beide sind per `.gitignore` ausgeschlossen. Tests im Repository und in CI verwenden nur synthetische Fixtures. Tests gegen die echten Daten werden übersprungen, wenn die Ordner fehlen.
+- **KI-Kennzeichnung:** Das Projekt entsteht mit KI-Unterstützung und weist das offen aus (`docs/ENTSCHEIDUNGEN.md`, 3.11). Jeder Commit mit KI-Beteiligung trägt die `Co-Authored-By`-Zeile. Die Hinweise in README und LICENSE nicht entfernen oder abschwächen. Hilfe-Fenster und Release-Notes bekommen denselben Hinweis. Keine Kopfzeilen pro Quelldatei.
 - **Kompatibilität mit bestehenden Kartenverzeichnissen:** Das Format von `.ChartButler.xml` exakt erhalten (`docs/TECHNISCHE-BASIS.md`, Abschnitt 4.3). Die Datei immer mit **CRLF** schreiben, auf allen Plattformen. Dateinamen nach den Regeln von Windows bilden, auch unter Linux.
 
 ## Struktur und Konventionen
