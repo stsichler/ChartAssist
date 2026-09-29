@@ -73,6 +73,8 @@ public partial class MainWindowViewModel : ViewModelBase
     [NotifyPropertyChangedFor(nameof(CanUpdateCharts))]
     public partial bool HasAirfields { get; set; }
 
+    public string VersionText => "Version " + AppInfo.VersionText;
+
     /// <summary>Neuere Programmversion auf GitHub, falls gefunden.</summary>
     public Version? NewRelease { get; set; }
 

@@ -9,8 +9,8 @@ public partial class HelpWindow : Window
     {
         InitializeComponent();
         VersionText.Text = "ChartAssist " + AppInfo.VersionText;
-        ProjectLink.Content = AppInfo.ProjectUrl;
-        ProjectLink.NavigateUri = new Uri(AppInfo.ProjectUrl);
+        ProjectLink.Content = AppInfo.WebsiteUrl;
+        ProjectLink.NavigateUri = new Uri(AppInfo.WebsiteUrl);
     }
 
     private void OnClose(object? sender, RoutedEventArgs e) => Close();
