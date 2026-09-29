@@ -16,6 +16,21 @@
     <vm:MainWindowViewModel />
   </Design.DataContext>
 
+  <Window.Resources>
+    <!-- Hintergrund der Vorschau: grau statt weiß, damit sich das weiße Kartenpapier abhebt,
+         z. B. beim TripKit im Querformat -->
+    <ResourceDictionary>
+      <ResourceDictionary.ThemeDictionaries>
+        <ResourceDictionary x:Key="Light">
+          <SolidColorBrush x:Key="PreviewBackground" Color="#D4D4D4" />
+        </ResourceDictionary>
+        <ResourceDictionary x:Key="Dark">
+          <SolidColorBrush x:Key="PreviewBackground" Color="#3A3A3A" />
+        </ResourceDictionary>
+      </ResourceDictionary.ThemeDictionaries>
+    </ResourceDictionary>
+  </Window.Resources>
+
   <Window.Styles>
     <Style Selector="TextBlock.group">
       <Setter Property="FontWeight" Value="Bold" />
@@ -47,7 +62,6 @@
                 ItemsSource="{Binding Nodes}"
                 SelectedItem="{Binding SelectedNode}"
                 DoubleTapped="OnTreeDoubleTapped"
-                KeyDown="OnTreeKeyDown"
                 ContextRequested="OnTreeContextRequested">
         <TreeView.ItemContainerTheme>
           <ControlTheme TargetType="TreeViewItem" BasedOn="{StaticResource {x:Type TreeViewItem}}" x:DataType="vm:TreeNodeViewModel">
@@ -65,7 +79,7 @@
       <GridSplitter Grid.Column="1" Width="6" Background="Transparent" ResizeDirection="Columns" />
 
       <!-- Vorschau der ausgewählten Karte; Doppelklick öffnet sie -->
-      <Border Grid.Column="2" Background="White" BorderBrush="Gray" BorderThickness="1" Margin="0,0,8,0">
+      <Border Grid.Column="2" Background="{DynamicResource PreviewBackground}" BorderBrush="Gray" BorderThickness="1" Margin="0,0,8,0">
         <Image Source="{Binding Preview}" Stretch="Uniform" Margin="4" DoubleTapped="OnPreviewDoubleTapped" />
       </Border>
 
