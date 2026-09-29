@@ -28,10 +28,10 @@ public static class DfsUrls
     /// Nur für "nur HTML" gespeicherte Seiten nötig, bei "komplett" ist der href bereits absolut.
     /// Gilt nur bis zur nächsten Ausgabe und wird daher nicht gespeichert.
     /// </summary>
-    public static Uri ChartPage(DateTime effective, string hash) =>
+    public static Uri ChartPage(DateOnly effective, string hash) =>
         new(BaseUrl + EditionFolder(effective) + "/pages/" + hash + ".html");
 
     /// <summary>Ordnername einer Ausgabe, z. B. "2026SEP17" für Effective 17.09.2026.</summary>
-    public static string EditionFolder(DateTime effective) =>
+    public static string EditionFolder(DateOnly effective) =>
         effective.ToString("yyyyMMMdd", CultureInfo.InvariantCulture).ToUpperInvariant();
 }
