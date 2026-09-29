@@ -132,6 +132,9 @@ public sealed class ChartImport
 
     public IReadOnlyList<UpdatedChart> UpdatedCharts => _updatedCharts;
 
+    /// <summary>Eine sonstige DFS-Seite (Flugplatzverzeichnis oder Startseite) wurde gespeichert.</summary>
+    public bool OtherPageImported { get; private set; }
+
     public bool IsFinished => State is ImportSessionState.NothingToDo or ImportSessionState.Completed or ImportSessionState.Aborted;
 
     /// <summary>Wertet eine gespeicherte Seite aus.</summary>
@@ -158,7 +161,7 @@ public sealed class ChartImport
             {
                 DfsPageKind.AirfieldPage => ApplyAirfieldPage(DfsPageParser.ParseAirfieldPage(html)),
                 DfsPageKind.ChartPage => ApplyChartPage(DfsPageParser.ParseChartPage(html)),
-                _ => new ImportResult(ImportOutcome.Processed, $"Effective: {Format(Effective!.Value)} erkannt. Bitte jetzt die Flugplatzseiten speichern."),
+                _ => ApplyOtherPage(),
             };
         }
         catch (DfsPageException e)
@@ -179,6 +182,12 @@ public sealed class ChartImport
         var task = new AirfieldTask(airfield, DfsUrls.AirfieldPage(page.Permalink), isNew: true);
         _airfields.Add(task);
         return CheckCharts(task, page, warning: null);
+    }
+
+    private ImportResult ApplyOtherPage()
+    {
+        OtherPageImported = true;
+        return new ImportResult(ImportOutcome.Processed, $"Effective: {Format(Effective!.Value)} erkannt. Bitte jetzt die Flugplatzseiten speichern.");
     }
 
     private ImportResult? CheckEffectiveDate(DateOnly effective)

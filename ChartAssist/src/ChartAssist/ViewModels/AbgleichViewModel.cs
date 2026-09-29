@@ -159,8 +159,9 @@ public partial class AbgleichViewModel : ViewModelBase
         Items.Clear();
         if (Import.Mode == ImportMode.AddAirfield)
         {
-            // Erledigt, sobald die Seite eines Flugplatzes übernommen ist; bleibt für weitere Plätze anklickbar
-            bool found = Import.Airfields.Count > 0;
+            // Erledigt, sobald das Verzeichnis selbst oder die Seite eines Flugplatzes gespeichert ist;
+            // bleibt für weitere Plätze anklickbar
+            bool found = Import.OtherPageImported || Import.Airfields.Count > 0;
             Items.Add(new TaskItemViewModel(found ? "✓" : "○", "Flugplatzverzeichnis", DfsUrls.AirfieldDirectory, isOpen: !found, isChart: false));
         }
 
