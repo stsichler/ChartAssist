@@ -29,7 +29,7 @@ Ziel: ein Werkzeug, das dem Piloten die Verwaltung der Karten abnimmt, ohne selb
 ## 3. Getroffene Entscheidungen
 
 1. **Import-Modus:** Der Benutzer ruft jede Seite selbst im Browser auf und speichert sie mit Strg+S in einen Import-Ordner. ChartAssist wertet nur diese Dateien aus. Es darf Adressen anzeigen, so wie eine Lesezeichenliste, und öffnet pro Benutzeraktion genau eine Seite. Die verbindlichen Leitplanken stehen in IMPORT-MODUS.md, Abschnitt 2.
-2. **Keine rechtliche Freigabe:** §8 und §11 der Nutzungsbedingungen (Urheberrecht, Vervielfältigung) betreffen das Speichern der Karten an sich, unabhängig vom Werkzeug. Der Import-Modus verringert das Risiko, beseitigt es aber nicht. Vor dem ersten Release soll die DFS erneut mit diesem konkreten Konzept angefragt werden.
+2. **Keine rechtliche Freigabe:** §8 und §11 der Nutzungsbedingungen (Urheberrecht, Vervielfältigung) betreffen das Speichern der Karten an sich, unabhängig vom Werkzeug. Der Import-Modus verringert das Risiko, beseitigt es aber nicht. Eine erneute Anfrage bei der DFS war geplant, entfällt aber (Entscheidung vom 29.09.2026): Nach der bisherigen Absage ist keine Zustimmung zu erwarten.
 3. **Neuentwicklung in eigenem Repository**, direkt auf .NET 10 und Avalonia. Die technische Basis kommt zuerst, der Import-Modus baut darauf auf.
 4. **Name ChartAssist**, Versionszählung ab 1.0. Zur Einordnung: *ChartButler* war das ursprüngliche C/C++-Tool von Jörg Pauly, *ChartButlerCS* die C#-Neuimplementierung, das "CS" diente nur der Unterscheidung. Der neue Name passt zum neuen Prinzip: kein Butler, der Karten holt, sondern ein Assistent für die eigenen Abrufe. Noch zu prüfen: ob der Name auf GitHub oder im Luftfahrtumfeld schon vergeben ist.
 5. **Entwicklung unter Linux mit VS Code**, LF-Zeilenenden. ChartButlerCS nutzt CRLF, weil es nur mit Visual Studio unter Windows bearbeitet wird.
@@ -51,7 +51,6 @@ Ziel: ein Werkzeug, das dem Piloten die Verwaltung der Karten abnimmt, ohne selb
 - Ob die Datenbankdatei `.ChartButler.xml` umbenannt wird (TECHNISCHE-BASIS.md, Abschnitt 13).
 - Ob das TripKit wegen §8 (abgeleitete Werke) optional wird.
 - Test mit Chrome/Edge (IMPORT-MODUS.md, Abschnitt 4, Frage 9).
-- Erneute Anfrage bei der DFS.
 
 ## 5. Bereits geprüft
 

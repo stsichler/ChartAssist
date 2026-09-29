@@ -21,7 +21,7 @@ Dass diese Nutzungsbedingungen des AIS-Portals auch für die BasicVFR (DFS AIP, 
 
 ChartButlerCS lädt Seiten und Karten per `HttpClient` selbst herunter und fällt damit klar unter das Verbot aus §2. Der Nachfolger soll diesen Punkt beseitigen. Das Portal wird dann nur noch durch den Menschen mit seinem Browser benutzt.
 
-§8 und §11 betreffen dagegen das **Speichern der Karten an sich**. Das gilt auch dann, wenn jemand eine Karte manuell speichert oder ausdruckt. Technisch lässt sich das nicht lösen. Es bleibt eine Frage der Auslegung (navigatorische Nutzung nach §3, Privatkopie nach §53 UrhG). Der Import-Modus ist deshalb **keine rechtliche Freigabe**, er reduziert nur das Risiko. Eine erneute Anfrage bei der DFS auf Basis dieses konkreten Konzepts bleibt sinnvoll (siehe Abschnitt 9).
+§8 und §11 betreffen dagegen das **Speichern der Karten an sich**. Das gilt auch dann, wenn jemand eine Karte manuell speichert oder ausdruckt. Technisch lässt sich das nicht lösen. Es bleibt eine Frage der Auslegung (navigatorische Nutzung nach §3, Privatkopie nach §53 UrhG). Der Import-Modus ist deshalb **keine rechtliche Freigabe**, er reduziert nur das Risiko. Eine erneute Anfrage bei der DFS entfällt (siehe Abschnitt 9).
 
 ## 2. Leitplanken
 
@@ -293,7 +293,7 @@ Die Gesamtreihenfolge steht in TECHNISCHE-BASIS.md, Abschnitt 11. **Zuerst entst
    - `ImportFolderScanner` (5.3),
    - `ChartImport` mit Tests in einem temporären Kartenverzeichnis (5.4).
 3. **Phase 4, Oberfläche:** `AbgleichWindow` (5.5) zusammen mit `MainWindow` und `OptionsWindow` (Import-Ordner).
-4. **Vor dem Release:** Checkliste in Abschnitt 7 durchgehen, Hilfe und README mit dem Ablauf füllen, DFS-Anfrage (Abschnitt 9) entscheiden.
+4. **Vor dem Release:** Checkliste in Abschnitt 7 durchgehen, Hilfe und README mit dem Ablauf füllen.
 
 ## 7. Test-Checkliste
 
@@ -335,4 +335,4 @@ Die Logik (Parser, Import, Datenbank) wird mit xUnit getestet (TECHNISCHE-BASIS.
 | GAT24-Altbestände | Keine Migration mehr. Nutzer alter GAT24-Datenbanken abonnieren ihre Plätze neu. |
 | Kartenaufgaben mit direktem Link | Umsetzen (Abschnitt 4, Frage 5). Das URL-Schema für "nur HTML" beruht auf einer einzigen Ausgabe. Schlägt der Link fehl, klickt der Benutzer die Karte in der Flugplatzseite an. |
 | Name, Repository, Umgang mit ChartButlerCS | Siehe TECHNISCHE-BASIS.md, Abschnitt 13. |
-| Erneute Anfrage bei der DFS | Vor dem ersten Release: dieses Konzept der DFS vorlegen und schriftliche Zustimmung erbitten, ggf. über AOPA oder DAeC. Die Leitplanken aus Abschnitt 2 eignen sich dafür als Anlage. |
+| Erneute Anfrage bei der DFS | **Entschieden:** entfällt. Nach der bisherigen Absage ist keine Zustimmung zu erwarten (ENTSCHEIDUNGEN.md, 3.2). |
