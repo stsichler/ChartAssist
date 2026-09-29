@@ -61,6 +61,10 @@ public partial class MainWindowViewModel : ViewModelBase
     [ObservableProperty]
     public partial string BannerText { get; set; } = "";
 
+    /// <summary>Statusleiste: Ausgabe des Kartensatzes und nächste planmäßige Ausgabe.</summary>
+    [ObservableProperty]
+    public partial string StatusText { get; set; } = "";
+
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(CanStartSession), nameof(CanUpdateCharts), nameof(CanChangeOptions))]
     public partial bool IsSessionOpen { get; set; }
@@ -187,8 +191,13 @@ public partial class MainWindowViewModel : ViewModelBase
             ? Utility.BuildChartPath(Folder.Path, node.Airfield, node.Chart)
             : null;
 
+    /// <summary>Nächste planmäßige Ausgabe der BasicVFR nach der angegebenen (28-Tage-Zyklus, IMPORT-MODUS 4).</summary>
+    public static DateOnly NextEdition(DateOnly edition) => edition.AddDays(EditionCycleDays);
+
     public void UpdateBanner()
     {
+        UpdateStatus();
+
         if (HasAirfields && IsLegacyDatabase)
         {
             Show(BannerKind.Warning, "Diese Datenbank stammt noch von GAT24. Bitte die Flugplätze neu abonnieren.");
@@ -198,9 +207,9 @@ public partial class MainWindowViewModel : ViewModelBase
             Show(BannerKind.UpdateRequired, "Bitte führen Sie einen Kartenabgleich durch. Hier klicken zum Starten.");
         }
         else if (HasAirfields && Database.AipLastUpdate is DateOnly last
-            && DateOnly.FromDateTime(DateTime.Today) >= last.AddDays(EditionCycleDays))
+            && DateOnly.FromDateTime(DateTime.Today) >= NextEdition(last))
         {
-            string expected = last.AddDays(EditionCycleDays).ToString("dd.MM.yyyy", CultureInfo.InvariantCulture);
+            string expected = Format(NextEdition(last));
             Show(BannerKind.UpdateRequired, $"Seit {expected} ist eine neue Ausgabe der BasicVFR zu erwarten. Hier klicken für den Kartenabgleich.");
         }
         else if (NewRelease != null)
@@ -212,6 +221,28 @@ public partial class MainWindowViewModel : ViewModelBase
             Show(BannerKind.None, "");
         }
     }
+
+    private void UpdateStatus()
+    {
+        if (!HasFolder)
+        {
+            StatusText = "Kein Kartenverzeichnis gewählt";
+        }
+        else if (Database.AipLastUpdate is not DateOnly edition)
+        {
+            StatusText = "Kartenstand: noch kein vollständiger Kartenabgleich";
+        }
+        else
+        {
+            DateOnly next = NextEdition(edition);
+            string nextText = DateOnly.FromDateTime(DateTime.Today) >= next
+                ? $"Neue Ausgabe seit {Format(next)} erwartet"
+                : $"Nächste Ausgabe voraussichtlich am {Format(next)}";
+            StatusText = $"Kartenstand: Ausgabe vom {Format(edition)}  ·  {nextText}";
+        }
+    }
+
+    private static string Format(DateOnly date) => date.ToString("dd.MM.yyyy", CultureInfo.InvariantCulture);
 
     partial void OnSelectedNodeChanged(TreeNodeViewModel? value)
     {
