@@ -161,7 +161,12 @@ Hinter dem DataSet steckt keine Datenbank, sondern nur eine XML-Datei (`.ChartBu
 - Typsichere, lesbare Zugriffe statt `IsCryptNull()`, `GetAFChartsRows()`, `BindingSource.Find(...)` und kulturabhängiger Filter-Strings (z. B. `"LastUpdate = '" + updrow.Date + "'"` in `updateTreeView`).
 - Leicht testbar.
 
-**Modell** (Vorschlag):
+**Modell:** umgesetzt in `Data/ChartDatabase.cs`, mit drei Abweichungen vom ursprünglichen Vorschlag unten:
+- **Karten als flache Liste** `ChartDatabase.Charts` in Dateireihenfolge statt `Airfield.Charts`. In der echten Datei wechseln sich die Flugplätze ab (neue Karten stehen am Ende), und nur so bleibt der Round-Trip byteweise identisch. `ChartsOf(airfield)` liefert die Karten eines Platzes.
+- **`Updates` als Liste** in Dateireihenfolge statt `SortedSet`, aus demselben Grund. `AddUpdate` behält wie ChartButlerCS die letzten 5.
+- **Datumswerte als `DateOnly`** (siehe unten, Datumswerte).
+
+Ursprünglicher Vorschlag:
 
 ```csharp
 public sealed class ChartDatabase
@@ -226,8 +231,11 @@ public sealed class Chart
   - der Offset der Datumswerte wechselt mit der Sommerzeit (`+01:00` bzw. `+02:00`), er gehört also zum jeweiligen Datum und nicht zum Zeitpunkt des Schreibens.
 
   Die Datei ist die Grundlage des Round-Trip-Tests: lesen, schreiben, **byteweise** vergleichen.
-- Datumswerte als `xs:dateTime` in **lokaler Zeit mit Offset**, weil das der Standard des DataSets ist. Lesen mit `XmlConvert.ToDateTime(s, XmlDateTimeSerializationMode.Local)`, schreiben mit `XmlConvert.ToString(d, XmlDateTimeSerializationMode.Local)`. Wichtig, weil `Updates.Date` und `AFCharts.LastUpdate` über Gleichheit verknüpft sind (Knoten "Aktualisierungen" im Baum).
-- Charts gehören über `ICAO` zu ihrem Flugplatz. Beim Lesen verwaiste Charts (ICAO ohne Flugplatz) tolerant behandeln, also ignorieren oder protokollieren.
+- **Datumswerte:** Alle Werte sind reine Kalendertage (in ChartButlerCS immer `.Date`), geschrieben als Mitternacht mit Offset. Das DataSet verwendet dafür die Zeitzone des Rechners. Damit hinge die Datei von der Zeitzone ab, und der Round-Trip-Test würde in CI (UTC) scheitern. ChartAssist verwendet deshalb **fest die deutsche Zeitzone**:
+  - Lesen: `xs:dateTime` in deutsche Zeit umrechnen, Kalendertag nehmen. Das liefert auch dann das richtige Datum, wenn ChartButlerCS die Datei auf einem Rechner mit anderer Zeitzone umgeschrieben hat.
+  - Schreiben: Mitternacht mit dem deutschen Offset dieses Tages, z. B. `2026-08-20T00:00:00+02:00`. Das ist genau das, was ChartButlerCS auf einem deutschen Rechner schreibt.
+  - Zeitzone `Europe/Berlin`, unter Windows ohne ICU `W. Europe Standard Time` (`Data/GermanTime.cs`).
+- Charts gehören über `ICAO` zu ihrem Flugplatz. Verwaiste Charts (ICAO ohne Flugplatz) werden beim Lesen ignoriert. Doppelte Schlüssel (ICAO, Cname, Date) gelten wie beim DataSet als Fehler, dann wird aus dem Verzeichnis wiederhergestellt.
 
 **Umsetzung:**
 - Lesen und Schreiben mit `System.Xml.Linq` (`XDocument`) oder `XmlReader`/`XmlWriter`, beides trimming-sicher. **Nicht** mit `XmlSerializer`: Der nutzt Reflection und bildet die flache Tabellenstruktur nur umständlich ab.
@@ -466,7 +474,8 @@ Jede Phase endet mit einem baubaren, getesteten Stand. Die Phasen 3 und 4 setzen
    - **Stand 29.09.2026:**
      - erledigt: Solution (`ChartAssist.slnx`), zentrale Build-Dateien, Core mit `DfsUrls` und ersten Tests, Avalonia-App mit leerem Hauptfenster (Icon, Versionsnummer), `build.yml`, `release.yml`. Lokal unter Linux gebaut, getestet, gestartet und als Single-File veröffentlicht (3, 8),
      - beide Workflows laufen auf GitHub grün, Release-Entwurf `v0.1.0.0` mit allen vier Paketen erzeugt,
-     - offen: Test-Release auf echten Rechnern mit Windows und Linux prüfen. macOS (Gatekeeper) bleibt offen, bis ein Mac verfügbar ist.
+     - Linux auf echtem Rechner geprüft, dazu Startmenü-Eintrag und Desktop-Verknüpfung (6). **Phase 1 abgeschlossen.**
+     - offen: Windows auf echtem Rechner, macOS (Gatekeeper), sobald ein Mac verfügbar ist.
 
 2. **Core-Basis** (mittel)
    - Datenmodell mit XML-Reader/-Writer (4.3) und Round-Trip-Tests gegen die echte `.ChartButler.xml`. Die Tests mit echten Daten laufen nur lokal, die Datei liegt in `testdata/`. Für CI eine synthetische, anonymisierte Datei gleichen Aufbaus einchecken.

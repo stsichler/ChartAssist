@@ -1,0 +1,67 @@
+<?xml version="1.0" standalone="yes"?>
+<ChartButlerDataSet>
+  <AFCharts>
+    <ICAO>EDXA</ICAO>
+    <Cname>EDXA Musterstadt 1.png</Cname>
+    <CreationDate>2024-04-14T00:00:00+02:00</CreationDate>
+    <Crypt>C0AAA1.html#EDXA Musterstadt 1</Crypt>
+    <LastUpdate>2017-02-16T00:00:00+01:00</LastUpdate>
+  </AFCharts>
+  <AFCharts>
+    <ICAO>EDXA</ICAO>
+    <Cname>EDXA AD 2-1.png</Cname>
+    <CreationDate>2025-10-09T00:00:00+02:00</CreationDate>
+    <Crypt>C0AAA1.html#AD 2-1</Crypt>
+    <LastUpdate>2025-09-18T00:00:00+02:00</LastUpdate>
+  </AFCharts>
+  <AFCharts>
+    <ICAO>EDXA</ICAO>
+    <Cname>EDXA_TripKit_Charts.pdf</Cname>
+    <CreationDate>2026-01-15T00:00:00+01:00</CreationDate>
+    <LastUpdate>2025-12-25T00:00:00+01:00</LastUpdate>
+  </AFCharts>
+  <AFCharts>
+    <ICAO>EDXB</ICAO>
+    <Cname>EDXB Beispielfeld &amp; Umgebung.png</Cname>
+    <CreationDate>2026-04-25T00:00:00+02:00</CreationDate>
+    <Crypt>C0BBB2.html#EDXB Beispielfeld &amp; Umgebung</Crypt>
+    <LastUpdate>2026-03-19T00:00:00+01:00</LastUpdate>
+  </AFCharts>
+  <AFCharts>
+    <ICAO>EDXB</ICAO>
+    <Cname>EDXB_TripKit_Charts.pdf</Cname>
+    <CreationDate>2026-04-25T00:00:00+02:00</CreationDate>
+  </AFCharts>
+  <AFCharts>
+    <ICAO>EDXA</ICAO>
+    <Cname>EDXA Musterstadt-2B.png</Cname>
+    <CreationDate>2026-04-25T00:00:00+02:00</CreationDate>
+    <Crypt>C0AAA1.html#EDXA Musterstadt/2B</Crypt>
+    <LastUpdate>2026-03-19T00:00:00+01:00</LastUpdate>
+  </AFCharts>
+  <Airfields>
+    <ICAO>EDXA</ICAO>
+    <AFname>Musterstadt</AFname>
+    <LastUpdate>2026-03-19T00:00:00+01:00</LastUpdate>
+  </Airfields>
+  <Airfields>
+    <ICAO>EDXB</ICAO>
+    <AFname>Beispielfeld &amp; Umgebung</AFname>
+  </Airfields>
+  <AIP>
+    <LastUpdate>2026-03-19T00:00:00+01:00</LastUpdate>
+  </AIP>
+  <Updates>
+    <Date>2025-09-18T00:00:00+02:00</Date>
+  </Updates>
+  <Updates>
+    <Date>2025-12-25T00:00:00+01:00</Date>
+  </Updates>
+  <Updates>
+    <Date>2026-03-19T00:00:00+01:00</Date>
+  </Updates>
+  <ChartButler>
+    <Version>2.0.1.1</Version>
+    <DataSource>DFS</DataSource>
+  </ChartButler>
+</ChartButlerDataSet>

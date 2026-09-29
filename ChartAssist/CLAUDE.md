@@ -9,7 +9,7 @@ ChartAssist ist der Nachfolger von ChartButlerCS: eine Desktop-Anwendung für Wi
 Der grundlegende Unterschied zu ChartButlerCS: **ChartAssist greift selbst nie auf die DFS zu.** Der Benutzer ruft die Seiten im Browser auf und speichert sie mit Strg+S in einen Import-Ordner. ChartAssist wertet diese Dateien aus ("Import-Modus"). Grund sind die Nutzungsbedingungen der DFS, §2, siehe `docs/ENTSCHEIDUNGEN.md`.
 
 - UI-Texte, Kommentare, Dokumentation und Commit-Messages sind **deutsch**.
-- **Status:** Die Planung ist abgeschlossen. Das Projekt wird zusammen mit dem Benutzer von Grund auf aufgebaut. Phase 0 ist erledigt, Phase 1 (Grundgerüst und Pipeline) läuft (`docs/TECHNISCHE-BASIS.md`, Abschnitt 11).
+- **Status:** Die Planung ist abgeschlossen. Das Projekt wird zusammen mit dem Benutzer von Grund auf aufgebaut. Phasen 0 und 1 sind erledigt, Phase 2 (Core-Basis) läuft (`docs/TECHNISCHE-BASIS.md`, Abschnitt 11).
 
 ## Vor der Arbeit lesen
 
