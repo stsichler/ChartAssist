@@ -10,5 +10,6 @@ internal static class AppInfo
     /// <summary>Version des rechtlichen Hinweises; eine neue Version wird beim Start erneut angezeigt.</summary>
     public const string LegalNoticeVersion = "v1";
 
-    public const string ProjectUrl = "https://github.com/stsichler/ChartAssist";
+    /// <summary>Webseite für Anwender (GitHub Pages, die README im Git-Root) mit den Downloads.</summary>
+    public const string WebsiteUrl = "https://stsichler.github.io/ChartAssist/";
 }

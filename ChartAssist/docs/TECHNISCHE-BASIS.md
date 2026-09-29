@@ -415,7 +415,7 @@ dotnet publish src/ChartAssist -c Release -r osx-x64   --self-contained true
   - `osx-x64` wird auf dem Apple-Silicon-Runner (`macos-latest`) quer gebaut.
   - Die `.icns`-Datei entsteht im Lauf mit `sips` und `iconutil` aus `Assets/Icon.png` (256 × 256).
   - Das Release wird als **Entwurf** angelegt, mit Standardtext (Downloads, Gatekeeper-Hinweis, KI-Hinweis). Veröffentlicht wird es von Hand, bei Tests als Pre-release. Erst ein veröffentlichtes, reguläres Release ist für `releases/latest` und die Versionsprüfung sichtbar.
-- **`README.md`** des neuen Repositorys: Download-Links pro Plattform, Systemvoraussetzungen (Windows 10+, keine Runtime-Installation), Beschreibung des Ablaufs mit Browser und Import-Ordner, Hinweis auf die DFS-Nutzungsbedingungen. Die README kann auch hier als GitHub-Pages-Seite dienen.
+- **`README.md`** des neuen Repositorys: Download-Links pro Plattform, Systemvoraussetzungen (Windows 10+, keine Runtime-Installation), Beschreibung des Ablaufs mit Browser und Import-Ordner, Hinweis auf die DFS-Nutzungsbedingungen. Die README ist zugleich die Webseite für Anwender (GitHub Pages, `https://stsichler.github.io/ChartAssist/`, Theme wie bei ChartButlerCS über `_config.yml`). Hauptfenster, Hilfe und Hinweis auf eine neue Version verlinken dorthin. Kein Screenshot mit Karte, denn DFS-Inhalte dürfen nicht ins Repository.
 
 ---
 

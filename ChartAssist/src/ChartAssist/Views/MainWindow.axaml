@@ -43,6 +43,13 @@
     <Style Selector="Border.banner.warning">
       <Setter Property="Background" Value="DarkRed" />
     </Style>
+    <Style Selector="Button.website">
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="Cursor" Value="Hand" />
+    </Style>
+    <Style Selector="Button.website:pointerover /template/ ContentPresenter">
+      <Setter Property="Background" Value="Transparent" />
+    </Style>
     <Style Selector="StackPanel.actions > Button">
       <Setter Property="HorizontalAlignment" Value="Stretch" />
       <Setter Property="HorizontalContentAlignment" Value="Center" />
@@ -92,7 +99,14 @@
           <Button Content="Flugplatz hinzufügen" Click="OnAddAirfield" IsEnabled="{Binding CanStartSession}" />
           <Button Content="Karten aktualisieren" Click="OnUpdateCharts" IsEnabled="{Binding CanUpdateCharts}" />
           <Button Content="Optionen" Click="OnOptions" IsEnabled="{Binding CanChangeOptions}" />
-          <Image Source="/Assets/Icon.png" Width="128" Height="128" Margin="0,32,0,0" />
+          <!-- Programm und Version; ein Klick öffnet die Webseite mit den Downloads -->
+          <Button Classes="website" Margin="0,32,0,0" Click="OnWebsite" ToolTip.Tip="Webseite von ChartAssist öffnen">
+            <StackPanel Spacing="4">
+              <Image Source="/Assets/Icon.png" Width="96" Height="96" />
+              <TextBlock Text="ChartAssist" FontSize="18" FontWeight="SemiBold" HorizontalAlignment="Center" />
+              <TextBlock Text="{Binding VersionText}" Opacity="0.7" HorizontalAlignment="Center" />
+            </StackPanel>
+          </Button>
         </StackPanel>
       </DockPanel>
     </Grid>

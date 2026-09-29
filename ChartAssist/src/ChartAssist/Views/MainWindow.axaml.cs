@@ -222,7 +222,7 @@ public partial class MainWindow : Window
                 await StartSessionAsync(ImportMode.UpdateCharts);
                 break;
             case BannerKind.NewRelease:
-                await Launch.UriAsync(this, new Uri(ReleaseCheck.ReleasesPageUrl));
+                await Launch.UriAsync(this, new Uri(AppInfo.WebsiteUrl));
                 break;
         }
     }
@@ -262,6 +262,8 @@ public partial class MainWindow : Window
     private async void OnUpdateCharts(object? sender, RoutedEventArgs e) => await StartSessionAsync(ImportMode.UpdateCharts);
 
     private async void OnOptions(object? sender, RoutedEventArgs e) => await OpenOptionsAsync();
+
+    private async void OnWebsite(object? sender, RoutedEventArgs e) => await Launch.UriAsync(this, new Uri(AppInfo.WebsiteUrl));
 
     private void OnHelp(object? sender, RoutedEventArgs e) => new HelpWindow().Show(this);
 

@@ -11,8 +11,6 @@ public static class ReleaseCheck
 {
     public const string LatestReleaseUrl = "https://api.github.com/repos/stsichler/ChartAssist/releases/latest";
 
-    public const string ReleasesPageUrl = "https://github.com/stsichler/ChartAssist/releases/latest";
-
     public static HttpClient CreateHttpClient()
     {
         var client = new HttpClient { Timeout = TimeSpan.FromSeconds(15) };
