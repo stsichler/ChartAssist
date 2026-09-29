@@ -19,6 +19,9 @@ public partial class MainWindow : Window
     public MainWindow()
     {
         InitializeComponent();
+
+        // Tunnel statt Bubble: Das TreeViewItem verarbeitet Enter sonst selbst und klappt den Knoten um
+        Tree.AddHandler(KeyDownEvent, OnTreeKeyDown, RoutingStrategies.Tunnel);
     }
 
     private AbgleichWindow? _sessionWindow;
@@ -223,9 +226,10 @@ public partial class MainWindow : Window
 
     private async void OnPreviewDoubleTapped(object? sender, TappedEventArgs e) => await OpenSelectedChartAsync();
 
+    /// <summary>Enter öffnet eine Karte; auf einem Flugplatz klappt Enter weiter auf und zu.</summary>
     private async void OnTreeKeyDown(object? sender, KeyEventArgs e)
     {
-        if (e.Key == Key.Enter)
+        if (e.Key == Key.Enter && ViewModel.GetChartPath(ViewModel.SelectedNode) != null)
         {
             e.Handled = true;
             await OpenSelectedChartAsync();
