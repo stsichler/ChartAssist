@@ -22,7 +22,7 @@ Der grundlegende Unterschied zu ChartButlerCS: **ChartAssist greift selbst nie a
 ## Verbindliche Regeln
 
 - **Keine Netzwerkzugriffe auf DFS-Server**, in keiner Form. Einzige erlaubte Netzwerkverbindung ist die Versionsprüfung bei GitHub.
-- **Keine Automatisierung des Browsers.** DFS-Seiten nur einzeln auf ausdrückliche Benutzeraktion öffnen (eine Aktion = eine Seite). Kein automatisches Weiterschalten, kein "Alle öffnen", keine Extension. Details: Leitplanken in `docs/IMPORT-MODUS.md`, Abschnitt 2.
+- **Keine Automatisierung des Browsers.** DFS-Seiten nur einzeln auf ausdrückliche Benutzeraktion öffnen (eine Aktion = eine Seite), ausgelöst vom Klick selbst, nie von einer Auswahländerung. Kein automatisches Weiterschalten, kein "Alle öffnen", keine Extension. Details: Leitplanken in `docs/IMPORT-MODUS.md`, Abschnitt 2.
 - **Echte DFS-Inhalte nie einchecken** (§11 der Nutzungsbedingungen). Sie liegen nur lokal:
   - `testdata/`: von Hand gespeicherte DFS-Seiten (Firefox, "nur HTML" und "komplett"),
   - `testcharts/`: Kopie eines echten Kartenverzeichnisses, geschrieben von ChartButlerCS 2.0.1.1.

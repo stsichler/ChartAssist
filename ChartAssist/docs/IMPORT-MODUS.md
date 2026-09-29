@@ -28,7 +28,7 @@ ChartButlerCS lädt Seiten und Karten per `HttpClient` selbst herunter und fäll
 Diese Regeln sind der Kern des Konzepts. Jede Umsetzungsentscheidung muss sich daran messen lassen.
 
 1. **ChartAssist stellt keine einzige Anfrage an DFS-Server.** Die einzige verbleibende Netzwerkverbindung ist die Prüfung auf eine neue Programmversion bei GitHub.
-2. **Jeder Seitenabruf wird einzeln vom Benutzer ausgelöst.** ChartAssist darf Adressen kennen und anzeigen, so wie eine Lesezeichenliste. Ein Doppelklick oder Enter auf **einen** Eintrag öffnet **eine** Seite im Standardbrowser.
+2. **Jeder Seitenabruf wird einzeln vom Benutzer ausgelöst.** ChartAssist darf Adressen kennen und anzeigen, so wie eine Lesezeichenliste. Ein Klick oder Enter auf **einen** Eintrag öffnet **eine** Seite im Standardbrowser. Ausgelöst wird das nur vom Klick selbst, nie von einer Änderung der Auswahl.
 3. **Keine Automatisierung des Browsers:**
    - Die nächste Seite wird nie automatisch geöffnet. Nach einem Import wird der nächste offene Eintrag nur *markiert*.
    - Es gibt kein "Alle öffnen".
@@ -50,7 +50,7 @@ Diese Regeln sind der Kern des Konzepts. Jede Umsetzungsentscheidung muss sich d
 ### 3.2 Kartenabgleich
 
 1. Der Benutzer klickt im Hauptfenster auf "Karten aktualisieren". Es öffnet sich das nicht-modale Fenster **"Kartenabgleich"**. Die Aufgabenliste enthält einen Eintrag je abonniertem Flugplatz, der auf den Permalink aus `AFCharts.Crypt` verlinkt. Der erste Eintrag ist markiert.
-2. Ein Doppelklick oder Enter auf den Eintrag öffnet die Flugplatzseite im Browser. Der Benutzer drückt Strg+S und dann Enter.
+2. Ein Klick oder Enter auf den Eintrag öffnet die Flugplatzseite im Browser. Der Benutzer drückt Strg+S und dann Enter.
 3. ChartAssist erkennt die neue Datei im Import-Ordner. **Jede** DFS-Seite enthält das Datum "Effective:". Die erste gespeicherte Seite entscheidet deshalb, ob überhaupt etwas zu tun ist:
    - **Unverändertes Datum** (gleich `AIP.LastUpdate`) bei gleicher Programmversion: Meldung "Keine Aktualisierung notwendig", fertig. Das entspricht dem Verhalten von ChartButlerCS in `DFS_CheckForNewCharts`. Ein eigener Schritt für die Startseite ist nicht nötig.
    - **Neues Datum:** Die Flugplatzseite wird ausgewertet, siehe Schritt 4.
@@ -63,7 +63,7 @@ Diese Regeln sind der Kern des Konzepts. Jede Umsetzungsentscheidung muss sich d
    - `AIP.LastUpdate` wird auf das Effective-Datum gesetzt.
    - Die Übersicht der aktualisierten Karten wird angezeigt, wie bisher.
 
-Typischer Aufwand pro Zyklus: je Seite ein Doppelklick, Strg+S und Enter, also eine Seite je Flugplatz und eine je geänderter Karte. Hat sich nichts geändert, genügt eine einzige Seite.
+Typischer Aufwand pro Zyklus: je Seite ein Klick, Strg+S und Enter, also eine Seite je Flugplatz und eine je geänderter Karte. Hat sich nichts geändert, genügt eine einzige Seite.
 
 ### 3.3 Neuen Flugplatz hinzufügen
 
@@ -260,7 +260,8 @@ Inhalt:
 - Statuszeile mit der letzten Meldung.
 
 Verhalten:
-- Doppelklick oder Enter öffnet den Link des markierten Eintrags. Nach einem erfolgreichen Import wird der nächste offene Eintrag **markiert, aber nicht geöffnet** (Leitplanke 3).
+- Klick oder Enter öffnet den Link des Eintrags. Nach einem erfolgreichen Import wird der nächste offene Eintrag **markiert, aber nicht geöffnet** (Leitplanke 3). Deshalb reagiert das Öffnen auf den Klick (`Tapped`), nicht auf die Auswahl; Pfeiltasten öffnen nichts.
+- Der Pfad des Import-Ordners ist selektierbar und hat einen Knopf "Kopieren", z. B. für den Speichern-Dialog des Browsers.
 - Der Import-Timer läuft nur, solange das Fenster offen ist. Während eine Datei verarbeitet wird, pausiert er.
 - Nach jedem Import wird die Datenbank über `ChartFolder` gespeichert, und das Hauptfenster aktualisiert seinen Baum. Die Datenbank ist damit auch bei einem Abbruch konsistent.
 - Solange das Fenster offen ist, sind im Hauptfenster "Flugplatz löschen" und "Optionen" deaktiviert. So kann das Kartenverzeichnis nicht mitten in der Sitzung wechseln.

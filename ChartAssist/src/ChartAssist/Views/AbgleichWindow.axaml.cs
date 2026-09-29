@@ -1,7 +1,9 @@
 using Avalonia.Controls;
 using Avalonia.Input;
+using Avalonia.Input.Platform;
 using Avalonia.Interactivity;
 using Avalonia.Threading;
+using Avalonia.VisualTree;
 using ChartAssist.Core.Dfs;
 using ChartAssist.ViewModels;
 
@@ -66,7 +68,27 @@ public partial class AbgleichWindow : Window
         }
     }
 
-    private async void OnTaskDoubleTapped(object? sender, TappedEventArgs e) => await OpenSelectedAsync();
+    /// <summary>
+    /// Ein Klick auf einen Eintrag öffnet ihn. Bewusst am Klick und nicht an der Auswahl: ChartAssist markiert
+    /// nach jedem Import den nächsten Eintrag selbst, das darf nie eine Seite öffnen (Leitplanke 3).
+    /// Ein Doppelklick löst nur einmal Tapped aus und öffnet daher ebenfalls nur eine Seite.
+    /// </summary>
+    private async void OnTaskTapped(object? sender, TappedEventArgs e)
+    {
+        if ((e.Source as Control)?.FindAncestorOfType<ListBoxItem>(includeSelf: true)?.DataContext is TaskItemViewModel { Link: Uri link })
+        {
+            await Launch.UriAsync(this, link);
+        }
+    }
+
+    private async void OnCopyImportFolder(object? sender, RoutedEventArgs e)
+    {
+        if (Clipboard is { } clipboard)
+        {
+            await clipboard.SetTextAsync(ViewModel.ImportFolder);
+            ViewModel.Status = "Pfad des Import-Ordners kopiert.";
+        }
+    }
 
     private async void OnTaskKeyDown(object? sender, KeyEventArgs e)
     {

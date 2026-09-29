@@ -24,7 +24,7 @@
         <ScrollViewer>
           <StackPanel Margin="4">
             <TextBlock Classes="heading" Text="Karten aktualisieren" />
-            <TextBlock Text="ChartAssist zeigt, welche Seiten der DFS Sie speichern müssen. Doppelklick auf einen Eintrag öffnet die Seite im Browser. Dort mit Strg+S als „Webseite, nur HTML“ in den Import-Ordner speichern. Den Rest erledigt ChartAssist." />
+            <TextBlock Text="ChartAssist zeigt, welche Seiten der DFS Sie speichern müssen. Klick auf einen Eintrag öffnet die Seite im Browser. Dort mit Strg+S als „Webseite, nur HTML“ in den Import-Ordner speichern. Den Rest erledigt ChartAssist." />
             <TextBlock Text="Hat sich nichts geändert, genügt die erste Seite. Sonst folgt je Flugplatz eine Seite und je geänderter Karte eine weitere." Margin="0,4,0,0" />
 
             <TextBlock Classes="heading" Text="Flugplatz hinzufügen" />
