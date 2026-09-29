@@ -188,7 +188,7 @@ public sealed class LinuxDesktopIntegration
     {
         try
         {
-            var startInfo = new ProcessStartInfo("gio") { UseShellExecute = false };
+            var startInfo = new ProcessStartInfo("gio") { UseShellExecute = false, RedirectStandardError = true };
             startInfo.ArgumentList.Add("set");
             startInfo.ArgumentList.Add(path);
             startInfo.ArgumentList.Add("metadata::trusted");

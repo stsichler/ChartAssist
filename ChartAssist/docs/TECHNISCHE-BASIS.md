@@ -113,7 +113,7 @@ Angelegt in Phase 1. Maßgeblich sind die Dateien selbst, hier nur der Aufbau un
 - **Keine DevTools im Debug-Build.** `Avalonia.Diagnostics` gibt es für Avalonia 12 nicht mehr. Das Template bindet stattdessen `AvaloniaUI.DiagnosticsSupport` ein, das eine Verbindung zu einem externen, nicht quelloffenen DevTools-Programm von AvaloniaUI aufbaut. Das passt nicht zur Regel "keine Netzwerkverbindungen außer der Versionsprüfung" und wurde entfernt.
 - Der `ViewLocator` des Templates wurde entfernt. Er arbeitet mit Reflection (Hindernis für Trimming, 8), und die Fenster werden ohnehin direkt erzeugt.
 
-Die Versionsprüfung gegen GitHub vergleicht wie bisher `"v" + Assembly.GetName().Version` mit dem Tag des neuesten Releases, jetzt im **neuen** Repository. `<Version>` muss deshalb vierstellig bleiben.
+Die Versionsprüfung (`ReleaseCheck`) liest den Tag des neuesten Releases im **neuen** Repository (`v1.2.3.4`) und meldet ihn nur, wenn er **größer** ist als die eigene Version. ChartButlerCS meldete jede Abweichung, also auch bei einem neueren Vorab-Build. `<Version>` muss vierstellig bleiben.
 
 Aus ChartButlerCS wird **nicht** übernommen:
 - `app.config`, `Properties/AssemblyInfo.cs` (→ csproj-Properties),
@@ -482,6 +482,10 @@ Jede Phase endet mit einem baubaren, getesteten Stand. Die Phasen 3 und 4 setzen
    - `ChartFolder` (Laden, Speichern, Wiederherstellen), `Settings` mit Übernahme aus ChartButlerCS (10), `Utility`.
    - `TripKitBuilder` mit SkiaSharp und PDFsharp 6. Test: Ein PDF aus generierten Beispielbildern im Hoch- und Querformat hat die erwartete Seitenzahl. Einmal lokal mit echten DFS-PNGs prüfen (Risiko in 13).
    - `ReleaseCheck`.
+   - **Erledigt am 29.09.2026.** Ergebnisse:
+     - Round-Trip gegen die echte `.ChartButler.xml` byteweise identisch, Wiederherstellung aus `testcharts/` ergibt dieselben Flugplätze und Karten,
+     - TripKit aus den echten Karten: für alle 8 Flugplätze dieselbe Seitenzahl wie bei ChartButlerCS, Farben und Anordnung per Sichtprüfung korrekt,
+     - `Settings` übernimmt das Kartenverzeichnis aus `ChartButlerCS.config` (beide Testdateien).
 
 3. **Import-Modus im Core** (mittel), siehe IMPORT-MODUS 5.2–5.4
    - `DfsPageParser` mit Tests gegen **synthetische Fixtures**: von Hand geschriebene Minimalseiten mit derselben HTML-Struktur wie die DFS-Seiten, jeweils als "nur HTML" und "komplett", mit kleinen generierten PNGs statt echter Karten. Zusätzlich Tests gegen `testdata/`, die übersprungen werden, wenn der Ordner fehlt.
@@ -540,7 +544,7 @@ Ergänzend zur Checkliste des Import-Modus (IMPORT-MODUS 7):
 | **Wegfall von Windows 7/8.1 und alten macOS-Versionen** | Anwender auf solchen Systemen müssen bei ChartButlerCS 2.0.x bleiben. Im README deutlich kommunizieren |
 | **Download-Größe** | Durch self-contained deutlich größer als ChartButlerCS. Für eine Desktop-Anwendung trotzdem unkritisch, Trimming verringert sie (8) |
 | **macOS-Signatur** | Ohne Apple-Developer-Account (kostenpflichtig) bleiben die Gatekeeper-Warnungen. Entscheiden, ob ein Account angeschafft wird oder ob eine Anleitung genügt |
-| **PNG-Import in PDFsharp 6 Core** | Mit echten DFS-Karten testen (Phase 2). Notfalls die PNGs vorher über SkiaSharp in JPEG oder ein anderes unterstütztes Format umwandeln |
+| **PNG-Import in PDFsharp 6 Core** | **Erledigt:** Die echten DFS-Karten (8-Bit RGB) werden direkt übernommen, ohne Umwandlung (Phase 2) |
 | **SkiaSharp-Version** | Muss zu der von Avalonia verwendeten passen, sonst gibt es Konflikte bei den nativen Bibliotheken |
 | **Layoutänderungen der DFS-Seiten** | Bleiben das größte Risiko im Betrieb, jetzt für den Parser der gespeicherten Seiten. Die Parser-Tests machen Anpassungen einfacher |
 | **Testdaten und Urheberrecht** | Echte DFS-Seiten nur lokal (`testdata/`). Im Repository und in CI nur synthetische Fixtures (11, Phase 3) |
