@@ -125,13 +125,20 @@ public partial class MainWindow : Window
         var session = new AbgleichViewModel(import, new ImportFolderScanner(vm.Settings.EffectiveImportFolder), OnDatabaseChanged);
         var window = new AbgleichWindow { DataContext = session };
         vm.IsSessionOpen = true;
-        window.Closed += (_, _) =>
+        window.Closed += async (_, _) =>
         {
             vm.IsSessionOpen = false;
             vm.Refresh();
+
+            // Das Hauptfenster liegt meist noch hinter dem Browser
+            Activate();
             if (import.UpdatedCharts.Count > 0)
             {
                 new UpdateOverviewWindow(import.UpdatedCharts).Show(this);
+            }
+            else if (session.ClosedAutomatically)
+            {
+                await MessageDialog.ShowAsync(this, session.Status, session.Title);
             }
         };
         _sessionWindow = window;

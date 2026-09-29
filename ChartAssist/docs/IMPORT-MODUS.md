@@ -266,7 +266,8 @@ Verhalten:
 - Der Import-Timer läuft nur, solange das Fenster offen ist. Während eine Datei verarbeitet wird, pausiert er.
 - Nach jedem Import wird die Datenbank über `ChartFolder` gespeichert, und das Hauptfenster aktualisiert seinen Baum. Die Datenbank ist damit auch bei einem Abbruch konsistent.
 - Solange das Fenster offen ist, sind im Hauptfenster "Flugplatz löschen" und "Optionen" deaktiviert. So kann das Kartenverzeichnis nicht mitten in der Sitzung wechseln.
-- Am Sitzungsende bzw. beim Schließen erscheint das `UpdateOverviewWindow` mit den aktualisierten Karten, falls es welche gibt.
+- Ist alles erledigt (Abgleich vollständig, keine Aktualisierung nötig, beim Hinzufügen alle Karten des Platzes übernommen), schließt sich das Fenster nach kurzer Pause selbst. Nach einem Abbruch bleibt es offen.
+- Beim Schließen kommt das Hauptfenster in den Vordergrund. Es erscheint das `UpdateOverviewWindow` mit den aktualisierten Karten, falls es welche gibt, sonst nach automatischem Schließen eine kurze Meldung mit dem Ergebnis.
 
 ### 5.6 Weitere Punkte
 
