@@ -301,7 +301,7 @@ Das ersetzt `OpenFileInDefaultApp` mit seiner OS-Weiche und funktioniert auf all
 |---|---|---|---|
 | Mindestversion | Windows 10 / 11 (Windows 7/8.1 werden von .NET 10 **nicht** unterstützt) | Aktuelle glibc-Distributionen (x64, optional arm64); musl/Alpine bräuchte eine eigene RID | Laut .NET-10-Supportmatrix (nur aktuelle macOS-Versionen); x64 und arm64 |
 | Paket | `.zip` mit einer `.exe` (Single-File) | `.tar.gz` mit ausführbarer Datei; optional AppImage | **`.app`-Bundle** in `.zip`/`.dmg`: `Contents/MacOS/ChartAssist`, `Contents/Info.plist`, `Contents/Resources/ChartAssist.icns` |
-| Icon | `ApplicationIcon` (`.ico`) | Fenster-Icon über Avalonia; optional `.desktop`-Datei | `.icns` aus dem vorhandenen Icon erzeugen |
+| Icon | `ApplicationIcon` (`.ico`) | Fenster-Icon über Avalonia. Startmenü-Eintrag und Desktop-Verknüpfung legt die App selbst an: beim ersten Start nach Rückfrage, danach passt sie die Pfade bei jedem Start an (`LinuxDesktopIntegration`). Nur im Release-Build | `.icns` aus dem vorhandenen Icon erzeugen |
 | Signatur | Optional (ohne Signatur warnt SmartScreen) | – | Unsignierte Apps blockiert Gatekeeper ("App ist beschädigt" nach Download). Ohne Apple-Developer-ID mindestens eine Ad-hoc-Signatur (**auf Apple Silicon Pflicht**) und eine Anleitung für Anwender (`xattr -dr com.apple.quarantine ChartAssist.app` bzw. Rechtsklick → Öffnen). Mit Developer-ID: `codesign` + `notarytool`. Deshalb den macOS-Build auf einem macOS-Runner erstellen |
 | Abhängigkeiten | keine (self-contained, siehe 8) | `fontconfig`, X11 bzw. XWayland; `libicu` nur ohne `InvariantGlobalization` (4.1) | keine |
 
@@ -419,7 +419,7 @@ Ein Umstieg von ChartButlerCS soll ohne Datenverlust möglich sein: Nach Auswahl
 |---|---|---|
 | `.ChartButler.xml` | im Kartenverzeichnis | Eigener Reader/Writer, der exakt das bisherige DataSet-Format liest und schreibt (4.3). Round-Trip-Test mit einer echten Datei einer 2.0.x-Version; einmal manuell prüfen, dass 2.0.x die neu geschriebene Datei liest |
 | Verzeichnis- und Dateinamen, versteckte Vorschaudateien | im Kartenverzeichnis | `Utility.BuildChartPath`/`BuildChartPreviewPath` und `GetFilenameFor` unverändert übernehmen. Die Vorschaudateien sind für den Import-Modus wesentlich, denn über sie wird Aktualität festgestellt |
-| `ChartButlerCS.config` | `ApplicationData` | Der Nachfolger hat eine eigene Einstellungsdatei. Fehlt sie beim ersten Start, übernimmt er `ChartFolder` aus `ChartButlerCS.config`, falls vorhanden. Den rechtlichen Hinweis zeigt er trotzdem, weil der Text neu ist |
+| `ChartButlerCS.config` | `ApplicationData` | Der Nachfolger hat eine eigene Einstellungsdatei (`ChartAssist/Settings.json`, JSON mit Source-Generator). Fehlt sie beim ersten Start, übernimmt er `ChartFolder` aus `ChartButlerCS.config`, falls vorhanden. Den rechtlichen Hinweis zeigt er trotzdem, weil der Text neu ist |
 | `ChartButlerCS.DFS.AFcache` | `ApplicationData` | Wird nicht mehr gebraucht und bleibt unberührt, denn sie gehört ChartButlerCS |
 
 ### Gemeinsames Kartenverzeichnis für Windows, Linux und macOS

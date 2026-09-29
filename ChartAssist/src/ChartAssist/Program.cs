@@ -14,6 +14,8 @@ internal sealed class Program
     public static AppBuilder BuildAvaloniaApp()
         => AppBuilder.Configure<App>()
             .UsePlatformDetect()
+            // Muss zu StartupWMClass im Startmenü-Eintrag passen, sonst zeigt das Dock kein Icon
+            .With(new X11PlatformOptions { WmClass = "ChartAssist" })
             .WithInterFont()
             .LogToTrace();
 }
