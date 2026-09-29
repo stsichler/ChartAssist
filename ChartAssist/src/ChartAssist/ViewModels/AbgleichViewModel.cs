@@ -65,6 +65,17 @@ public partial class AbgleichViewModel : ViewModelBase
     public partial bool IsTopmost { get; set; } = true;
 
     /// <summary>
+    /// Alles erledigt: Abgleich vollständig, keine Aktualisierung nötig, oder beim Hinzufügen alle Karten des neuen
+    /// Flugplatzes übernommen. Dann schließt sich das Fenster selbst. Nach einem Abbruch bleibt es offen.
+    /// </summary>
+    public bool IsComplete => Import.State is ImportSessionState.Completed or ImportSessionState.NothingToDo
+        || (Import.Mode == ImportMode.AddAirfield && Import.Airfields.Count > 0
+            && Import.Airfields.All(t => t.Status == AirfieldTaskStatus.Done) && Import.PendingCharts.Count == 0);
+
+    /// <summary>Das Fenster wurde geschlossen, weil alles erledigt war.</summary>
+    public bool ClosedAutomatically { get; set; }
+
+    /// <summary>
     /// Verarbeitet die fertig gespeicherten Dateien im Import-Ordner nacheinander.
     /// </summary>
     /// <param name="confirmNewAirfield">Rückfrage "Flugplatz abonnieren?" für einen unbekannten Flugplatz.</param>
