@@ -304,6 +304,46 @@ public sealed class ChartImportTests : IDisposable
         Assert.Equal(2, _database.ChartsOf(_airfield).Count(c => !c.IsTripKit));
     }
 
+    [Fact]
+    public void GleicheSeitenMehrfach_Abgleich()
+    {
+        byte[] newPreview = DfsTestPages.Png(SKColors.Orange);
+        string airfieldPage = AirfieldPage(NewEdition, ("EDXA Musterstadt 1", "h1", newPreview), ("AD 2-1", "h2", Preview2));
+        string chartPage = DfsTestPages.ChartPage(NewEdition, "h1", "EDXA Musterstadt 1", null, Chart2, SaveFormat.HtmlOnly);
+        ChartImport import = StartUpdate();
+
+        import.Import(airfieldPage);
+        import.Import(airfieldPage); // Flugplatzseite doppelt: dieselbe Karte bleibt angefordert, nicht doppelt
+        Assert.Single(import.PendingCharts);
+
+        import.Import(chartPage);
+        string before = Snapshot();
+        ImportResult again = import.Import(chartPage); // Kartenseite doppelt
+
+        Assert.Contains("bereits beendet", again.Message);
+        Assert.Equal(before, Snapshot());
+    }
+
+    [Fact]
+    public void GleicheSeitenMehrfach_NeuerFlugplatz()
+    {
+        var import = new ChartImport(_folder, _database, Version, ImportMode.AddAirfield);
+        string airfieldPage = DfsTestPages.AirfieldPage(NewEdition, "C0BBB2.html", "Beispiel EDXB",
+            [new("EDXB Beispiel 1", "b1", Preview1), new("AD 2-5", "b2", Preview2)], SaveFormat.HtmlOnly);
+        string chartPage = DfsTestPages.ChartPage(NewEdition, "b1", "EDXB Beispiel 1", null, Chart1, SaveFormat.HtmlOnly);
+        import.AddAirfield(import.Import(airfieldPage).NewAirfield!);
+        import.Import(chartPage);
+
+        import.Import(airfieldPage); // Flugplatzseite erneut: die übernommene Karte bleibt erledigt
+        Assert.Equal(["EDXB AD 2-5.png"], import.PendingCharts.Select(p => p.ChartName));
+        Assert.Equal(["EDXB Beispiel 1.png"], import.CompletedCharts.Select(p => p.ChartName));
+
+        string before = Snapshot();
+        ImportResult again = import.Import(chartPage); // Kartenseite doppelt
+        Assert.Contains("bereits übernommen", again.Message);
+        Assert.Equal(before, Snapshot());
+    }
+
     // Lokale Tests gegen echte Daten (IMPORT-MODUS 5.2)
 
     [Theory]

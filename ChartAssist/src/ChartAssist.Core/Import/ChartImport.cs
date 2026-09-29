@@ -258,8 +258,10 @@ public sealed class ChartImport
             }
             string chartName = chart?.Name ?? Utility.GetFilenameFor(serverName) + ".png";
 
+            // Auch bei neuen Flugplätzen vergleichen: Wird die Seite erneut gespeichert, sind schon übernommene
+            // Karten mit Datei und Vorschau vorhanden und werden nicht noch einmal angefordert
             var probe = new Chart { Icao = airfield.Icao, Name = chartName };
-            bool isCurrent = !task.IsNew && chart != null
+            bool isCurrent = chart != null
                 && File.Exists(Utility.BuildChartPath(_folder.Path, airfield, probe))
                 && Utility.FileEquals(Utility.BuildChartPreviewPath(_folder.Path, airfield, probe, "png"), entry.PreviewPng);
             if (!isCurrent)
@@ -299,7 +301,9 @@ public sealed class ChartImport
         PendingChart? pending = _pendingCharts.Find(p => string.Equals(p.Hash, page.Hash, StringComparison.OrdinalIgnoreCase));
         if (pending == null)
         {
-            return new ImportResult(ImportOutcome.Processed, $"Karte \"{page.Name}\" wurde nicht angefordert und wird übergangen.");
+            return _completedCharts.Any(c => string.Equals(c.Hash, page.Hash, StringComparison.OrdinalIgnoreCase))
+                ? new ImportResult(ImportOutcome.Processed, $"Karte \"{page.Name}\" ist bereits übernommen.")
+                : new ImportResult(ImportOutcome.Processed, $"Karte \"{page.Name}\" wurde nicht angefordert und wird übergangen.");
         }
         if (!string.Equals(page.Name, pending.ServerName, StringComparison.Ordinal)
             && !pending.ServerName.EndsWith(" " + page.Name, StringComparison.Ordinal))
