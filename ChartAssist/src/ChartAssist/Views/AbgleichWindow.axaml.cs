@@ -83,9 +83,22 @@ public partial class AbgleichWindow : Window
     /// <summary>Öffnet genau die eine Seite des markierten Eintrags (IMPORT-MODUS 2, Leitplanke 2).</summary>
     private async Task OpenSelectedAsync()
     {
-        if (ViewModel.SelectedItem?.Link is Uri link)
+        if (ViewModel.SelectedItem is { } item)
+        {
+            await OpenAsync(item);
+        }
+    }
+
+    /// <summary>Flugplätze ohne bekannten Permalink haben keinen Link; sie werden über das Flugplatzverzeichnis aufgerufen.</summary>
+    private async Task OpenAsync(TaskItemViewModel item)
+    {
+        if (item.Link is Uri link)
         {
             await Launch.UriAsync(this, link);
+        }
+        else
+        {
+            ViewModel.Status = "Für diesen Flugplatz ist kein direkter Link bekannt. Bitte über das Flugplatzverzeichnis aufrufen und die Seite speichern.";
         }
     }
 
@@ -100,9 +113,9 @@ public partial class AbgleichWindow : Window
         {
             return;
         }
-        if ((e.Source as Control)?.FindAncestorOfType<ListBoxItem>(includeSelf: true)?.DataContext is TaskItemViewModel { Link: Uri link })
+        if ((e.Source as Control)?.FindAncestorOfType<ListBoxItem>(includeSelf: true)?.DataContext is TaskItemViewModel item)
         {
-            await Launch.UriAsync(this, link);
+            await OpenAsync(item);
         }
     }
 

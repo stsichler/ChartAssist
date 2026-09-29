@@ -153,28 +153,29 @@ public partial class AbgleichViewModel : ViewModelBase
         RebuildItems();
     }
 
-    /// <summary>Baut die Aufgabenliste neu auf und markiert den nächsten offenen Eintrag, ohne ihn zu öffnen (Leitplanke 3).</summary>
+    /// <summary>
+    /// Baut die Aufgabenliste neu auf und markiert den nächsten offenen Eintrag, ohne ihn zu öffnen (Leitplanke 3).
+    /// Regel für alle Einträge: abgehakt, sobald die Seite, auf die der Link zeigt, übernommen ist.
+    /// </summary>
     public void RebuildItems()
     {
         Items.Clear();
-        if (Import.Mode == ImportMode.AddAirfield)
+
+        // Das Flugplatzverzeichnis beim Hinzufügen, und beim Abgleich für Flugplätze ohne bekannten Permalink
+        if (Import.Mode == ImportMode.AddAirfield || Import.Airfields.Any(t => t.Link == null))
         {
-            // Erledigt, sobald das Verzeichnis selbst oder die Seite eines Flugplatzes gespeichert ist;
-            // bleibt für weitere Plätze anklickbar
-            bool found = Import.OtherPageImported || Import.Airfields.Count > 0;
-            Items.Add(new TaskItemViewModel(found ? "✓" : "○", "Flugplatzverzeichnis", DfsUrls.AirfieldDirectory, isOpen: !found, isChart: false));
+            bool saved = Import.OtherPageImported;
+            Items.Add(new TaskItemViewModel(saved ? "✓" : "○", "Flugplatzverzeichnis", DfsUrls.AirfieldDirectory,
+                isOpen: !saved && !Import.IsFinished, isChart: false));
         }
 
         foreach (AirfieldTask task in Import.Airfields)
         {
-            string symbol = task.Status switch
-            {
-                AirfieldTaskStatus.Done => "✓",
-                AirfieldTaskStatus.WaitingForCharts => "…",
-                _ => "○",
-            };
-            Items.Add(new TaskItemViewModel(symbol, $"{task.Icao} – {task.Name}", task.Link ?? DfsUrls.AirfieldDirectory,
-                task.Status == AirfieldTaskStatus.Open && !Import.IsFinished, isChart: false));
+            // Abgehakt, sobald die Flugplatzseite verarbeitet ist; fehlende Karten stehen eingerückt darunter
+            bool pageSaved = task.Status != AirfieldTaskStatus.Open;
+            string text = task.Link == null ? $"{task.Icao} – {task.Name} (über Flugplatzverzeichnis)" : $"{task.Icao} – {task.Name}";
+            Items.Add(new TaskItemViewModel(pageSaved ? "✓" : "○", text, task.Link,
+                isOpen: !pageSaved && !Import.IsFinished, isChart: false));
 
             // Übernommene Karten bleiben abgehakt stehen, in der Reihenfolge der Flugplatzseite
             var charts = Import.CompletedCharts.Where(c => c.Icao == task.Icao).Select(c => (Chart: c, Done: true))
@@ -189,7 +190,7 @@ public partial class AbgleichViewModel : ViewModelBase
             }
         }
 
-        SelectedItem = Items.FirstOrDefault(i => i.IsOpen && i.Link != DfsUrls.AirfieldDirectory)
+        SelectedItem = Items.FirstOrDefault(i => i.IsOpen && i.Link != null && i.Link != DfsUrls.AirfieldDirectory)
             ?? Items.FirstOrDefault(i => i.IsOpen);
     }
 }
