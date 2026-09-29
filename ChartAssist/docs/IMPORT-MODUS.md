@@ -261,13 +261,13 @@ Inhalt:
 - Statuszeile mit der letzten Meldung.
 
 Verhalten:
-- Klick oder Enter öffnet den Link des Eintrags. Nach einem erfolgreichen Import wird der nächste offene Eintrag **markiert, aber nicht geöffnet** (Leitplanke 3). Deshalb reagiert das Öffnen auf den Klick (`Tapped`), nicht auf die Auswahl; Pfeiltasten öffnen nichts.
+- Klick oder Enter öffnet den Link des Eintrags. Nach einem erfolgreichen Import wird der nächste offene Eintrag **markiert, aber nicht geöffnet** (Leitplanke 3). Deshalb reagiert das Öffnen auf den Klick (`Tapped`), nicht auf die Auswahl. Pfeiltasten verschieben nur die Markierung; das Fenster verarbeitet sie selbst, weil der Neuaufbau der Liste nach jedem Import den Fokus des Eintrags löscht.
 - Der Pfad des Import-Ordners ist selektierbar und hat einen Knopf "Kopieren", z. B. für den Speichern-Dialog des Browsers.
 - Der Import-Timer läuft nur, solange das Fenster offen ist. Während eine Datei verarbeitet wird, pausiert er.
 - Nach jedem Import wird die Datenbank über `ChartFolder` gespeichert, und das Hauptfenster aktualisiert seinen Baum. Die Datenbank ist damit auch bei einem Abbruch konsistent.
 - Solange das Fenster offen ist, sind im Hauptfenster "Flugplatz löschen" und "Optionen" deaktiviert. So kann das Kartenverzeichnis nicht mitten in der Sitzung wechseln.
 - Ist alles erledigt (Abgleich vollständig, keine Aktualisierung nötig, beim Hinzufügen alle Karten des Platzes übernommen), schließt sich das Fenster nach kurzer Pause selbst. Nach einem Abbruch bleibt es offen.
-- Beim Schließen kommt das Hauptfenster in den Vordergrund. Es erscheint das `UpdateOverviewWindow` mit den aktualisierten Karten, falls es welche gibt, sonst nach automatischem Schließen eine kurze Meldung mit dem Ergebnis.
+- Beim Schließen kommt das Hauptfenster in den Vordergrund (Activate und kurz `Topmost`, weil GNOME Activate ablehnt, solange ChartAssist nicht aktiv ist). Es erscheint das `UpdateOverviewWindow` mit den aktualisierten Karten, falls es welche gibt, sonst nach automatischem Schließen eine kurze Meldung mit dem Ergebnis.
 
 ### 5.6 Weitere Punkte
 

@@ -79,7 +79,8 @@ public partial class AbgleichViewModel : ViewModelBase
     /// Verarbeitet die fertig gespeicherten Dateien im Import-Ordner nacheinander.
     /// </summary>
     /// <param name="confirmNewAirfield">Rückfrage "Flugplatz abonnieren?" für einen unbekannten Flugplatz.</param>
-    public async Task ProcessImportFolderAsync(Func<DfsAirfieldPage, Task<bool>> confirmNewAirfield)
+    /// <returns>true, wenn mindestens eine Datei verarbeitet und die Aufgabenliste neu aufgebaut wurde.</returns>
+    public async Task<bool> ProcessImportFolderAsync(Func<DfsAirfieldPage, Task<bool>> confirmNewAirfield)
     {
         IReadOnlyList<string> files;
         try
@@ -89,13 +90,14 @@ public partial class AbgleichViewModel : ViewModelBase
         catch (Exception e) when (e is IOException or UnauthorizedAccessException)
         {
             Status = "Der Import-Ordner ist nicht erreichbar: " + e.Message;
-            return;
+            return false;
         }
 
         foreach (string file in files)
         {
             await ProcessFileAsync(file, confirmNewAirfield);
         }
+        return files.Count > 0;
     }
 
     private async Task ProcessFileAsync(string file, Func<DfsAirfieldPage, Task<bool>> confirmNewAirfield)

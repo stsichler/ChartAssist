@@ -22,6 +22,10 @@ public partial class AbgleichWindow : Window
     {
         InitializeComponent();
         _timer.Tick += OnTimerTick;
+
+        // Tastatur auf Fensterebene: Nach jedem Import wird die Liste neu aufgebaut, dabei geht der Fokus des
+        // Listeneintrags verloren. Pfeiltasten und Enter sollen trotzdem immer funktionieren.
+        AddHandler(KeyDownEvent, OnWindowKeyDown, RoutingStrategies.Tunnel);
     }
 
     private AbgleichViewModel ViewModel => (AbgleichViewModel)DataContext!;
@@ -30,7 +34,7 @@ public partial class AbgleichWindow : Window
     {
         base.OnOpened(e);
         _timer.Start();
-        TaskList.Focus();
+        FocusSelectedItem();
     }
 
     protected override void OnClosed(EventArgs e)
@@ -48,7 +52,10 @@ public partial class AbgleichWindow : Window
         _busy = true;
         try
         {
-            await ViewModel.ProcessImportFolderAsync(ConfirmNewAirfieldAsync);
+            if (await ViewModel.ProcessImportFolderAsync(ConfirmNewAirfieldAsync))
+            {
+                FocusSelectedItem();
+            }
             if (ViewModel.IsComplete)
             {
                 // Kurz stehen lassen, damit der letzte Haken zu sehen ist
@@ -98,13 +105,61 @@ public partial class AbgleichWindow : Window
         }
     }
 
-    private async void OnTaskKeyDown(object? sender, KeyEventArgs e)
+    /// <summary>
+    /// Pfeiltasten verschieben nur die Markierung, Enter öffnet genau den markierten Eintrag (Leitplanken 2 und 3).
+    /// Auf Knöpfen und der Checkbox behalten die Tasten ihre normale Bedeutung.
+    /// </summary>
+    private async void OnWindowKeyDown(object? sender, KeyEventArgs e)
     {
-        if (e.Key == Key.Enter)
+        if (FocusManager?.GetFocusedElement() is Button or CheckBox)
         {
-            e.Handled = true;
-            await OpenSelectedAsync();
+            return;
         }
+        switch (e.Key)
+        {
+            case Key.Up:
+                e.Handled = true;
+                MoveSelection(-1);
+                break;
+            case Key.Down:
+                e.Handled = true;
+                MoveSelection(+1);
+                break;
+            case Key.Enter:
+                e.Handled = true;
+                await OpenSelectedAsync();
+                break;
+        }
+    }
+
+    private void MoveSelection(int step)
+    {
+        int count = ViewModel.Items.Count;
+        if (count == 0)
+        {
+            return;
+        }
+        int index = ViewModel.SelectedItem == null ? -1 : ViewModel.Items.IndexOf(ViewModel.SelectedItem);
+        index = index < 0 ? 0 : Math.Clamp(index + step, 0, count - 1);
+        ViewModel.SelectedItem = ViewModel.Items[index];
+        FocusSelectedItem();
+    }
+
+    /// <summary>Gibt dem markierten Eintrag den Tastaturfokus, auch nachdem die Liste neu aufgebaut wurde.</summary>
+    private void FocusSelectedItem()
+    {
+        Dispatcher.UIThread.Post(() =>
+        {
+            if (ViewModel.SelectedItem is { } item)
+            {
+                TaskList.ScrollIntoView(item);
+                (TaskList.ContainerFromItem(item) ?? TaskList).Focus(NavigationMethod.Directional);
+            }
+            else
+            {
+                TaskList.Focus();
+            }
+        }, DispatcherPriority.Background);
     }
 
     private async void OnOpenInBrowser(object? sender, RoutedEventArgs e) => await OpenSelectedAsync();
