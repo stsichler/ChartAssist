@@ -495,6 +495,7 @@ Jede Phase endet mit einem baubaren, getesteten Stand. Die Phasen 3 und 4 setzen
 4. **Oberfläche** (groß)
    - `MessageDialog`, dann `MainWindow` (Baum, Vorschau, Banner, Buttons), `AbgleichWindow`, `OptionsWindow`, `UpdateOverviewWindow`, `HelpWindow`.
    - Auf allen drei Plattformen manuell testen (Checklisten in Abschnitt 12 und IMPORT-MODUS 7).
+   - **Stand 29.09.2026:** alle Fenster umgesetzt und mit `Avalonia.Headless` gerendert geprüft (Hauptfenster, Abgleich mit echten Seiten, Optionen, Übersicht, Hilfe, Startablauf). Abweichend von 5.1: Das Hauptfenster nutzt Code-Behind für Dialoge und Fensterwechsel, das ViewModel hält nur den Zustand. Offen: manueller Test mit Browser auf allen drei Plattformen.
 
 5. **Release** (klein)
    - `README.md` fertigstellen, Vorab-Release (Pre-release) erstellen und auf echten Rechnern testen, auch den Umstieg von ChartButlerCS mit einem bestehenden Kartenverzeichnis.

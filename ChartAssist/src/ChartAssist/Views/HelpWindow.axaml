@@ -1,0 +1,69 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="ChartAssist.Views.HelpWindow"
+        Icon="/Assets/Icon.ico"
+        Title="Hilfe / Info"
+        Width="620" Height="560" MinWidth="420" MinHeight="360"
+        WindowStartupLocation="CenterOwner">
+
+  <Window.Styles>
+    <Style Selector="TextBlock.heading">
+      <Setter Property="FontWeight" Value="SemiBold" />
+      <Setter Property="Margin" Value="0,10,0,2" />
+    </Style>
+    <Style Selector="TextBlock">
+      <Setter Property="TextWrapping" Value="Wrap" />
+    </Style>
+  </Window.Styles>
+
+  <DockPanel Margin="12">
+    <Button DockPanel.Dock="Bottom" Content="Schließen" HorizontalAlignment="Right" IsCancel="True" Margin="0,8,0,0" Click="OnClose" />
+
+    <TabControl>
+      <TabItem Header="Bedienung">
+        <ScrollViewer>
+          <StackPanel Margin="4">
+            <TextBlock Classes="heading" Text="Karten aktualisieren" />
+            <TextBlock Text="ChartAssist zeigt, welche Seiten der DFS Sie speichern müssen. Doppelklick auf einen Eintrag öffnet die Seite im Browser. Dort mit Strg+S als „Webseite, nur HTML“ in den Import-Ordner speichern. Den Rest erledigt ChartAssist." />
+            <TextBlock Text="Hat sich nichts geändert, genügt die erste Seite. Sonst folgt je Flugplatz eine Seite und je geänderter Karte eine weitere." Margin="0,4,0,0" />
+
+            <TextBlock Classes="heading" Text="Flugplatz hinzufügen" />
+            <TextBlock Text="Im Flugplatzverzeichnis den Platz aufrufen und seine Seite speichern. Danach fordert ChartAssist alle Karten des Platzes an. Tipp: Auf der Kartenseite führt der „Weiter“-Pfeil zur nächsten Karte." />
+
+            <TextBlock Classes="heading" Text="Warum Sie die Seiten selbst aufrufen" />
+            <TextBlock Text="Die Nutzungsbedingungen der DFS verbieten den Zugriff mit automatisierten Tools. ChartAssist greift deshalb nie selbst auf die DFS zu." />
+
+            <TextBlock Classes="heading" Text="Hauptfenster" />
+            <TextBlock Text="Doppelklick auf eine Karte öffnet sie. Rechtsklick auf einen Flugplatz: löschen." />
+
+            <TextBlock Classes="heading" Text="Kartenverzeichnis" />
+            <TextBlock Text="Karten und Datenbank liegen zusammen im Kartenverzeichnis. Sie können es kopieren oder synchronisieren und unter Windows, Linux und macOS verwenden. Kartenverzeichnisse von ChartButlerCS funktionieren weiter." />
+          </StackPanel>
+        </ScrollViewer>
+      </TabItem>
+
+      <TabItem Header="Info">
+        <ScrollViewer>
+          <StackPanel Margin="4">
+            <TextBlock x:Name="VersionText" FontSize="18" FontWeight="SemiBold" />
+            <HyperlinkButton x:Name="ProjectLink" Padding="0" Margin="0,2,0,0" />
+
+            <TextBlock Classes="heading" Text="Urheber" />
+            <TextBlock Text="Copyright © 2016-2026 Stefan Sichler. Idee und Originalversion (ChartButler) © 2010 Jörg Pauly, Weiterentwicklung mit seiner freundlichen Genehmigung. Alle Rechte vorbehalten. Das Programm ist frei erhältlich." />
+            <TextBlock Text="Programm-Icon: Christoph Wildenmann." Margin="0,4,0,0" />
+
+            <TextBlock Classes="heading" Text="Entstehung mit KI-Unterstützung" />
+            <TextBlock Text="ChartAssist wird mit KI entwickelt (Claude Code von Anthropic). Quellcode und Dokumentation sind ganz oder teilweise KI-generiert." />
+
+            <TextBlock Classes="heading" Text="Kartenmaterial" />
+            <TextBlock Text="DFS Deutsche Flugsicherung GmbH, BasicVFR AIP. ChartAssist greift nicht selbst darauf zu. Bitte beachten Sie die Nutzungsbedingungen der DFS. Sie sind selbst für die Aktualität Ihrer Karten verantwortlich." />
+
+            <TextBlock Classes="heading" Text="Verwendete Bibliotheken" />
+            <TextBlock Text=".NET, Avalonia, SkiaSharp, PDFsharp, CommunityToolkit.Mvvm (jeweils MIT-Lizenz), Schrift Inter (SIL Open Font License)." />
+          </StackPanel>
+        </ScrollViewer>
+      </TabItem>
+    </TabControl>
+  </DockPanel>
+
+</Window>
