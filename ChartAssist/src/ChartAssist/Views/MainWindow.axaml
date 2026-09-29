@@ -64,6 +64,11 @@
       <TextBlock Text="{Binding BannerText}" Foreground="White" TextWrapping="Wrap" FontWeight="SemiBold" />
     </Border>
 
+    <!-- Statusleiste: Stand der Karten und nächste planmäßige Ausgabe -->
+    <Border DockPanel.Dock="Bottom" BorderBrush="Gray" BorderThickness="0,1,0,0" Padding="10,4">
+      <TextBlock Text="{Binding StatusText}" FontSize="12" Opacity="0.8" />
+    </Border>
+
     <Grid ColumnDefinitions="300,Auto,*,220" Margin="8">
       <TreeView x:Name="Tree" Grid.Column="0"
                 ItemsSource="{Binding Nodes}"

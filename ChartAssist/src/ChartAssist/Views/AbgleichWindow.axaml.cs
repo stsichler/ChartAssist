@@ -17,6 +17,7 @@ public partial class AbgleichWindow : Window
 {
     private readonly DispatcherTimer _timer = new() { Interval = TimeSpan.FromSeconds(1.5) };
     private bool _busy;
+    private bool _lastPressWasRightButton;
 
     public AbgleichWindow()
     {
@@ -26,6 +27,11 @@ public partial class AbgleichWindow : Window
         // Tastatur auf Fensterebene: Nach jedem Import wird die Liste neu aufgebaut, dabei geht der Fokus des
         // Listeneintrags verloren. Pfeiltasten und Enter sollen trotzdem immer funktionieren.
         AddHandler(KeyDownEvent, OnWindowKeyDown, RoutingStrategies.Tunnel);
+
+        // Welche Maustaste zuletzt gedrückt wurde: Ein Rechtsklick öffnet nur das Kontextmenü, nie die Seite
+        TaskList.AddHandler(PointerPressedEvent,
+            (_, e) => _lastPressWasRightButton = e.GetCurrentPoint(TaskList).Properties.IsRightButtonPressed,
+            RoutingStrategies.Tunnel);
     }
 
     private AbgleichViewModel ViewModel => (AbgleichViewModel)DataContext!;
@@ -90,10 +96,34 @@ public partial class AbgleichWindow : Window
     /// </summary>
     private async void OnTaskTapped(object? sender, TappedEventArgs e)
     {
+        if (_lastPressWasRightButton)
+        {
+            return;
+        }
         if ((e.Source as Control)?.FindAncestorOfType<ListBoxItem>(includeSelf: true)?.DataContext is TaskItemViewModel { Link: Uri link })
         {
             await Launch.UriAsync(this, link);
         }
+    }
+
+    /// <summary>Kontextmenü "Link kopieren", z. B. zum Einfügen in die Adressleiste des Browsers.</summary>
+    private void OnTaskContextRequested(object? sender, ContextRequestedEventArgs e)
+    {
+        if ((e.Source as Control)?.FindAncestorOfType<ListBoxItem>(includeSelf: true) is not { DataContext: TaskItemViewModel { Link: Uri link } } container)
+        {
+            return;
+        }
+        var copy = new MenuItem { Header = "Link kopieren" };
+        copy.Click += async (_, _) =>
+        {
+            if (Clipboard is { } clipboard)
+            {
+                await clipboard.SetTextAsync(link.AbsoluteUri);
+                ViewModel.Status = "Link kopiert: " + link.AbsoluteUri;
+            }
+        };
+        new ContextMenu { ItemsSource = new[] { copy } }.Open(container);
+        e.Handled = true;
     }
 
     private async void OnCopyImportFolder(object? sender, RoutedEventArgs e)

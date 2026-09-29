@@ -263,6 +263,7 @@ Inhalt:
 Verhalten:
 - Klick oder Enter öffnet den Link des Eintrags. Nach einem erfolgreichen Import wird der nächste offene Eintrag **markiert, aber nicht geöffnet** (Leitplanke 3). Deshalb reagiert das Öffnen auf den Klick (`Tapped`), nicht auf die Auswahl. Pfeiltasten verschieben nur die Markierung; das Fenster verarbeitet sie selbst, weil der Neuaufbau der Liste nach jedem Import den Fokus des Eintrags löscht.
 - Der Pfad des Import-Ordners ist selektierbar und hat einen Knopf "Kopieren", z. B. für den Speichern-Dialog des Browsers.
+- Rechtsklick auf einen Eintrag: Kontextmenü "Link kopieren", um die Adresse selbst in den Browser einzufügen. Ein Rechtsklick öffnet nie eine Seite.
 - Der Import-Timer läuft nur, solange das Fenster offen ist. Während eine Datei verarbeitet wird, pausiert er.
 - Nach jedem Import wird die Datenbank über `ChartFolder` gespeichert, und das Hauptfenster aktualisiert seinen Baum. Die Datenbank ist damit auch bei einem Abbruch konsistent.
 - Solange das Fenster offen ist, sind im Hauptfenster "Flugplatz löschen" und "Optionen" deaktiviert. So kann das Kartenverzeichnis nicht mitten in der Sitzung wechseln.
@@ -272,7 +273,7 @@ Verhalten:
 ### 5.6 Weitere Punkte
 
 - **`MainWindow`:** "Karten aktualisieren" und "Neuer Flugplatz" öffnen das `AbgleichWindow` im jeweiligen Modus. Eine ICAO-Eingabe gibt es nicht mehr. Das Hinweisbanner spricht von "Kartenabgleich" statt "Abgleich mit dem Server".
-- **Erinnerung an neue Ausgaben:** ChartButlerCS mahnt einen Abgleich an, wenn der letzte älter als 28 Tage ist. Weil die BasicVFR einen festen 28-Tage-Zyklus hat (Abschnitt 4), kann der Nachfolger genauer sein: Nächste erwartete Ausgabe = `AipLastUpdate` + 28 Tage. Ab diesem Tag erscheint das Banner, z. B. "Seit 17.09.2026 ist eine neue Ausgabe der BasicVFR zu erwarten". Das ist nur eine Erinnerung. Ob sich tatsächlich etwas geändert hat, entscheidet weiterhin das Effective-Datum der ersten gespeicherten Seite. Weicht die DFS einmal vom Zyklus ab, geht dadurch nichts verloren.
+- **Erinnerung an neue Ausgaben:** ChartButlerCS mahnt einen Abgleich an, wenn der letzte älter als 28 Tage ist. Weil die BasicVFR einen festen 28-Tage-Zyklus hat (Abschnitt 4), kann der Nachfolger genauer sein: Nächste erwartete Ausgabe = `AipLastUpdate` + 28 Tage. Ab diesem Tag erscheint das Banner, z. B. "Seit 17.09.2026 ist eine neue Ausgabe der BasicVFR zu erwarten". Das ist nur eine Erinnerung. Ob sich tatsächlich etwas geändert hat, entscheidet weiterhin das Effective-Datum der ersten gespeicherten Seite. Die Statusleiste des Hauptfensters zeigt dauerhaft die Ausgabe des Kartensatzes und die nächste planmäßige Ausgabe. Weicht die DFS einmal vom Zyklus ab, geht dadurch nichts verloren.
 - **Rechtlicher Hinweis beim ersten Start**, neu formuliert:
   - ChartAssist greift selbst nicht auf die DFS zu,
   - der Benutzer ruft die Seiten selbst im Browser auf und speichert sie,
