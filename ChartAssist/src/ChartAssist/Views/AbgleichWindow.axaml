@@ -1,0 +1,49 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:ChartAssist.ViewModels"
+        x:Class="ChartAssist.Views.AbgleichWindow"
+        x:DataType="vm:AbgleichViewModel"
+        Icon="/Assets/Icon.ico"
+        Title="{Binding Title}"
+        Topmost="{Binding IsTopmost}"
+        Width="520" Height="560" MinWidth="380" MinHeight="320"
+        WindowStartupLocation="CenterOwner">
+
+  <DockPanel Margin="12">
+    <TextBlock DockPanel.Dock="Top" Text="{Binding Instructions}" TextWrapping="Wrap" Margin="0,0,0,4" />
+    <TextBlock DockPanel.Dock="Top" Text="{Binding ImportFolderText}" TextWrapping="Wrap" Opacity="0.7" FontSize="12" Margin="0,0,0,8" />
+
+    <Grid DockPanel.Dock="Bottom" ColumnDefinitions="Auto,*,Auto,Auto" Margin="0,8,0,0">
+      <CheckBox Grid.Column="0" Content="Immer im Vordergrund" IsChecked="{Binding IsTopmost}" />
+      <Button Grid.Column="2" Content="Import-Ordner öffnen" Click="OnOpenImportFolder" Margin="0,0,8,0" />
+      <Button Grid.Column="3" Content="Schließen" Click="OnClose" />
+    </Grid>
+
+    <Border DockPanel.Dock="Bottom" BorderBrush="Gray" BorderThickness="0,1,0,0" Padding="0,8,0,0" Margin="0,8,0,0">
+      <TextBlock Text="{Binding Status}" TextWrapping="Wrap" />
+    </Border>
+
+    <Button DockPanel.Dock="Bottom" Content="Im Browser öffnen" Click="OnOpenInBrowser" HorizontalAlignment="Left" Margin="0,8,0,0" />
+
+    <ListBox x:Name="TaskList" ItemsSource="{Binding Items}" SelectedItem="{Binding SelectedItem}"
+             DoubleTapped="OnTaskDoubleTapped" KeyDown="OnTaskKeyDown">
+      <ListBox.ItemTemplate>
+        <DataTemplate DataType="vm:TaskItemViewModel">
+          <StackPanel Orientation="Horizontal" Spacing="8" Classes.chart="{Binding IsChart}">
+            <TextBlock Text="{Binding Symbol}" Width="16" TextAlignment="Center" />
+            <TextBlock Text="{Binding Text}" />
+          </StackPanel>
+        </DataTemplate>
+      </ListBox.ItemTemplate>
+      <ListBox.Styles>
+        <Style Selector="ListBoxItem">
+          <Setter Property="Padding" Value="8,5" />
+        </Style>
+        <Style Selector="StackPanel.chart">
+          <Setter Property="Margin" Value="24,0,0,0" />
+        </Style>
+      </ListBox.Styles>
+    </ListBox>
+  </DockPanel>
+
+</Window>

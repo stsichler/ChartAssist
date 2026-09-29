@@ -13,7 +13,8 @@ namespace ChartAssist;
 /// </summary>
 internal static class LinuxDesktopSetup
 {
-    public static async Task RunAsync(Window owner)
+    /// <param name="save">Speichert die Einstellungen, nachdem sich <see cref="Settings.DesktopIntegrationOffered"/> geändert hat.</param>
+    public static async Task RunAsync(Window owner, Settings settings, Action save)
     {
 #if DEBUG
         // Beim Entwickeln keine Einträge auf den Pfad in bin/Debug anlegen
@@ -34,7 +35,6 @@ internal static class LinuxDesktopSetup
                 return;
             }
 
-            Settings settings = Settings.Load(Settings.DefaultPath);
             if (settings.DesktopIntegrationOffered)
             {
                 return;
@@ -43,7 +43,7 @@ internal static class LinuxDesktopSetup
             bool install = await MessageDialog.AskAsync(owner, "ChartAssist einrichten",
                 "Soll ChartAssist einen Eintrag im Startmenü und eine Verknüpfung auf dem Desktop bekommen?");
             settings.DesktopIntegrationOffered = true;
-            settings.Save(Settings.DefaultPath);
+            save();
             if (install)
             {
                 integration.Install(executable, icon, desktopShortcut: true);

@@ -3,23 +3,85 @@
         xmlns:vm="using:ChartAssist.ViewModels"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        mc:Ignorable="d" d:DesignWidth="980" d:DesignHeight="600"
         x:Class="ChartAssist.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
         Icon="/Assets/Icon.ico"
-        Width="800" Height="500"
-        Title="ChartAssist">
+        Width="1000" Height="640" MinWidth="720" MinHeight="420"
+        WindowStartupLocation="CenterScreen"
+        Title="{Binding Title}">
 
   <Design.DataContext>
     <!-- Nur für die Vorschau in der IDE; zur Laufzeit setzt App.axaml.cs den DataContext -->
     <vm:MainWindowViewModel />
   </Design.DataContext>
 
-  <!-- Phase 1: nur ein leeres Hauptfenster mit der Versionsnummer -->
-  <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="8">
-    <Image Source="/Assets/Icon.png" Width="96" Height="96" />
-    <TextBlock HorizontalAlignment="Center" FontSize="20" Text="ChartAssist" />
-    <TextBlock HorizontalAlignment="Center" Opacity="0.7" Text="{Binding Version, StringFormat='Version {0}'}" />
-  </StackPanel>
+  <Window.Styles>
+    <Style Selector="TextBlock.group">
+      <Setter Property="FontWeight" Value="Bold" />
+    </Style>
+    <Style Selector="Border.banner">
+      <Setter Property="Background" Value="SteelBlue" />
+      <Setter Property="Cursor" Value="Hand" />
+      <Setter Property="Padding" Value="12,8" />
+    </Style>
+    <Style Selector="Border.banner.warning">
+      <Setter Property="Background" Value="DarkRed" />
+    </Style>
+    <Style Selector="StackPanel.actions > Button">
+      <Setter Property="HorizontalAlignment" Value="Stretch" />
+      <Setter Property="HorizontalContentAlignment" Value="Center" />
+      <Setter Property="Padding" Value="8,10" />
+    </Style>
+  </Window.Styles>
+
+  <DockPanel>
+    <!-- Hinweisbanner: Kartenabgleich nötig (rot) oder neue Version (blau) -->
+    <Border DockPanel.Dock="Top" Classes="banner" Classes.warning="{Binding IsBannerWarning}"
+            IsVisible="{Binding IsBannerVisible}" PointerPressed="OnBannerPressed">
+      <TextBlock Text="{Binding BannerText}" Foreground="White" TextWrapping="Wrap" FontWeight="SemiBold" />
+    </Border>
+
+    <Grid ColumnDefinitions="300,Auto,*,220" Margin="8">
+      <TreeView x:Name="Tree" Grid.Column="0"
+                ItemsSource="{Binding Nodes}"
+                SelectedItem="{Binding SelectedNode}"
+                DoubleTapped="OnTreeDoubleTapped"
+                KeyDown="OnTreeKeyDown"
+                ContextRequested="OnTreeContextRequested">
+        <TreeView.ItemContainerTheme>
+          <ControlTheme TargetType="TreeViewItem" BasedOn="{StaticResource {x:Type TreeViewItem}}" x:DataType="vm:TreeNodeViewModel">
+            <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}" />
+            <Setter Property="MinHeight" Value="26" />
+          </ControlTheme>
+        </TreeView.ItemContainerTheme>
+        <TreeView.ItemTemplate>
+          <TreeDataTemplate DataType="vm:TreeNodeViewModel" ItemsSource="{Binding Children}">
+            <TextBlock Text="{Binding Header}" Classes.group="{Binding IsGroup}" />
+          </TreeDataTemplate>
+        </TreeView.ItemTemplate>
+      </TreeView>
+
+      <GridSplitter Grid.Column="1" Width="6" Background="Transparent" ResizeDirection="Columns" />
+
+      <!-- Vorschau der ausgewählten Karte; Doppelklick öffnet sie -->
+      <Border Grid.Column="2" Background="White" BorderBrush="Gray" BorderThickness="1" Margin="0,0,8,0">
+        <Image Source="{Binding Preview}" Stretch="Uniform" Margin="4" DoubleTapped="OnPreviewDoubleTapped" />
+      </Border>
+
+      <DockPanel Grid.Column="3">
+        <StackPanel DockPanel.Dock="Bottom" Classes="actions" Spacing="8">
+          <Button Content="Hilfe/Info" Click="OnHelp" />
+          <Button Content="Schließen" Click="OnClose" />
+        </StackPanel>
+        <StackPanel Classes="actions" Spacing="8">
+          <Button Content="Flugplatz hinzufügen" Click="OnAddAirfield" IsEnabled="{Binding CanStartSession}" />
+          <Button Content="Karten aktualisieren" Click="OnUpdateCharts" IsEnabled="{Binding CanUpdateCharts}" />
+          <Button Content="Optionen" Click="OnOptions" IsEnabled="{Binding CanChangeOptions}" />
+          <Image Source="/Assets/Icon.png" Width="128" Height="128" Margin="0,32,0,0" />
+        </StackPanel>
+      </DockPanel>
+    </Grid>
+  </DockPanel>
 
 </Window>

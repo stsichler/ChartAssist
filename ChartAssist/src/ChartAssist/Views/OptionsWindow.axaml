@@ -1,0 +1,32 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="ChartAssist.Views.OptionsWindow"
+        Icon="/Assets/Icon.ico"
+        Title="Optionen"
+        Width="560" SizeToContent="Height"
+        CanResize="False" ShowInTaskbar="False"
+        WindowStartupLocation="CenterOwner">
+
+  <StackPanel Margin="20" Spacing="6">
+    <TextBlock Text="Kartenverzeichnis" FontWeight="SemiBold" />
+    <Grid ColumnDefinitions="*,Auto">
+      <TextBox x:Name="ChartFolderBox" Grid.Column="0" />
+      <Button Grid.Column="1" Content="Durchsuchen…" Margin="8,0,0,0" Click="OnBrowseChartFolder" />
+    </Grid>
+
+    <TextBlock Text="Import-Ordner" FontWeight="SemiBold" Margin="0,12,0,0" />
+    <Grid ColumnDefinitions="*,Auto">
+      <TextBox x:Name="ImportFolderBox" Grid.Column="0" PlaceholderText="Standard: Unterordner „Import“ im Kartenverzeichnis" />
+      <Button Grid.Column="1" Content="Durchsuchen…" Margin="8,0,0,0" Click="OnBrowseImportFolder" />
+    </Grid>
+    <TextBlock Text="Hierhin speichern Sie die Seiten der DFS aus dem Browser." TextWrapping="Wrap" Opacity="0.7" FontSize="12" />
+
+    <TextBlock x:Name="ErrorText" Foreground="DarkRed" TextWrapping="Wrap" IsVisible="False" Margin="0,8,0,0" />
+
+    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8" Margin="0,16,0,0">
+      <Button Content="OK" MinWidth="90" IsDefault="True" Click="OnOk" />
+      <Button Content="Abbrechen" MinWidth="90" IsCancel="True" Click="OnCancel" />
+    </StackPanel>
+  </StackPanel>
+
+</Window>

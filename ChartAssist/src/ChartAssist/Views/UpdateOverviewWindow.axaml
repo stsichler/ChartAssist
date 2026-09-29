@@ -1,0 +1,29 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:import="using:ChartAssist.Core.Import"
+        x:Class="ChartAssist.Views.UpdateOverviewWindow"
+        Icon="/Assets/Icon.ico"
+        Title="Aktualisierte Karten"
+        Width="460" Height="420" MinWidth="360" MinHeight="260"
+        WindowStartupLocation="CenterOwner">
+
+  <DockPanel Margin="12">
+    <TextBlock DockPanel.Dock="Top" TextWrapping="Wrap" Margin="0,0,0,8"
+               Text="Diese Karten wurden aktualisiert. Denken Sie an ausgedruckte Exemplare. Doppelklick öffnet eine Karte." />
+
+    <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8" Margin="0,8,0,0">
+      <Button Content="Alle anzeigen" Click="OnShowAll" />
+      <Button Content="Alle kopieren…" Click="OnCopyAll" />
+      <Button Content="Schließen" IsCancel="True" Click="OnClose" />
+    </StackPanel>
+
+    <ListBox x:Name="ChartList" DoubleTapped="OnChartDoubleTapped">
+      <ListBox.ItemTemplate>
+        <DataTemplate DataType="import:UpdatedChart">
+          <TextBlock Text="{Binding Name}" />
+        </DataTemplate>
+      </ListBox.ItemTemplate>
+    </ListBox>
+  </DockPanel>
+
+</Window>
