@@ -444,7 +444,7 @@ Dasselbe Kartenverzeichnis soll abwechselnd unter Windows, Linux und macOS verwe
 
 ### Versionswechsel
 
-Das Feld `ChartButler.Version` in der DB ändert sich mit dem Nachfolger. Dadurch gilt der erste Abgleich als vollständig, was erwünscht ist. Wechselt ein Anwender zurück zu ChartButlerCS, erzwingt dieses aus demselben Grund einen vollständigen Abgleich mit dem Server. Das funktioniert, ist aber genau der Serverzugriff, den der Nachfolger vermeiden soll. Paralleler Betrieb beider Programme auf demselben Kartenverzeichnis wird deshalb nicht empfohlen.
+Das Feld `ChartButler.Version` in der DB ändert sich mit dem Nachfolger. ChartAssist schreibt es mit Programmnamen, z. B. `ChartAssist 1.0.0.0`: ChartButlerCS vergleicht nur den Text mit seiner eigenen Nummer, und bei gleicher Nummer würden die Programme die Datenbank des anderen sonst für ihre eigene halten. Dadurch gilt der erste Abgleich als vollständig, was erwünscht ist. Wechselt ein Anwender zurück zu ChartButlerCS, erzwingt dieses aus demselben Grund einen vollständigen Abgleich mit dem Server. Das funktioniert, ist aber genau der Serverzugriff, den der Nachfolger vermeiden soll. Paralleler Betrieb beider Programme auf demselben Kartenverzeichnis wird deshalb nicht empfohlen.
 
 ---
 

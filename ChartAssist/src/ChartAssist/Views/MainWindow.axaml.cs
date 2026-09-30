@@ -124,7 +124,7 @@ public partial class MainWindow : Window
             return;
         }
 
-        var import = new ChartImport(vm.Folder, vm.Database, AppInfo.VersionText, mode);
+        var import = new ChartImport(vm.Folder, vm.Database, AppInfo.DatabaseVersion, mode);
         var session = new AbgleichViewModel(import, new ImportFolderScanner(vm.Settings.EffectiveImportFolder), OnDatabaseChanged);
         var window = new AbgleichWindow { DataContext = session };
         vm.IsSessionOpen = true;

@@ -98,7 +98,7 @@ public sealed class ChartImport
     private readonly List<PendingChart> _completedCharts = [];
     private readonly List<UpdatedChart> _updatedCharts = [];
 
-    /// <param name="programVersion">Vierstellige Programmversion; eine andere Version in der Datenbank erzwingt einen vollständigen Abgleich.</param>
+    /// <param name="programVersion">Kennung für <c>ChartButler.Version</c>, z. B. "ChartAssist 1.0.0.0"; eine andere Kennung in der Datenbank erzwingt einen vollständigen Abgleich.</param>
     public ChartImport(ChartFolder folder, ChartDatabase database, string programVersion, ImportMode mode)
     {
         _folder = folder;
