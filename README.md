@@ -9,15 +9,15 @@
 
 ---
 
-ChartAssist hilft Ihnen, die VFR-Anflugkarten der BasicVFR AIP der DFS aktuell zu halten: Es behält den Überblick über Ihre lokal gespeicherten Karten, zeigt Ihnen, welche Seiten Sie aufrufen müssen, übernimmt die gespeicherten Karten und erzeugt pro Flugplatz ein TripKit-PDF.
+ChartAssist hilft Ihnen, VFR-Anflugkarten der BasicVFR AIP der DFS auf Ihrem heimischen Rechner aktuell zu halten: Es behält den Überblick über Ihre lokal gespeicherten Karten und leitet Sie durch den Aktualisierungsprozess. Für jeden Flugplatz wird außerdem ein "TripKit-PDF" im Stil von GAT24 erzeugt, damit Sie die Karten auch ganz traditionell in Papierform auf Ihr Kniebrett schnallen können.
 
 **Nachfolger von [ChartButlerCS](https://github.com/stsichler/ChartButlerCS).** Ihr bisheriges Kartenverzeichnis können Sie weiterverwenden.
 
 ## Sie rufen die Seiten selbst auf – mit Absicht
 
-Die Nutzungsbedingungen der DFS verbieten den Zugriff auf die AIP mit automatisierten Tools. Deshalb greift ChartAssist **nie selbst** auf die DFS zu: Sie öffnen jede Seite im Browser und speichern sie mit Strg+S, den Rest erledigt ChartAssist.
+Die Nutzungsbedingungen der DFS verbieten den Zugriff auf die AIP mit automatisierten Tools. Deshalb greift ChartAssist **nie selbst** auf die DFS zu: Es stellt Ihnen stattdessen eine Linkliste zur Verfügung. Sie öffnen dann jede Seite im Browser manuell und speichern sie mit Strg+S in einen Import-Ordner, den Rest erledigt ChartAssist.
 
-ChartButlerCS hat die Karten noch automatisch geladen und wird deshalb nicht weiterentwickelt.
+Da ChartButlerCS dagegen die Karten noch automatisch herunter geladen hat, wird er nicht mehr weiterentwickelt.
 
 ## Systemvoraussetzungen
 
@@ -32,7 +32,7 @@ Windows 10 oder 11, aktuelles Linux (x64) oder macOS. Keine Installation nötig:
 
 **Rechtlicher Hinweis:** Sie sind als Pilot selbst für die Aktualität Ihrer Karten verantwortlich. ChartAssist ist nur eine Hilfe und keine zugelassene Software. Fehler sind nicht ausgeschlossen, eine Haftung besteht nicht.
 
-Kartenmaterial: [DFS Deutsche Flugsicherung GmbH](https://aip.dfs.de/BasicVFR), BasicVFR AIP. Bitte beachten Sie die Nutzungsbedingungen der DFS.
+Kartenmaterial: [DFS Deutsche Flugsicherung GmbH](https://aip.dfs.de/BasicVFR), BasicVFR AIP. Bitte beachten Sie die [Nutzungsbedingungen der DFS](https://ais.dfs.de/pilotservice/service/information/disclaimer/disclaimer.jsp).
 
 **Entstehung mit KI-Unterstützung:** ChartAssist wird mit KI entwickelt (Claude Code von Anthropic). Quellcode und Dokumentation sind ganz oder teilweise KI-generiert. Details: [LICENSE](LICENSE).
 
