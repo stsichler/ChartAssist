@@ -203,7 +203,7 @@ public partial class MainWindowViewModel : ViewModelBase
         {
             Show(BannerKind.Warning, "Diese Datenbank stammt noch von GAT24. Bitte die Flugplätze neu abonnieren.");
         }
-        else if (HasAirfields && (Database.AipLastUpdate == null || Database.Version != AppInfo.VersionText))
+        else if (HasAirfields && (Database.AipLastUpdate == null || Database.Version != AppInfo.DatabaseVersion))
         {
             Show(BannerKind.UpdateRequired, "Bitte führen Sie einen Kartenabgleich durch. Hier klicken zum Starten.");
         }
