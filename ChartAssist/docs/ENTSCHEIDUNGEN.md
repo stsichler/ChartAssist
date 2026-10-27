@@ -45,6 +45,7 @@ Ziel: ein Werkzeug, das dem Piloten die Verwaltung der Karten abnimmt, ohne selb
     - Hilfe-Fenster der Anwendung (Reiter mit den Programminformationen) und Release-Notes.
 
     Kopfzeilen in jeder Quelldatei gibt es nicht: Sie stünden in jeder Datei und brächten gegenüber dem zentralen Hinweis keine zusätzliche Information. In der LICENSE steht außerdem, dass der Vorbehalt der Rechte nur gilt, soweit Schutzrechte bestehen. Rein KI-generierte Teile sind nach deutschem Recht mangels menschlicher Schöpfung möglicherweise nicht geschützt.
+12. **Empfohlenes Speicherformat "Webseite, komplett"** (Entscheidung vom 27.10.2026, vorher "nur HTML"). Nur in "komplett" stehen die Adressen der Kartenseiten, weil der Browser die Links dabei absolut schreibt. Bei "nur HTML" sind sie relativ, und der Ordner der Ausgabe lässt sich nicht ableiten: Die Ausgabe mit Effective 15 OCT 2026 lag unter `2026OCT20`. Beide Formate bleiben unterstützt; bei "nur HTML" werden die Karten auf der Flugplatzseite angeklickt. In Kauf genommen: "komplett" ist das vom Browser dargestellte DOM, das Erweiterungen verändern können (der Parser ist darauf getestet).
 
 ## 4. Noch offen
 

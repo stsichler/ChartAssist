@@ -29,9 +29,12 @@ public static class DfsTestPages
         Page(effective, "pages/C00001.html", format, "", "<span lang=\"de\">Luftfahrthandbuch AIP VFR</span>",
             "<li class=\"folder-item\"><a class=\"folder-link\" href=\"../pages/C0004A.html\">Flugplätze</a></li>");
 
-    public static string AirfieldPage(DateOnly effective, string permalink, string headline, IEnumerable<TestChart> charts, SaveFormat format)
+    /// <param name="editionFolder">Ordner der Ausgabe in den absoluten Links von "komplett", z. B. "2026OCT20". Er muss
+    /// nicht zum Effective-Datum passen; ohne Angabe wird er daraus gebildet.</param>
+    public static string AirfieldPage(DateOnly effective, string permalink, string headline, IEnumerable<TestChart> charts, SaveFormat format,
+        string? editionFolder = null)
     {
-        string edition = DfsUrlsEdition(effective);
+        string edition = editionFolder ?? effective.ToString("yyyyMMMdd", CultureInfo.InvariantCulture).ToUpperInvariant();
         string items = string.Concat(charts.Select(chart =>
         {
             string href = format == SaveFormat.Complete
@@ -130,6 +133,4 @@ public static class DfsTestPages
 
     public static string EffectiveText(DateOnly date) =>
         date.ToString("dd MMM yyyy", CultureInfo.InvariantCulture).ToUpperInvariant();
-
-    private static string DfsUrlsEdition(DateOnly date) => ChartAssist.Core.Dfs.DfsUrls.EditionFolder(date);
 }

@@ -1,5 +1,3 @@
-using System.Globalization;
-
 namespace ChartAssist.Core.Dfs;
 
 /// <summary>
@@ -22,16 +20,4 @@ public static class DfsUrls
 
     /// <summary>Flugplatzseite über ihren Permalink, wie er in <c>AFCharts.Crypt</c> steht (z. B. "C01A45.html").</summary>
     public static Uri AirfieldPage(string permalink) => new(PermalinkBaseUrl + permalink);
-
-    /// <summary>
-    /// Kartenseite einer Ausgabe, abgeleitet aus Effective-Datum und Hash (IMPORT-MODUS 4, Frage 5).
-    /// Nur für "nur HTML" gespeicherte Seiten nötig, bei "komplett" ist der href bereits absolut.
-    /// Gilt nur bis zur nächsten Ausgabe und wird daher nicht gespeichert.
-    /// </summary>
-    public static Uri ChartPage(DateOnly effective, string hash) =>
-        new(BaseUrl + EditionFolder(effective) + "/pages/" + hash + ".html");
-
-    /// <summary>Ordnername einer Ausgabe, z. B. "2026SEP17" für Effective 17.09.2026.</summary>
-    public static string EditionFolder(DateOnly effective) =>
-        effective.ToString("yyyyMMMdd", CultureInfo.InvariantCulture).ToUpperInvariant();
 }

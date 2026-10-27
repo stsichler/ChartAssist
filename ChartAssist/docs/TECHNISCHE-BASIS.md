@@ -251,7 +251,7 @@ public sealed class Chart
 
 ### 4.5 Ressourcen
 
-- `Properties.Resources.DFS_*` → `static class DfsUrls` mit Konstanten. Die URLs dienen nur noch als Links zum Öffnen im Browser, neu kommt `DFS_BaseURL` für die Kartenlinks hinzu (IMPORT-MODUS 5.2).
+- `Properties.Resources.DFS_*` → `static class DfsUrls` mit Konstanten. Die URLs dienen nur noch als Links zum Öffnen im Browser, neu kommt `DFS_BaseURL` hinzu, um absolute Kartenlinks aus "komplett" gespeicherten Seiten zu prüfen (IMPORT-MODUS 5.2).
 - Hilfetexte → direkt ins `HelpWindow.axaml` oder als eingebettete Textdatei. Sie werden für den neuen Ablauf ohnehin neu geschrieben.
 - Icons → `Assets/` als `AvaloniaResource`.
 

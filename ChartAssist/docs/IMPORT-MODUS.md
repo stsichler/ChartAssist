@@ -44,7 +44,7 @@ Diese Regeln sind der Kern des Konzepts. Jede Umsetzungsentscheidung muss sich d
 ### 3.1 Einmalige Einrichtung
 
 - Unter "Optionen" gibt es einen **Import-Ordner**. Vorschlag für den Standard: `<Kartenverzeichnis>/Import`, siehe Abschnitt 5.3.
-- Beim ersten Speichern im Browser wählt der Benutzer diesen Ordner. Empfohlen wird das Format **"Webseite, nur HTML"**. "Webseite, komplett" (Standard in Firefox) wird aber ebenfalls unterstützt, siehe Abschnitt 4.
+- Beim ersten Speichern im Browser wählt der Benutzer diesen Ordner. Empfohlen wird das Format **"Webseite, komplett"** (Standard in Firefox), weil nur dann die Adressen der Kartenseiten in der Datei stehen. "Webseite, nur HTML" wird ebenfalls unterstützt; die Karten sind dann auf der Flugplatzseite anzuklicken (Abschnitt 4, Frage 5).
 - Der Dateiname spielt keine Rolle. Alle DFS-Seiten heißen "AIP VFR Germany", der Browser schlägt also immer denselben Namen vor. ChartAssist erkennt die Seitenart am Inhalt und entfernt jede Datei gleich nach der Verarbeitung, sodass der Name beim nächsten Speichern wieder frei ist (Abschnitt 5.3).
 
 ### 3.2 Kartenabgleich
@@ -56,7 +56,7 @@ Diese Regeln sind der Kern des Konzepts. Jede Umsetzungsentscheidung muss sich d
    - **Neues Datum:** Die Flugplatzseite wird ausgewertet, siehe Schritt 4.
 4. ChartAssist vergleicht die Vorschaubilder der Flugplatzseite mit den lokalen Vorschaudateien.
    - **Alles aktuell:** Der Eintrag wird abgehakt, der nächste offene Flugplatz wird markiert.
-   - **Geänderte oder neue Karten:** Sie erscheinen als Untereinträge "Bitte speichern: EDxx …", mit direktem Link auf die Kartenseite (Abschnitt 4, Frage 5).
+   - **Geänderte oder neue Karten:** Sie erscheinen als Untereinträge "Bitte speichern: EDxx …". Bei "komplett" mit direktem Link auf die Kartenseite, bei "nur HTML" ohne (Abschnitt 4, Frage 5).
    - **Entfallene Karten** werden sofort entfernt.
 5. Der Benutzer öffnet eine geänderte Karte und speichert sie. Zum Öffnen doppelklickt er den Eintrag in der Liste oder klickt die Karte in der noch geöffneten Flugplatzseite an. ChartAssist ordnet die Kartenseite sicher zu (Abschnitt 4, Frage 4), übernimmt das PNG und hakt den Eintrag ab. Sobald alle Karten eines Flugplatzes da sind, wird das TripKit neu erzeugt.
 6. Wenn alle Einträge erledigt sind, gilt:
@@ -88,7 +88,7 @@ Die folgenden Punkte wurden an **echten, manuell gespeicherten Seiten** geprüft
 | 2 | Weicht "komplett" im Markup ab? | **"Nur HTML"** ist der Originalquelltext. `DFS_GetChartLinks` (inkl. `XmlDocument`), der Datums-Regex und der `imgAIP`-Regex funktionieren **unverändert**. **"Komplett"** ist das vom Browser serialisierte DOM, inklusive Änderungen durch Erweiterungen (hier fast 200 Einträge von Dark Reader). `<img>` ist nicht geschlossen, deshalb scheitert `XmlDocument.LoadXml` für jedes `document-item`. Die Regexe für Datum und `imgAIP` funktionieren weiterhin. | Den Parser für `document-item` von `XmlDocument` auf tolerante Regexe umstellen (Abschnitt 5.2). Dann gehen beide Formate. |
 | 3 | Lassen sich ICAO-Code und Flugplatzname aus der Flugplatzseite ablesen? | **Ja:** `<div class="headlineText left">…<span lang="de">Mannheim City EDFM</span>`. Das ist dasselbe Format "Name ICAO" wie in der bisherigen Flugplatzliste. | ICAO = letztes Wort, Name = Rest (wie bisher `airfield.Key.Remove(Length - 5)`), danach `Utility.GetFilenameFor`. |
 | 4 | Woran lässt sich eine Kartenseite einer Karte zuordnen? | **Eindeutig über `const myURL`:** `"AD/758fd4e2…/EDFM Mannheim City 1"`. Der Hash in der Mitte ist genau der Dateiname aus dem `href` des `document-link` der Flugplatzseite (`../pages/758fd4e2….html`). Der Name steht außerdem in `<div class="headlineText float-start">`. `myPermalink` der Kartenseite (`pages/P00363.html`) taucht auf der Flugplatzseite dagegen nicht auf. | Zuordnung über den Hash. Der Name dient nur zur Anzeige und Plausibilitätsprüfung. Eine Auswahl durch den Benutzer ist nicht nötig. |
-| 5 | Lässt sich die absolute URL einer Seite ermitteln? | Es gibt keinen `saved from url`-Kommentar und kein `<base>`. In "komplett" sind die `href` aber **absolut** (`https://aip.dfs.de/BasicVFR/2026SEP17/pages/<hash>.html`). In "nur HTML" sind sie relativ (`../pages/<hash>.html`). Der Ordnername `2026SEP17` entspricht dem Effective-Datum. | Kartenlink = absoluter `href`, sonst `https://aip.dfs.de/BasicVFR/<yyyyMMMdd des Effective-Datums>/pages/<hash>.html`. Das Schema ist bisher nur an **einer** Ausgabe bestätigt. Als Rückfallweg bleibt der Klick in der Flugplatzseite. Der Link gilt nur bis zur nächsten Ausgabe, wird also nicht gespeichert. |
+| 5 | Lässt sich die absolute URL einer Seite ermitteln? | Es gibt keinen `saved from url`-Kommentar und kein `<base>`. In "komplett" sind die `href` aber **absolut** (`https://aip.dfs.de/BasicVFR/2026SEP17/pages/<hash>.html`). In "nur HTML" sind sie relativ (`../pages/<hash>.html`). Der Ordnername `2026SEP17` entsprach dem Effective-Datum. **Widerlegt am 27.10.2026:** Die Ausgabe mit Effective 15 OCT 2026 lag unter `2026OCT20`, der Ordner lässt sich also nicht aus dem Effective-Datum ableiten. Auch ohne Ordner (`/BasicVFR/pages/<hash>.html`) ist die Seite nicht erreichbar. | Kartenlink = absoluter `href` aus "komplett". Bei "nur HTML" gibt es keinen direkten Link; der Benutzer klickt die Karte auf der Flugplatzseite an. Deshalb wird "komplett" empfohlen. Der Link gilt nur bis zur nächsten Ausgabe, wird also nicht gespeichert. |
 | 6 | Enthält auch die Flugplatzseite das Effective-Datum? | **Ja**, Startseite, Flugplatzseite und Kartenseite enthalten es gleichermaßen. | Die Startseite als eigener Schritt entfällt (Abschnitt 3.2). |
 | 7 | Zeichenkodierung? Umlaute? Merkt sich der Browser Ordner und Format? | UTF-8 (`<meta charset="utf-8">`). Die DFS **umschreibt Umlaute** in allen relevanten Feldern (Überschrift "Muenchen EDDM", Kartennamen, `myURL`). "ü" kommt nur in festen Oberflächentexten vor. **Firefox merkt sich** das zuletzt gewählte Format und den Zielordner. | Mit UTF-8 lesen, sonst ist nichts nötig. Nach der ersten Einrichtung sind pro Seite nur Strg+S und Enter nötig. |
 | 8 | Temporäre Dateinamen beim Speichern, wann ist die Datei vollständig? | **Nicht beobachtbar**, das Speichern geht zu schnell. | `*.part` u. ä. ignorieren und prüfen, ob die Dateigröße über zwei Abfragen stabil bleibt (Abschnitt 5.3). |
@@ -176,8 +176,8 @@ Hinweise:
 
   Dieser Ansatz wurde an den Testdaten bereits erprobt (Python-Nachbildung): gleiche Ergebnisse für beide Formate.
 - **Kartenlink bilden** (Abschnitt 4, Frage 5):
-  - Ist `Href` absolut, wird er direkt verwendet.
-  - Sonst `DfsUrls.BaseUrl` (`https://aip.dfs.de/BasicVFR/`) + Effective-Datum als `yyyyMMMdd` in Großbuchstaben mit invarianter Kultur (z. B. `2026SEP17`) + `/pages/<Hash>.html`.
+  - Ist `Href` absolut ("komplett"), wird er direkt verwendet.
+  - Sonst ("nur HTML") gibt es keinen Link. Die frühere Ableitung aus dem Effective-Datum ist entfernt, weil sie falsche Adressen lieferte (Abschnitt 4, Frage 5).
 - Das Voranstellen des ICAO-Codes vor den Kartennamen (`if (!name.StartsWith(ICAO)) name = ICAO + " " + name;`) bleibt wie bisher. Es passiert in `ChartImport`, nachdem der Flugplatz zugeordnet ist.
 - Ist die Kartenliste leer oder schlägt die Erkennung fehl, meldet der Parser einen Fehler (Exception oder Ergebnis mit Fehlertext). Er liefert niemals eine leere Liste als gültiges Ergebnis, weil sonst das Entfernen verwaister Karten alle Karten löschen würde.
 - **Tests** (TECHNISCHE-BASIS.md 11, Phase 3):
@@ -252,8 +252,8 @@ Wichtig: **Die Vorschau wird erst geschrieben, wenn die Karte selbst übernommen
 ### 5.5 `AbgleichWindow` (Avalonia, nicht-modal)
 
 Inhalt:
-- Kurze Anleitung: "Eintrag doppelklicken → Seite im Browser mit Strg+S in den Import-Ordner speichern (empfohlen: 'Webseite, nur HTML')".
-- Wird eine Seite als "komplett" gespeichert (erkennbar am Ordner `<Name>_files`, `ImportFolderScanner.IsSavedComplete`), erscheint ein kurzer Tipp: "Speichern Sie als 'Webseite, nur HTML'." Grund: "komplett" ist das vom Browser dargestellte DOM, das Erweiterungen wie Dark Reader verändern; "nur HTML" ist der Originalquelltext. "Komplett" bleibt trotzdem unterstützt, weil es in Firefox der Standard ist.
+- Kurze Anleitung: "Klick auf einen Eintrag öffnet die Seite im Browser. Speichern Sie sie dort mit Strg+S als 'Webseite, komplett' in den Import-Ordner."
+- Wird eine Flugplatzseite als "nur HTML" gespeichert (kein Ordner `<Name>_files`, `ImportFolderScanner.IsSavedComplete`) und fehlen deshalb Kartenlinks, erscheint ein kurzer Tipp: "Als 'Webseite, komplett' speichern, dann führt ein Klick direkt zur Karte." Ein Klick auf eine Karte ohne Link erklärt, dass sie auf der Flugplatzseite anzuklicken ist. Abwägung: "komplett" ist das vom Browser dargestellte DOM, das Erweiterungen wie Dark Reader verändern können (der Parser ist darauf getestet); nur dort stehen aber die Adressen der Kartenseiten.
 - Aufgabenliste (`TreeView` oder `ListBox`) mit Aufgabe und Status. Karten erscheinen eingerückt unter ihrem Flugplatz. Regel für alle Einträge: **abgehakt, sobald die Seite, auf die der Link zeigt, übernommen ist**. Ein Flugplatz also mit seiner Seite (fehlende Karten stehen eingerückt darunter), eine Karte mit ihrer Kartenseite, Erledigtes bleibt abgehakt stehen, Karten in der Reihenfolge der Flugplatzseite. Der Eintrag "→ Flugplatzverzeichnis öffnen" ist keine Aufgabe, sondern nur der Einstieg zum Navigieren; er muss nicht gespeichert werden und wird nie abgehakt. Er steht beim Hinzufügen und beim Abgleich, wenn Flugplätze ohne bekannten Permalink (z. B. nach Wiederherstellung der Datenbank) keinen eigenen Link haben.
 - Buttons "Im Browser öffnen" (öffnet genau den markierten Eintrag über `Launcher.LaunchUriAsync`, TECHNISCHE-BASIS.md 5.4), "Import-Ordner öffnen" und "Schließen".
 - Umschalter "Immer im Vordergrund" (`Topmost`), damit das Fenster neben dem Browser sichtbar bleibt.
@@ -310,7 +310,7 @@ Die Logik (Parser, Import, Datenbank) wird mit xUnit getestet (TECHNISCHE-BASIS.
 - [ ] Neuer Flugplatz über das Flugplatzverzeichnis → Rückfrage, Verzeichnis angelegt, alle Karten ausstehend
 - [ ] Kartenseite ohne passende offene Aufgabe → Hinweis, keine Änderung
 - [ ] Mehrere ausstehende Karten, Zuordnung der Kartenseite über den Hash korrekt, auch in beliebiger Reihenfolge
-- [ ] Direkter Kartenlink aus der Aufgabenliste öffnet die richtige Kartenseite, für "nur HTML" (abgeleitete URL) und "komplett" (absoluter `href`)
+- [ ] Direkter Kartenlink aus der Aufgabenliste öffnet die richtige Kartenseite ("komplett"); bei "nur HTML" kein Link, Hinweis auf die Flugplatzseite
 - [ ] Geänderter Permalink eines Flugplatzes → Warnung, Zuordnung über ICAO-Code
 - [ ] "Webseite, komplett" gespeichert → korrekt verarbeitet, Ressourcenordner `<Name>_files` entfernt
 - [ ] Fremde HTML-Datei, abgeschnittene Datei, `.part`-Datei → nicht verarbeitet bzw. nach `Fehler/` verschoben
@@ -334,6 +334,6 @@ Die Logik (Parser, Import, Datenbank) wird mit xUnit getestet (TECHNISCHE-BASIS.
 | TripKit optional machen (§8, abgeleitete Werke) | Einstellung im `OptionsWindow`; Standard offen lassen, bis die Rechtslage klarer ist |
 | Fortschritt über Programmneustarts hinweg merken | Zunächst nicht. Eine Sitzung dauert nur Minuten. Später optional, z. B. über ein zusätzliches Element `LastChecked` je Flugplatz. Vorher prüfen, ob ChartButlerCS 2.0.x eine Datei mit unbekannten Elementen noch liest (TECHNISCHE-BASIS.md 4.3, Rückwärtskompatibilität). |
 | GAT24-Altbestände | Keine Migration mehr. Nutzer alter GAT24-Datenbanken abonnieren ihre Plätze neu. |
-| Kartenaufgaben mit direktem Link | Umsetzen (Abschnitt 4, Frage 5). Das URL-Schema für "nur HTML" beruht auf einer einzigen Ausgabe. Schlägt der Link fehl, klickt der Benutzer die Karte in der Flugplatzseite an. |
+| Kartenaufgaben mit direktem Link | **Entschieden:** nur bei "komplett" (absoluter `href`). Bei "nur HTML" klickt der Benutzer die Karte auf der Flugplatzseite an (Abschnitt 4, Frage 5; ENTSCHEIDUNGEN.md, 3.12). |
 | Name, Repository, Umgang mit ChartButlerCS | Siehe TECHNISCHE-BASIS.md, Abschnitt 13. |
 | Erneute Anfrage bei der DFS | **Entschieden:** entfällt. Nach der bisherigen Absage ist keine Zustimmung zu erwarten (ENTSCHEIDUNGEN.md, 3.2). |
