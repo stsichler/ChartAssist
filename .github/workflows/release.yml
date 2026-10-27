@@ -130,6 +130,6 @@ jobs:
           EOF
           gh release create "$GITHUB_REF_NAME" assets/* \
             --repo "$GITHUB_REPOSITORY" \
-            --title "ChartAssist ${GITHUB_REF_NAME#v}" \
+            --title "ChartAssist ${GITHUB_REF_NAME}" \
             --notes-file notes.md \
             --draft
