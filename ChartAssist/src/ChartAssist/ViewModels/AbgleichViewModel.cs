@@ -26,7 +26,7 @@ public sealed class TaskItemViewModel(string symbol, string text, Uri? link, boo
 /// <summary>Abgleichfenster (IMPORT-MODUS 5.5): Aufgabenliste, Import-Ordner, Statuszeile.</summary>
 public partial class AbgleichViewModel : ViewModelBase
 {
-    private const string CompleteFormatTip = " Tipp: Speichern Sie als „Webseite, nur HTML“.";
+    private const string CompleteFormatTip = " Tipp: Als „Webseite, komplett“ speichern, dann führt ein Klick direkt zur Karte.";
 
     private readonly Action _databaseChanged;
 
@@ -49,7 +49,7 @@ public partial class AbgleichViewModel : ViewModelBase
 
     public string Instructions =>
         "Klick auf einen Eintrag öffnet die Seite im Browser. Speichern Sie sie dort mit Strg+S "
-        + "als „Webseite, nur HTML“ in den Import-Ordner. Den Rest erledigt ChartAssist.";
+        + "als „Webseite, komplett“ in den Import-Ordner. Den Rest erledigt ChartAssist.";
 
     public string ImportFolder => Scanner.Folder;
 
@@ -145,7 +145,7 @@ public partial class AbgleichViewModel : ViewModelBase
 
         Status = result.Outcome == ImportOutcome.Failed
             ? result.Message + " Die Datei liegt jetzt im Ordner „Fehler“."
-            : result.Message + (savedComplete ? CompleteFormatTip : "");
+            : result.Message + (!savedComplete && Import.PendingCharts.Any(p => p.Link == null) ? CompleteFormatTip : "");
         _databaseChanged();
         RebuildItems();
     }
@@ -190,6 +190,6 @@ public partial class AbgleichViewModel : ViewModelBase
             }
         }
 
-        SelectedItem = Items.FirstOrDefault(i => i.IsOpen && i.Link != null) ?? directory ?? Items.FirstOrDefault(i => i.IsOpen);
+        SelectedItem = Items.FirstOrDefault(i => i.IsOpen) ?? directory;
     }
 }

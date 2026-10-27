@@ -88,7 +88,10 @@ public partial class AbgleichWindow : Window
         }
     }
 
-    /// <summary>Flugplätze ohne bekannten Permalink haben keinen Link; sie werden über das Flugplatzverzeichnis aufgerufen.</summary>
+    /// <summary>
+    /// Einträge ohne Link: Karten aus einer "nur HTML" gespeicherten Flugplatzseite (auf der Flugplatzseite anklicken)
+    /// und Flugplätze ohne bekannten Permalink (über das Flugplatzverzeichnis aufrufen).
+    /// </summary>
     private async Task OpenAsync(TaskItemViewModel item)
     {
         if (item.Link is Uri link)
@@ -97,7 +100,9 @@ public partial class AbgleichWindow : Window
         }
         else
         {
-            ViewModel.Status = "Für diesen Flugplatz ist kein direkter Link bekannt. Bitte über das Flugplatzverzeichnis aufrufen und die Seite speichern.";
+            ViewModel.Status = item.IsChart
+                ? "Für diese Karte ist kein direkter Link bekannt. Bitte die Karte auf der Flugplatzseite im Browser anklicken und speichern."
+                : "Für diesen Flugplatz ist kein direkter Link bekannt. Bitte über das Flugplatzverzeichnis aufrufen und die Seite speichern.";
         }
     }
 

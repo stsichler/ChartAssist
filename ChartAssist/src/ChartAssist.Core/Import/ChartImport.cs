@@ -76,8 +76,12 @@ public sealed class AirfieldTask
 }
 
 /// <summary>Aufgabe "Bitte speichern: Karte", zugeordnet über den Hash der Kartenseite.</summary>
+/// <param name="Link">
+/// Kartenseite, nur bei "Webseite, komplett" bekannt (dort ist der href absolut). Bei "nur HTML" null: Dann klickt der
+/// Benutzer die Karte auf der Flugplatzseite an (IMPORT-MODUS 4, Frage 5).
+/// </param>
 /// <param name="Position">Stelle auf der Flugplatzseite, für die Reihenfolge in der Aufgabenliste.</param>
-public sealed record PendingChart(string Icao, string ChartName, string ServerName, string AirfieldPermalink, string Hash, Uri Link, byte[] Preview, int Position);
+public sealed record PendingChart(string Icao, string ChartName, string ServerName, string AirfieldPermalink, string Hash, Uri? Link, byte[] Preview, int Position);
 
 /// <summary>In dieser Sitzung aktualisierte Karte, für die Übersicht am Ende.</summary>
 public sealed record UpdatedChart(string Name, string Path);
@@ -273,7 +277,7 @@ public sealed class ChartImport
             {
                 _completedCharts.RemoveAll(c => c.Icao == airfield.Icao && c.ChartName == chartName);
                 _pendingCharts.Add(new PendingChart(airfield.Icao, chartName, serverName, page.Permalink, entry.Hash,
-                    ChartLink(entry, page.Effective), entry.PreviewPng, position));
+                    ChartLink(entry), entry.PreviewPng, position));
             }
         }
 
@@ -295,7 +299,9 @@ public sealed class ChartImport
         else
         {
             task.Status = AirfieldTaskStatus.WaitingForCharts;
-            message = $"{airfield.Icao}: {pending} Karte(n) bitte speichern.";
+            message = _pendingCharts.Any(p => p.Icao == airfield.Icao && p.Link == null)
+                ? $"{airfield.Icao}: {pending} Karte(n) bitte speichern. Dazu die Karten auf der Flugplatzseite anklicken."
+                : $"{airfield.Icao}: {pending} Karte(n) bitte speichern.";
         }
         return new ImportResult(ImportOutcome.Processed, warning == null ? message : warning + " " + message);
     }
@@ -421,11 +427,15 @@ public sealed class ChartImport
         _database.DataSource = "DFS";
     }
 
-    /// <summary>Absoluter href ("komplett") oder aus Effective-Datum und Hash gebildet ("nur HTML", IMPORT-MODUS 4, Frage 5).</summary>
-    private static Uri ChartLink(DfsChartEntry entry, DateOnly effective) =>
+    /// <summary>
+    /// Absoluter href aus einer "komplett" gespeicherten Seite, sonst null. Bei "nur HTML" ist der href relativ, und
+    /// der Ordner der Ausgabe steht nirgends in der Seite; er lässt sich auch nicht aus dem Effective-Datum ableiten
+    /// (Ausgabe vom 15 OCT 2026 lag unter 2026OCT20).
+    /// </summary>
+    private static Uri? ChartLink(DfsChartEntry entry) =>
         entry.Href.StartsWith(DfsUrls.BaseUrl, StringComparison.OrdinalIgnoreCase) && Uri.TryCreate(entry.Href, UriKind.Absolute, out Uri? link)
             ? link
-            : DfsUrls.ChartPage(effective, entry.Hash);
+            : null;
 
     private static string Format(DateOnly date) => DfsPageParser.FormatDate(date);
 }

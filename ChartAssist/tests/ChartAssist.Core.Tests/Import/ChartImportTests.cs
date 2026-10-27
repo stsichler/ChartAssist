@@ -95,7 +95,8 @@ public sealed class ChartImportTests : IDisposable
 
         PendingChart pending = Assert.Single(import.PendingCharts);
         Assert.Equal("EDXA Musterstadt 1.png", pending.ChartName);
-        Assert.Equal("https://aip.dfs.de/BasicVFR/2026SEP17/pages/h1.html", pending.Link.AbsoluteUri);
+        // Nur "komplett" enthält die Adresse der Kartenseite; bei "nur HTML" wird die Karte auf der Flugplatzseite angeklickt
+        Assert.Equal(format == SaveFormat.Complete ? "https://aip.dfs.de/BasicVFR/2026SEP17/pages/h1.html" : null, pending.Link?.AbsoluteUri);
         Assert.Equal(AirfieldTaskStatus.WaitingForCharts, import.Airfields.Single().Status);
         Assert.Equal(Preview1, File.ReadAllBytes(PreviewPath("EDXA Musterstadt 1.png"))); // Vorschau erst mit der Karte
 
@@ -112,6 +113,32 @@ public sealed class ChartImportTests : IDisposable
         Assert.Equal(new DateOnly(2026, 9, 10), _database.FindChart("EDXA_TripKit_Charts.pdf")!.LastUpdate);
         Assert.Equal(ImportSessionState.Completed, import.State);
         Assert.Equal(NewEdition, _database.AipLastUpdate);
+    }
+
+    [Fact]
+    public void Kartenlink_OrdnerAusDerSeite_NichtAusDemEffectiveDatum()
+    {
+        // Ausgabe vom 15 OCT 2026, von der DFS aber unter 2026OCT20 veröffentlicht (Test vom 27.10.2026)
+        var effective = new DateOnly(2026, 10, 15);
+        ChartImport import = StartUpdate();
+
+        ImportResult result = import.Import(DfsTestPages.AirfieldPage(effective, Permalink, "Musterstadt EDXA",
+            [new("EDXA Musterstadt 1", "H1", DfsTestPages.Png(SKColors.Orange)), new("AD 2-1", "h2", Preview2)],
+            SaveFormat.Complete, editionFolder: "2026OCT20"));
+
+        Assert.Equal("https://aip.dfs.de/BasicVFR/2026OCT20/pages/H1.html", Assert.Single(import.PendingCharts).Link?.AbsoluteUri);
+        Assert.DoesNotContain("anklicken", result.Message);
+    }
+
+    [Fact]
+    public void NurHtml_KeinRatenDesKartenlinks()
+    {
+        ChartImport import = StartUpdate();
+
+        ImportResult result = import.Import(AirfieldPage(NewEdition, ("EDXA Musterstadt 1", "h1", DfsTestPages.Png(SKColors.Orange)), ("AD 2-1", "h2", Preview2)));
+
+        Assert.Null(Assert.Single(import.PendingCharts).Link);
+        Assert.Contains("auf der Flugplatzseite anklicken", result.Message);
     }
 
     [Fact]
