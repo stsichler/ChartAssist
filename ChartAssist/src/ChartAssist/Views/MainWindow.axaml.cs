@@ -140,13 +140,10 @@ public partial class MainWindow : Window
             Topmost = true;
             await Task.Delay(TimeSpan.FromMilliseconds(300));
             Topmost = false;
+            // Nur wenn Karten aktualisiert wurden, z. B. zum Ausdrucken; sonst keine Meldung
             if (import.UpdatedCharts.Count > 0)
             {
                 new UpdateOverviewWindow(import.UpdatedCharts).Show(this);
-            }
-            else if (session.ClosedAutomatically)
-            {
-                await MessageDialog.ShowAsync(this, session.Status, session.Title);
             }
         };
         _sessionWindow = window;

@@ -268,7 +268,7 @@ Verhalten:
 - Nach jedem Import wird die Datenbank über `ChartFolder` gespeichert, und das Hauptfenster aktualisiert seinen Baum. Die Datenbank ist damit auch bei einem Abbruch konsistent.
 - Solange das Fenster offen ist, sind im Hauptfenster "Flugplatz löschen" und "Optionen" deaktiviert. So kann das Kartenverzeichnis nicht mitten in der Sitzung wechseln.
 - Ist alles erledigt (Abgleich vollständig, keine Aktualisierung nötig, beim Hinzufügen alle Karten des Platzes übernommen), schließt sich das Fenster nach kurzer Pause selbst. Nach einem Abbruch bleibt es offen.
-- Beim Schließen kommt das Hauptfenster in den Vordergrund (Activate und kurz `Topmost`, weil GNOME Activate ablehnt, solange ChartAssist nicht aktiv ist). Es erscheint das `UpdateOverviewWindow` mit den aktualisierten Karten, falls es welche gibt, sonst nach automatischem Schließen eine kurze Meldung mit dem Ergebnis.
+- Beim Schließen kommt das Hauptfenster in den Vordergrund (Activate und kurz `Topmost`, weil GNOME Activate ablehnt, solange ChartAssist nicht aktiv ist). Es erscheint das `UpdateOverviewWindow` mit den aktualisierten Karten, aber nur, wenn es welche gibt (z. B. zum Ausdrucken). Sonst erscheint keine Meldung; Banner und Statusleiste zeigen den Stand.
 
 ### 5.6 Weitere Punkte
 

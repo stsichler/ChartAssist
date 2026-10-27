@@ -67,7 +67,6 @@ public partial class AbgleichWindow : Window
                 // Kurz stehen lassen, damit der letzte Haken zu sehen ist
                 _timer.Stop();
                 await Task.Delay(TimeSpan.FromSeconds(1.5));
-                ViewModel.ClosedAutomatically = true;
                 Close();
             }
         }

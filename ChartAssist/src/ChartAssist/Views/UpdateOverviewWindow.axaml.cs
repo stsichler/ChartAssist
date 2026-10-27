@@ -23,6 +23,19 @@ public partial class UpdateOverviewWindow : Window
         ChartList.ItemsSource = charts;
     }
 
+    /// <summary>
+    /// Erscheint oft, während der Browser aktiv ist. GNOME legt neue Fenster eines inaktiven Programms dann hinter
+    /// den Browser; kurz "immer im Vordergrund" holt die Übersicht nach vorn.
+    /// </summary>
+    protected override async void OnOpened(EventArgs e)
+    {
+        base.OnOpened(e);
+        Activate();
+        Topmost = true;
+        await Task.Delay(TimeSpan.FromMilliseconds(300));
+        Topmost = false;
+    }
+
     private async void OnChartDoubleTapped(object? sender, TappedEventArgs e)
     {
         if (ChartList.SelectedItem is UpdatedChart chart)

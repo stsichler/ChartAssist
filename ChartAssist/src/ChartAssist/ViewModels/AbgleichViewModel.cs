@@ -72,9 +72,6 @@ public partial class AbgleichViewModel : ViewModelBase
         || (Import.Mode == ImportMode.AddAirfield && Import.Airfields.Count > 0
             && Import.Airfields.All(t => t.Status == AirfieldTaskStatus.Done) && Import.PendingCharts.Count == 0);
 
-    /// <summary>Das Fenster wurde geschlossen, weil alles erledigt war.</summary>
-    public bool ClosedAutomatically { get; set; }
-
     /// <summary>
     /// Verarbeitet die fertig gespeicherten Dateien im Import-Ordner nacheinander.
     /// </summary>
