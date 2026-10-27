@@ -502,6 +502,7 @@ Jede Phase endet mit einem baubaren, getesteten Stand. Die Phasen 3 und 4 setzen
 5. **Release** (klein)
    - `README.md` fertigstellen, Vorab-Release (Pre-release) erstellen und auf echten Rechnern testen, auch den Umstieg von ChartButlerCS mit einem bestehenden Kartenverzeichnis.
    - Trimming aktivieren und erneut testen (8).
+   - **Stand 27.10.2026:** Trimming aktiv, Linux und Windows auf echten Rechnern getestet, erster echter Kartenabgleich mit der Ausgabe vom 15 OCT 2026 (Ergebnis: Kartenlinks nur noch aus "komplett", siehe IMPORT-MODUS 4, Frage 5). Erstes Release `v1.0.0.0`. macOS ist ungetestet.
 
 6. **ChartButlerCS abkündigen: letztes Release** (klein)
 

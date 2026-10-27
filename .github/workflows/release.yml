@@ -122,6 +122,8 @@ jobs:
           cat > notes.md <<'EOF'
           **Downloads:** Windows 10/11 (`win-x64`), Linux (`linux-x64`), macOS Apple Silicon (`macos-arm64`) und Intel (`macos-x64`). Eine .NET-Installation ist nicht nötig.
 
+          **Tipp:** Die Seiten der DFS im Browser als „Webseite, komplett“ speichern, dann führen die Karteneinträge direkt zur Karte.
+
           **macOS:** Die App ist nicht von Apple notarisiert. Beim ersten Start mit Rechtsklick → Öffnen starten oder im Terminal `xattr -dr com.apple.quarantine ChartAssist.app` ausführen.
 
           ChartAssist wird mit Unterstützung von KI entwickelt (Claude Code von Anthropic). Einzelheiten stehen in der LICENSE.
