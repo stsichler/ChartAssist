@@ -23,7 +23,7 @@ Da ChartButlerCS dagegen die Karten noch automatisch herunter geladen hat, wird 
 
 Windows 10 oder 11, aktuelles Linux (x64) oder macOS. Keine Installation nötig: entpacken und starten.
 
-- **Linux:** Beim ersten Start bietet ChartAssist einen Eintrag im Startmenü und eine Verknüpfung auf dem Desktop an.
+- **Windows und Linux:** Beim ersten Start bietet ChartAssist einen Eintrag im Startmenü und eine Verknüpfung auf dem Desktop an. Später geht das unter „Optionen“.
 - **macOS:** Die App ist nicht von Apple notarisiert. Beim ersten Start mit Rechtsklick → Öffnen starten.
 
 **Dieses Programm ist frei erhältlich.**

@@ -57,7 +57,7 @@ public partial class MainWindow : Window
             await OpenOptionsAsync();
         }
 
-        await LinuxDesktopSetup.RunAsync(this, ViewModel.Settings, () => _ = SaveSettingsAsync());
+        await DesktopSetup.RunAsync(this, ViewModel.Settings, () => _ = SaveSettingsAsync());
 
 #if !DEBUG
         await CheckForNewReleaseAsync();

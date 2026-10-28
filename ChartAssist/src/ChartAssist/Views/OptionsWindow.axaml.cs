@@ -11,6 +11,7 @@ public partial class OptionsWindow : Window
     public OptionsWindow()
     {
         InitializeComponent();
+        DesktopPanel.IsVisible = DesktopSetup.IsSupported;
     }
 
     public OptionsWindow(Settings settings)
@@ -49,6 +50,13 @@ public partial class OptionsWindow : Window
         }
         IReadOnlyList<IStorageFolder> folders = await StorageProvider.OpenFolderPickerAsync(options);
         return folders.Count > 0 ? folders[0].TryGetLocalPath() : null;
+    }
+
+    /// <summary>Wirkt sofort, unabhängig von OK und Abbrechen.</summary>
+    private void OnCreateShortcuts(object? sender, RoutedEventArgs e)
+    {
+        DesktopResult.Text = DesktopSetup.InstallNow();
+        DesktopResult.IsVisible = true;
     }
 
     private void OnOk(object? sender, RoutedEventArgs e)
