@@ -1,11 +1,19 @@
-# Release-Pakete für alle Plattformen, ausgelöst durch einen Tag v<vierstellige Version>
-# (docs/TECHNISCHE-BASIS.md, 8 und 9). Das Release wird als Entwurf angelegt und von Hand
-# veröffentlicht, nachdem die Release-Notes geprüft sind.
+# Pakete für alle Plattformen (docs/TECHNISCHE-BASIS.md, 8 und 9).
+# - Tag v<vierstellige Version>: Release-Entwurf mit den Paketen, von Hand zu veröffentlichen,
+#   nachdem die Release-Notes geprüft sind.
+# - Von Hand gestartet (Actions → "Run workflow", Branch wählbar): nur Testpakete als Download am
+#   Lauf, kein Release.
 name: Release
 
 on:
   push:
     tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version der Testpakete, vierstellig (leer: aus Directory.Build.props)'
+        required: false
+        default: ''
 
 permissions:
   contents: read
@@ -36,11 +44,17 @@ jobs:
         with:
           dotnet-version: '10.0.x'
 
-      - name: Version aus dem Tag
+      - name: Version
+        env:
+          INPUT_VERSION: ${{ inputs.version }}
         run: |
-          version="${GITHUB_REF_NAME#v}"
+          if [ "$GITHUB_EVENT_NAME" = "workflow_dispatch" ]; then
+            version="${INPUT_VERSION:-$(sed -n 's:.*<Version>\(.*\)</Version>.*:\1:p' Directory.Build.props)}"
+          else
+            version="${GITHUB_REF_NAME#v}"
+          fi
           if [[ ! "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-            echo "::error::Der Tag muss eine vierstellige Version haben, z. B. v1.0.0.0"
+            echo "::error::Die Version muss vierstellig sein, z. B. 1.0.0.0 (Tag: v1.0.0.0), ist aber: $version"
             exit 1
           fi
           echo "VERSION=$version" >> "$GITHUB_ENV"
@@ -100,9 +114,12 @@ jobs:
           name: ${{ matrix.asset }}
           path: ChartAssist/${{ matrix.asset }}
           if-no-files-found: error
+          retention-days: 14
 
   release:
     needs: publish
+    # Nur bei einem Tag; von Hand gestartete Läufe liefern nur Testpakete
+    if: github.event_name == 'push'
     runs-on: ubuntu-latest
     permissions:
       contents: write
