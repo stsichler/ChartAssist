@@ -511,13 +511,13 @@ Jede Phase endet mit einem baubaren, getesteten Stand. Die Phasen 3 und 4 setzen
    - Die Versionsprüfung von ChartButlerCS fragt das neueste Release **im alten Repository** ab. Sie zeigt das blaue Banner "Eine neue Version von ChartButler steht zur Verfügung", sobald dessen Tag von `"v2.0.1.1"` abweicht. Releases im neuen Repository sieht ChartButlerCS nicht.
    - Ein Klick auf das Banner öffnet `https://stsichler.github.io/ChartButlerCS/`, also die README im Git-Root des alten Repositorys.
 
-   **Status: vorgemerkt.** Der Benutzer stößt diesen Schritt selbst an, frühestens wenn es ein erstes Release von ChartAssist gibt, auf das verwiesen werden kann. Checkliste:
-   - [ ] **README.md im Git-Root** des alten Repositorys (zugleich GitHub-Pages-Seite) aktualisieren:
+   **Status: erledigt am 28.10.2026.** README im alten Repository aktualisiert (Commit `4de1da6`, zusammen mit dem bis dahin nur lokalen `ba93927`), Release `v2.0.1.2` mit der unveränderten `ChartButlerCS.zip` aus `v2.0.1.1` als "latest" veröffentlicht. Geprüft: `releases/latest` liefert `v2.0.1.2`, der Download-Link der README funktioniert, die Pages-Seite zeigt den Hinweis. Die GAT24-Passagen der README sind geblieben. Checkliste:
+   - [x] **README.md im Git-Root** des alten Repositorys (zugleich GitHub-Pages-Seite) aktualisieren:
      - Hinweis auf ChartAssist mit Link, gut sichtbar am Anfang.
      - Den Hinweis "**eventuell** eine schriftliche Zustimmung durch die DFS" eindeutig formulieren. Die DFS hat inzwischen ausdrücklich bestätigt, dass die Nutzungsbedingungen des AIS-Portals auch für die BasicVFR gelten. Die Nutzung von ChartButlerCS verstößt damit gegen §2. Die Entscheidung über die Nutzung liegt beim Anwender.
      - Optional die veralteten GAT24-Passagen entfernen.
-   - [ ] **Release-Notes** für das letzte Release: dieselben beiden Aussagen (Verweis auf ChartAssist, eindeutiger Hinweis auf die Nutzungsbedingungen), dazu: ChartButlerCS wird nicht weiterentwickelt.
-   - [ ] **Letztes Release** im alten Repository mit neuem Tag, z. B. `v2.0.1.2`. Es muss **wieder `ChartButlerCS.zip` enthalten** (dieselbe Datei wie in v2.0.1.1), denn der Download-Link der README zeigt auf `releases/latest/download/ChartButlerCS.zip` und liefe sonst ins Leere. Kein Pre-Release, denn `releases/latest` berücksichtigt nur reguläre Releases.
+   - [x] **Release-Notes** für das letzte Release: dieselben beiden Aussagen (Verweis auf ChartAssist, eindeutiger Hinweis auf die Nutzungsbedingungen), dazu: ChartButlerCS wird nicht weiterentwickelt.
+   - [x] **Letztes Release** im alten Repository mit neuem Tag, z. B. `v2.0.1.2`. Es muss **wieder `ChartButlerCS.zip` enthalten** (dieselbe Datei wie in v2.0.1.1), denn der Download-Link der README zeigt auf `releases/latest/download/ChartButlerCS.zip` und liefe sonst ins Leere. Kein Pre-Release, denn `releases/latest` berücksichtigt nur reguläre Releases.
    - Nicht geändert werden die Texte in der Anwendung selbst (Startmeldung in `frmChartDB.cs`, Hilfe in `frmHelp.resx`). Sie sagen weiterhin "eventuell", weil keine neue Programmversion gebaut wird.
 
 ---
