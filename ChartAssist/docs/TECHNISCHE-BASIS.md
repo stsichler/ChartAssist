@@ -309,9 +309,11 @@ Das ersetzt `OpenFileInDefaultApp` mit seiner OS-Weiche und funktioniert auf all
 |---|---|---|---|
 | Mindestversion | Windows 10 / 11 (Windows 7/8.1 werden von .NET 10 **nicht** unterstützt) | Aktuelle glibc-Distributionen (x64, optional arm64); musl/Alpine bräuchte eine eigene RID | Laut .NET-10-Supportmatrix (nur aktuelle macOS-Versionen); x64 und arm64 |
 | Paket | `.zip` mit einer `.exe` (Single-File) | `.tar.gz` mit ausführbarer Datei; optional AppImage | **`.app`-Bundle** in `.zip`/`.dmg`: `Contents/MacOS/ChartAssist`, `Contents/Info.plist`, `Contents/Resources/ChartAssist.icns` |
-| Icon | `ApplicationIcon` (`.ico`) | Fenster-Icon über Avalonia. Startmenü-Eintrag und Desktop-Verknüpfung legt die App selbst an: beim ersten Start nach Rückfrage, danach passt sie die Pfade bei jedem Start an (`LinuxDesktopIntegration`). Nur im Release-Build | `.icns` aus dem vorhandenen Icon erzeugen |
+| Icon und Programmstart | `ApplicationIcon` (`.ico`). Verknüpfungen im Startmenü und auf dem Desktop (`.lnk`, `WindowsShortcuts` über IShellLink mit vom Compiler erzeugter COM-Anbindung, trimming-fest) | Fenster-Icon über Avalonia. Startmenü-Eintrag und Desktop-Verknüpfung als `.desktop` (`LinuxDesktopIntegration`) | `.icns` aus dem vorhandenen Icon erzeugen; Verknüpfungen nicht nötig (.app in "Programme") |
 | Signatur | Optional (ohne Signatur warnt SmartScreen) | – | Unsignierte Apps blockiert Gatekeeper ("App ist beschädigt" nach Download). Ohne Apple-Developer-ID mindestens eine Ad-hoc-Signatur (**auf Apple Silicon Pflicht**) und eine Anleitung für Anwender (`xattr -dr com.apple.quarantine ChartAssist.app` bzw. Rechtsklick → Öffnen). Mit Developer-ID: `codesign` + `notarytool`. Deshalb den macOS-Build auf einem macOS-Runner erstellen |
 | Abhängigkeiten | keine (self-contained, siehe 8) | `fontconfig`, X11 bzw. XWayland; `libicu` nur ohne `InvariantGlobalization` (4.1) | keine |
+
+Startmenü-Eintrag und Desktop-Verknüpfung (Windows und Linux, `DesktopSetup`): Beim ersten Start einer veröffentlichten Version fragt ChartAssist einmal nach (`Settings.DesktopIntegrationOffered`). Gibt es schon einen Startmenü-Eintrag, wird nicht gefragt, sondern nur der Programmpfad angepasst; eine gelöschte Desktop-Verknüpfung wird dabei nicht neu angelegt. Der Knopf in den Optionen legt beides jederzeit an, auch nach einem "Nein".
 
 ---
 

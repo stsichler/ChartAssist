@@ -21,6 +21,12 @@
     </Grid>
     <TextBlock Text="Hierhin speichern Sie die Seiten der DFS aus dem Browser." TextWrapping="Wrap" Opacity="0.7" FontSize="12" />
 
+    <StackPanel x:Name="DesktopPanel" Spacing="6" Margin="0,12,0,0">
+      <TextBlock Text="Programmstart" FontWeight="SemiBold" />
+      <Button Content="Startmenü-Eintrag und Desktop-Verknüpfung anlegen" Click="OnCreateShortcuts" />
+      <TextBlock x:Name="DesktopResult" TextWrapping="Wrap" Opacity="0.7" FontSize="12" IsVisible="False" />
+    </StackPanel>
+
     <TextBlock x:Name="ErrorText" Foreground="DarkRed" TextWrapping="Wrap" IsVisible="False" Margin="0,8,0,0" />
 
     <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8" Margin="0,16,0,0">

@@ -1,6 +1,8 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <IsTrimmable>true</IsTrimmable>
+    <!-- Für die vom Compiler erzeugte COM-Anbindung der Windows-Verknüpfungen (Platform/WindowsShortcuts.cs) -->
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="PDFsharp" />
