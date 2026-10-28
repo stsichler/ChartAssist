@@ -9,7 +9,8 @@ ChartAssist ist der Nachfolger von ChartButlerCS: eine Desktop-Anwendung für Wi
 Der grundlegende Unterschied zu ChartButlerCS: **ChartAssist greift selbst nie auf die DFS zu.** Der Benutzer ruft die Seiten im Browser auf und speichert sie mit Strg+S in einen Import-Ordner. ChartAssist wertet diese Dateien aus ("Import-Modus"). Grund sind die Nutzungsbedingungen der DFS, §2, siehe `docs/ENTSCHEIDUNGEN.md`.
 
 - UI-Texte, Kommentare, Dokumentation und Commit-Messages sind **deutsch**.
-- **Status:** Die Planung ist abgeschlossen. Das Projekt wird zusammen mit dem Benutzer von Grund auf aufgebaut. Phasen 0 bis 4 sind erledigt, Phase 5: erstes Release `v1.0.0.0` vom 27.10.2026. Phase 6 (ChartButlerCS abgekündigt, `v2.0.1.2`) am 28.10.2026 erledigt. Offen: macOS-Test, Branch `feature/tripkit-optional` (`docs/TECHNISCHE-BASIS.md`, Abschnitt 11).
+- **Versionsnummern** nach den Regeln in `docs/ENTSCHEIDUNGEN.md`, 3.13 (vierstellig: Funktionen groß, Funktionen klein, Bugfixes, Rebuilds).
+- **Status:** Die Planung ist abgeschlossen. Das Projekt wird zusammen mit dem Benutzer von Grund auf aufgebaut. Phasen 0 bis 4 sind erledigt, Phase 5: erstes Release `v1.0.0.0` vom 27.10.2026, `v1.1.0.0` vom 28.10.2026. Phase 6 (ChartButlerCS abgekündigt, `v2.0.1.2`) am 28.10.2026 erledigt. Offen: macOS-Test, Branch `feature/tripkit-optional` (`docs/TECHNISCHE-BASIS.md`, Abschnitt 11).
 
 ## Vor der Arbeit lesen
 
