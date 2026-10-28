@@ -371,6 +371,80 @@ public sealed class ChartImportTests : IDisposable
         Assert.Equal(before, Snapshot());
     }
 
+    [Fact]
+    public void NichtLesbarerKarteneintrag_LoeschtKeineKarte()
+    {
+        // Code-Review, Befund 2: AD 2-1 fehlt der deutsche Name; die Karte darf nicht als entfallen gelöscht werden
+        ChartImport import = StartUpdate();
+        string page = AirfieldPage(NewEdition, ("EDXA Musterstadt 1", "h1", Preview1), ("AD 2-1", "h2", Preview2))
+            .Replace("<span lang=\"de\" class=\"document-name\">AD 2-1</span>", "", StringComparison.Ordinal);
+
+        Assert.Equal(ImportOutcome.Failed, import.Import(page).Outcome);
+        Assert.NotNull(_database.FindChart("EDXA AD 2-1.png"));
+        Assert.True(File.Exists(ChartPath("EDXA AD 2-1.png")));
+    }
+
+    [Fact]
+    public void SchreibfehlerBeiNeuerKarte_DatenbankBleibtUnveraendert()
+    {
+        // Code-Review, Befund 1: Die Karte kam vor dem Schreiben in die Datenbank, mit CreationDate 0001-01-01
+        ChartImport import = StartUpdate();
+        import.Import(AirfieldPage(NewEdition, ("EDXA Musterstadt 1", "h1", Preview1), ("AD 2-1", "h2", Preview2), ("Neu", "h3", Preview2)));
+        Directory.CreateDirectory(ChartPath("EDXA Neu.png")); // Ziel ist ein Verzeichnis: Schreiben scheitert
+        string before = Convert.ToHexString(ChartDatabaseXml.ToBytes(_database));
+
+        Assert.ThrowsAny<Exception>(() => import.Import(DfsTestPages.ChartPage(NewEdition, "h3", "EDXA Neu", null, Chart1, SaveFormat.HtmlOnly)));
+
+        Assert.Null(_database.FindChart("EDXA Neu.png"));
+        Assert.Equal(before, Convert.ToHexString(ChartDatabaseXml.ToBytes(_database)));
+        Assert.Single(import.PendingCharts); // bleibt angefordert
+    }
+
+    [Fact]
+    public void LeereVorschau_KarteGiltNieAlsAktuell()
+    {
+        // Code-Review, Befund 6: Eine leere Vorschau stimmt sonst für immer mit einer leeren Vorschaudatei überein
+        ChartImport import = StartUpdate();
+        import.Import(AirfieldPage(NewEdition, ("EDXA Musterstadt 1", "h1", []), ("AD 2-1", "h2", Preview2)));
+        Assert.Equal("EDXA Musterstadt 1.png", Assert.Single(import.PendingCharts).ChartName);
+
+        import.Import(DfsTestPages.ChartPage(NewEdition, "h1", "EDXA Musterstadt 1", null, Chart2, SaveFormat.HtmlOnly));
+
+        Assert.False(File.Exists(PreviewPath("EDXA Musterstadt 1.png"))); // keine leere Vorschaudatei
+        ChartImport next = new(_folder, _database, Version, ImportMode.UpdateCharts);
+        next.Import(AirfieldPage(new DateOnly(2026, 10, 15), ("EDXA Musterstadt 1", "h1", []), ("AD 2-1", "h2", Preview2)));
+        Assert.Equal("EDXA Musterstadt 1.png", Assert.Single(next.PendingCharts).ChartName);
+    }
+
+    [Fact]
+    public void EntfalleneKarte_FlugplatzverzeichnisFehlt_KeinFehler()
+    {
+        // Code-Review, Befund 7: Verzeichnis von Hand gelöscht, Flugplatz noch in der Datenbank
+        Directory.Delete(Path.Combine(_root, "EDXA - Musterstadt"), recursive: true);
+        ChartImport import = StartUpdate();
+
+        ImportResult result = import.Import(AirfieldPage(NewEdition, ("EDXA Musterstadt 1", "h1", Preview1)));
+
+        Assert.Equal(ImportOutcome.Processed, result.Outcome);
+        Assert.Null(_database.FindChart("EDXA AD 2-1.png"));
+    }
+
+    [Fact]
+    public void NeuerFlugplatz_UngepruefteFlugplaetze_KartenstandBleibtLeer()
+    {
+        // Code-Review, Befund 3: Nach einer Wiederherstellung ist AipLastUpdate leer und EDXA ungeprüft
+        _database.AipLastUpdate = null;
+        var import = new ChartImport(_folder, _database, Version, ImportMode.AddAirfield);
+        ImportResult result = import.Import(DfsTestPages.AirfieldPage(NewEdition, "C0BBB2.html", "Beispiel EDXB",
+            [new("EDXB Beispiel 1", "b1", Preview1)], SaveFormat.HtmlOnly));
+        import.AddAirfield(result.NewAirfield!);
+
+        import.Import(DfsTestPages.ChartPage(NewEdition, "b1", "EDXB Beispiel 1", null, Chart1, SaveFormat.HtmlOnly));
+
+        Assert.NotNull(_database.FindAirfield("EDXB"));
+        Assert.Null(_database.AipLastUpdate);
+    }
+
     // Lokale Tests gegen echte Daten (IMPORT-MODUS 5.2)
 
     [Theory]

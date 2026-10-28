@@ -40,14 +40,24 @@ public sealed class UtilityTests : IDisposable
     public void FileEquals_VergleichtInhalt()
     {
         string a = Path.Combine(_root, "a");
-        string b = Path.Combine(_root, "b");
         File.WriteAllBytes(a, [1, 2, 3]);
-        File.WriteAllBytes(b, [1, 2, 3]);
 
-        Assert.True(Utility.FileEquals(a, b));
         Assert.True(Utility.FileEquals(a, [1, 2, 3]));
         Assert.False(Utility.FileEquals(a, [1, 2, 4]));
-        Assert.False(Utility.FileEquals(a, Path.Combine(_root, "fehlt")));
+        Assert.False(Utility.FileEquals(Path.Combine(_root, "fehlt"), [1, 2, 3]));
+    }
+
+    [Fact]
+    public void DeleteFile_OhneDateiUndOhneVerzeichnis_KeinFehler()
+    {
+        // Unter Windows wirft File.Delete bei fehlendem Verzeichnis (Code-Review, Befund 7)
+        Utility.DeleteFile(Path.Combine(_root, "fehlt", "datei.png"));
+        Utility.DeleteFile(Path.Combine(_root, "datei.png"));
+
+        string path = Path.Combine(_root, "vorhanden");
+        File.WriteAllBytes(path, [1]);
+        Utility.DeleteFile(path);
+        Assert.False(File.Exists(path));
     }
 
     [Fact]

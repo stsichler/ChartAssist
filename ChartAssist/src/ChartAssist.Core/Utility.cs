@@ -48,23 +48,21 @@ public static partial class Utility
         return result;
     }
 
-    /// <summary>Binärer Vergleich zweier Dateien. Fehlt eine davon, sind sie verschieden.</summary>
-    public static bool FileEquals(string path1, string path2)
-    {
-        if (!File.Exists(path1) || !File.Exists(path2))
-        {
-            return false;
-        }
-        if (new FileInfo(path1).Length != new FileInfo(path2).Length)
-        {
-            return false;
-        }
-        return File.ReadAllBytes(path1).AsSpan().SequenceEqual(File.ReadAllBytes(path2));
-    }
-
     /// <summary>Vergleicht eine Datei mit Bytes im Speicher, z. B. eine Vorschau aus einer gespeicherten Seite.</summary>
     public static bool FileEquals(string path, ReadOnlySpan<byte> content) =>
         File.Exists(path) && new FileInfo(path).Length == content.Length && File.ReadAllBytes(path).AsSpan().SequenceEqual(content);
+
+    /// <summary>
+    /// Löscht eine Datei, falls sie existiert. Anders als <see cref="File.Delete"/> auch dann ohne Fehler, wenn ihr
+    /// Verzeichnis fehlt (unter Windows wirft File.Delete sonst DirectoryNotFoundException).
+    /// </summary>
+    public static void DeleteFile(string path)
+    {
+        if (File.Exists(path))
+        {
+            File.Delete(path);
+        }
+    }
 
     /// <summary>
     /// Schreibt über eine Temp-Datei im Zielverzeichnis und benennt sie dann um. So ist die Datei nie halb

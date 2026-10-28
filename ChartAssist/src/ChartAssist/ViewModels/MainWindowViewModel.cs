@@ -97,25 +97,35 @@ public partial class MainWindowViewModel : ViewModelBase
     /// <summary>Veraltete Datenbank mit GAT24 als Quelle; wird nicht mehr migriert (IMPORT-MODUS 5.6).</summary>
     public bool IsLegacyDatabase => Database.DataSource == "GAT24" || (Database.DataSource == null && Database.Version != null);
 
-    public void ApplySettings(Settings settings)
-    {
-        Settings = settings;
-    }
-
     /// <summary>Lädt die Datenbank des eingestellten Kartenverzeichnisses.</summary>
     /// <returns>Das Ergebnis, oder null, wenn kein Verzeichnis eingestellt ist oder es fehlt.</returns>
     public ChartFolderLoadResult? LoadDatabase()
     {
         string path = Settings.ChartFolder;
         Folder = path.Length > 0 && Directory.Exists(path) ? new ChartFolder(path) : null;
-        HasFolder = Folder != null;
         Title = path.Length > 0 ? "ChartAssist – " + path : "ChartAssist";
+        LoadError = null;
 
-        ChartFolderLoadResult? result = Folder?.Load();
+        ChartFolderLoadResult? result = null;
+        try
+        {
+            result = Folder?.Load();
+        }
+        catch (Exception e) when (e is IOException or UnauthorizedAccessException)
+        {
+            // Z. B. Datenbank gesperrt oder Verzeichnis nicht lesbar. Das Verzeichnis dann nicht verwenden: Sonst würde
+            // die leere Datenbank beim nächsten Speichern die vorhandene überschreiben.
+            LoadError = e.Message;
+            Folder = null;
+        }
+        HasFolder = Folder != null;
         Database = result?.Database ?? new ChartDatabase();
         Refresh();
         return result;
     }
+
+    /// <summary>Fehler beim letzten <see cref="LoadDatabase"/>, sonst null.</summary>
+    public string? LoadError { get; private set; }
 
     /// <summary>Speichert die Datenbank, falls sie sich geändert hat.</summary>
     public void SaveDatabase()

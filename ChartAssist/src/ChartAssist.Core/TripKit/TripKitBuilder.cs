@@ -132,8 +132,8 @@ public static class TripKitBuilder
 
         if (images.Count == 0)
         {
-            File.Delete(pdfPath);
-            File.Delete(previewPath);
+            Utility.DeleteFile(pdfPath);
+            Utility.DeleteFile(previewPath);
             if (tripKit != null)
             {
                 database.Charts.Remove(tripKit);

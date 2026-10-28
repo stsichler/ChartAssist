@@ -101,6 +101,7 @@ public class ChartDatabaseXmlTests
     [InlineData("<?xml version=\"1.0\"?><Anderes />")]
     [InlineData("<ChartButlerDataSet><Airfields><ICAO>EDXA</ICAO></Airfields></ChartButlerDataSet>")]
     [InlineData("<ChartButlerDataSet><Updates><Date>gestern</Date></Updates></ChartButlerDataSet>")]
+    [InlineData("<ChartButlerDataSet><Updates><Date>0001-01-01T00:00:00+00:54</Date></Updates></ChartButlerDataSet>")] // außerhalb des Bereichs (Befund 1)
     [InlineData("<ChartButlerDataSet><Airfields><ICAO>EDXA</ICAO><AFname>A</AFname></Airfields>"
         + "<Airfields><ICAO>EDXA</ICAO><AFname>B</AFname></Airfields></ChartButlerDataSet>")]
     public void Lesen_UngueltigeDatei_WirftInvalidDataException(string xml)
@@ -118,6 +119,14 @@ public class ChartDatabaseXmlTests
         ChartDatabase database = ChartDatabaseXml.Read(new MemoryStream(Encoding.UTF8.GetBytes(xml)));
 
         Assert.Empty(database.Charts);
+    }
+
+    [Fact]
+    public void IsTripKit_AmNamenErkannt_NichtAmFehlendenPermalink()
+    {
+        // Aus dem Verzeichnis wiederhergestellte Karten haben keinen Permalink (Befund 10)
+        Assert.False(new Chart { Icao = "EDXA", Name = "EDXA Musterstadt 1.png" }.IsTripKit);
+        Assert.True(new Chart { Icao = "EDXA", Name = "EDXA_TripKit_Charts.pdf" }.IsTripKit);
     }
 
     [Fact]

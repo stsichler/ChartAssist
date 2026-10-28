@@ -121,7 +121,7 @@ public partial class AbgleichViewModel : ViewModelBase
                     : new ImportResult(ImportOutcome.Processed, $"{page.Icao} wurde nicht abonniert.");
             }
         }
-        catch (Exception e) when (e is IOException or UnauthorizedAccessException or InvalidOperationException or ArgumentException)
+        catch (Exception e)
         {
             Debug.WriteLine(e);
             result = new ImportResult(ImportOutcome.Failed, "Fehler beim Übernehmen: " + e.Message);
