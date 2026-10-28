@@ -65,8 +65,20 @@ public class DfsPageParserTests
             .Replace("<ul>", "<ul><li class=\"document-item\"></li>", StringComparison.Ordinal);
 
         Assert.Equal(DfsPageKind.AirfieldPage, DfsPageParser.DetectKind(html));
+        // Ein leerer Eintrag ist nicht lesbar: Fehler der ganzen Seite, niemals eine leere Kartenliste
         DfsPageException e = Assert.Throws<DfsPageException>(() => DfsPageParser.ParseAirfieldPage(html));
-        Assert.Contains("keine Karten", e.Message);
+        Assert.Contains("nicht lesbar", e.Message);
+    }
+
+    [Theory]
+    [InlineData("<span lang=\"de\" class=\"document-name\">EDXA Musterstadt 1</span>", "")] // deutscher Name fehlt
+    [InlineData("class=\"document-link\" href=\"../pages/0a1b2c3d4e5f.html\"", "class=\"document-link\"")] // Link fehlt
+    public void ParseAirfieldPage_NichtLesbarerEintrag_IstFehlerDerGanzenSeite(string original, string replacement)
+    {
+        // Ein übergangener Eintrag würde als entfallene Karte gelöscht (Code-Review, Befund 2)
+        string html = AirfieldPage(SaveFormat.HtmlOnly).Replace(original, replacement, StringComparison.Ordinal);
+
+        Assert.Throws<DfsPageException>(() => DfsPageParser.ParseAirfieldPage(html));
     }
 
     [Fact]

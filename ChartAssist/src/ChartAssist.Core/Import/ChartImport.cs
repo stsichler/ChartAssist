@@ -271,6 +271,7 @@ public sealed class ChartImport
             // Karten mit Datei und Vorschau vorhanden und werden nicht noch einmal angefordert
             var probe = new Chart { Icao = airfield.Icao, Name = chartName };
             bool isCurrent = chart != null
+                && entry.PreviewPng.Length > 0
                 && File.Exists(Utility.BuildChartPath(_folder.Path, airfield, probe))
                 && Utility.FileEquals(Utility.BuildChartPreviewPath(_folder.Path, airfield, probe, "png"), entry.PreviewPng);
             if (!isCurrent)
@@ -324,25 +325,36 @@ public sealed class ChartImport
 
         AirfieldTask task = _airfields.First(t => t.Icao == pending.Icao);
         Airfield airfield = task.Airfield;
+
+        // Erst die Dateien, dann die Datenbank: Scheitert das Schreiben, bleibt die Datenbank unverändert.
+        // Die Vorschau erst nach der Karte: Bricht etwas ab, gilt die Karte beim nächsten Mal wieder als geändert.
+        Directory.CreateDirectory(Path.Combine(_folder.Path, Utility.AirfieldDirectoryName(airfield)));
+        var target = new Chart { Icao = airfield.Icao, Name = pending.ChartName };
+        string chartPath = Utility.BuildChartPath(_folder.Path, airfield, target);
+        string previewPath = Utility.BuildChartPreviewPath(_folder.Path, airfield, target, "png");
+        Utility.WriteFileAtomic(chartPath, page.Png);
+        if (pending.Preview.Length > 0)
+        {
+            Utility.WriteFileAtomic(previewPath, pending.Preview, hidden: true);
+        }
+        else
+        {
+            // Ohne Vorschau auf der Flugplatzseite keine leere Vorschaudatei: Die würde ewig als "aktuell" gelten
+            Utility.DeleteFile(previewPath);
+        }
+
         if (_database.FindAirfield(airfield.Icao) == null)
         {
             _database.Airfields.Add(airfield);
         }
-        Directory.CreateDirectory(Path.Combine(_folder.Path, Utility.AirfieldDirectoryName(airfield)));
-
         Chart? chart = _database.FindChart(pending.ChartName);
         if (chart == null)
         {
-            chart = new Chart { Icao = airfield.Icao, Name = pending.ChartName };
+            chart = target;
             _database.Charts.Add(chart);
         }
         chart.AirfieldPermalink = pending.AirfieldPermalink;
         chart.ServerName = pending.ServerName;
-
-        // Die Vorschau erst nach der Karte schreiben: Bricht etwas ab, gilt die Karte beim nächsten Mal wieder als geändert
-        string chartPath = Utility.BuildChartPath(_folder.Path, airfield, chart);
-        Utility.WriteFileAtomic(chartPath, page.Png);
-        Utility.WriteFileAtomic(Utility.BuildChartPreviewPath(_folder.Path, airfield, chart, "png"), pending.Preview, hidden: true);
 
         DateOnly chartUpdate = page.Date ?? Effective!.Value;
         chart.CreationDate = DateOnly.FromDateTime(DateTime.Now);
@@ -377,8 +389,8 @@ public sealed class ChartImport
             .ToList();
         foreach (Chart chart in orphans)
         {
-            File.Delete(Utility.BuildChartPath(_folder.Path, airfield, chart));
-            File.Delete(Utility.BuildChartPreviewPath(_folder.Path, airfield, chart, "png"));
+            Utility.DeleteFile(Utility.BuildChartPath(_folder.Path, airfield, chart));
+            Utility.DeleteFile(Utility.BuildChartPreviewPath(_folder.Path, airfield, chart, "png"));
             _database.Charts.Remove(chart);
         }
         return orphans.Count;
@@ -404,8 +416,11 @@ public sealed class ChartImport
 
         if (Mode == ImportMode.AddAirfield)
         {
-            // Wie ChartButlerCS: Das Datum der Ausgabe nur eintragen, wenn es noch keins gibt
-            if (_database.AipLastUpdate == null && _database.Charts.Count > 0)
+            // Wie ChartButlerCS: Das Datum der Ausgabe nur eintragen, wenn es noch keins gibt. Aber nur, wenn die
+            // Datenbank allein aus den in dieser Sitzung hinzugefügten Flugplätzen besteht: Andere Flugplätze (z. B.
+            // nach einer Wiederherstellung) sind nicht geprüft und dürfen nicht als aktuell gelten.
+            bool onlyNewAirfields = _database.Airfields.All(a => _airfields.Any(t => t.IsNew && t.Airfield == a));
+            if (_database.AipLastUpdate == null && _database.Charts.Count > 0 && onlyNewAirfields)
             {
                 MarkDatabaseCurrent();
             }

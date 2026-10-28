@@ -194,16 +194,16 @@ public static class ChartDatabaseXml
     /// <summary>Liest ein xs:dateTime und liefert den Kalendertag in deutscher Zeit.</summary>
     public static DateOnly ParseDate(string value)
     {
-        DateTimeOffset parsed;
         try
         {
-            parsed = XmlConvert.ToDateTimeOffset(value.Trim());
+            DateTimeOffset parsed = XmlConvert.ToDateTimeOffset(value.Trim());
+            return DateOnly.FromDateTime(TimeZoneInfo.ConvertTime(parsed, GermanTime.Zone).DateTime);
         }
-        catch (FormatException e)
+        catch (Exception e) when (e is FormatException or ArgumentException or OverflowException)
         {
+            // Auch Werte außerhalb des darstellbaren Bereichs: Eine beschädigte Datei wird wiederhergestellt statt abzustürzen
             throw new InvalidDataException("Ungültiges Datum in der Karten-Datenbank: " + value, e);
         }
-        return DateOnly.FromDateTime(TimeZoneInfo.ConvertTime(parsed, GermanTime.Zone).DateTime);
     }
 
     private static Chart ReadChart(XElement row)
