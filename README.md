@@ -13,6 +13,8 @@ ChartAssist hilft Ihnen, VFR-Anflugkarten der BasicVFR AIP der DFS auf Ihrem hei
 
 **Nachfolger von [ChartButlerCS](https://github.com/stsichler/ChartButlerCS).** Ihr bisheriges Kartenverzeichnis können Sie weiterverwenden.
 
+![Hauptfenster von ChartAssist](./ChartAssist/docs/screenshot.png)
+
 ## Sie rufen die Seiten selbst auf – mit Absicht
 
 Die Nutzungsbedingungen der DFS verbieten den Zugriff auf die AIP mit automatisierten Tools. Deshalb greift ChartAssist **nie selbst** auf die DFS zu: Es stellt Ihnen stattdessen eine Linkliste zur Verfügung. Sie öffnen dann jede Seite im Browser manuell und speichern sie mit Strg+S in einen Import-Ordner, den Rest erledigt ChartAssist.
