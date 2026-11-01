@@ -6,7 +6,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <LangVersion>latest</LangVersion>
 
-    <!-- Datumsformate werden explizit festgelegt, daher keine Abhängigkeit von libicu (TECHNISCHE-BASIS 4.1) -->
+    <!-- Datumsformate werden explizit festgelegt, daher keine Abhängigkeit von libicu -->
     <InvariantGlobalization>true</InvariantGlobalization>
 
     <!-- Regeln aus .editorconfig auch beim Bauen prüfen; in CI (GitHub setzt CI=true) sind Warnungen Fehler -->

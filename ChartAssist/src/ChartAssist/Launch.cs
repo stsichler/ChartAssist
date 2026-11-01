@@ -6,8 +6,9 @@ using Avalonia.Platform.Storage;
 namespace ChartAssist;
 
 /// <summary>
-/// Öffnet Dateien, Ordner und Links mit dem Standardprogramm des Systems (TECHNISCHE-BASIS 5.4).
-/// DFS-Seiten nur auf ausdrückliche Benutzeraktion und immer nur eine (IMPORT-MODUS 2, Leitplanke 2).
+/// Öffnet Dateien, Ordner und Links mit dem Standardprogramm des Systems.
+/// DFS-Seiten nur auf ausdrückliche Benutzeraktion und immer nur eine, ausgelöst vom Klick selbst,
+/// nie von einer Auswahländerung.
 /// </summary>
 internal static class Launch
 {

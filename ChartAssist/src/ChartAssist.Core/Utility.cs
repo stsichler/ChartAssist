@@ -4,7 +4,7 @@ using ChartAssist.Core.Data;
 
 namespace ChartAssist.Core;
 
-/// <summary>Pfade und Dateinamen im Kartenverzeichnis, übernommen aus ChartButlerCS (TECHNISCHE-BASIS 10).</summary>
+/// <summary>Pfade und Dateinamen im Kartenverzeichnis, übernommen aus ChartButlerCS.</summary>
 public static partial class Utility
 {
     /// <summary>Verzeichnisname eines Flugplatzes, z. B. "EDFM - Mannheim City".</summary>

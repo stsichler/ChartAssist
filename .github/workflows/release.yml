@@ -1,6 +1,6 @@
-# Release-Pakete für alle Plattformen, ausgelöst durch einen Tag v<vierstellige Version>
-# (docs/TECHNISCHE-BASIS.md, 8 und 9). Das Release wird als Entwurf angelegt und von Hand
-# veröffentlicht, nachdem die Release-Notes geprüft sind.
+# Release-Pakete für alle Plattformen, ausgelöst durch einen Tag v<vierstellige Version>.
+# Das Release wird als Entwurf angelegt und von Hand veröffentlicht, nachdem die Release-Notes
+# geprüft sind.
 name: Release
 
 on:
@@ -81,7 +81,7 @@ jobs:
           done
           iconutil -c icns "$iconset" -o "$app/Contents/Resources/ChartAssist.icns"
 
-          # Ad-hoc-Signatur, auf Apple Silicon Pflicht (TECHNISCHE-BASIS 6)
+          # Ad-hoc-Signatur, auf Apple Silicon Pflicht
           codesign --force --deep --sign - "$app"
           codesign --verify --deep --strict "$app"
 

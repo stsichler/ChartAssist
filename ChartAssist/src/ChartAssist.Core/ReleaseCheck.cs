@@ -5,7 +5,8 @@ namespace ChartAssist.Core;
 
 /// <summary>
 /// Fragt das neueste Release auf GitHub ab. Das ist die einzige Netzwerkverbindung von ChartAssist
-/// (IMPORT-MODUS 2, Leitplanke 1). Normale Zertifikatsprüfung, keine eigene TLS-Konfiguration.
+/// (an DFS-Server stellt ChartAssist keine einzige Anfrage).
+/// Normale Zertifikatsprüfung, keine eigene TLS-Konfiguration.
 /// </summary>
 public static class ReleaseCheck
 {

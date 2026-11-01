@@ -4,7 +4,7 @@ using Avalonia.Interactivity;
 namespace ChartAssist.Views;
 
 /// <summary>
-/// Einfache Meldung oder Rückfrage, Ersatz für <c>MessageBox.Show</c> (TECHNISCHE-BASIS 5.2).
+/// Einfache Meldung oder Rückfrage, Ersatz für <c>MessageBox.Show</c>.
 /// Schließen über das Fenster gilt als "Nein" bzw. "Abbrechen".
 /// </summary>
 public partial class MessageDialog : Window

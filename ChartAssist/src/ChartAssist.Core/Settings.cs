@@ -15,7 +15,7 @@ public sealed class Settings
     /// <summary>Kartenverzeichnis, leer, solange keines gewählt ist.</summary>
     public string ChartFolder { get; set; } = "";
 
-    /// <summary>Import-Ordner für gespeicherte DFS-Seiten; leer bedeutet <c>&lt;Kartenverzeichnis&gt;/Import</c> (IMPORT-MODUS 5.3).</summary>
+    /// <summary>Import-Ordner für gespeicherte DFS-Seiten; leer bedeutet <c>&lt;Kartenverzeichnis&gt;/Import</c>.</summary>
     public string ImportFolder { get; set; } = "";
 
     /// <summary>Je Flugplatz ein TripKit-PDF mit allen Karten erzeugen.</summary>
@@ -54,7 +54,7 @@ public sealed class Settings
 
     /// <summary>
     /// Lädt die Einstellungen. Gibt es noch keine, wird das Kartenverzeichnis aus ChartButlerCS übernommen,
-    /// falls vorhanden (TECHNISCHE-BASIS 10). Den rechtlichen Hinweis bestätigt der Benutzer neu.
+    /// falls vorhanden. Den rechtlichen Hinweis bestätigt der Benutzer neu.
     /// </summary>
     public static Settings LoadOrImport(string path, string chartButlerCSPath)
     {
@@ -94,7 +94,7 @@ public sealed class Settings
     }
 }
 
-// Source-Generator statt Reflection, damit Trimming möglich bleibt (TECHNISCHE-BASIS 8)
+// Source-Generator statt Reflection, damit Trimming möglich bleibt
 [JsonSourceGenerationOptions(WriteIndented = true)]
 [JsonSerializable(typeof(Settings))]
 internal sealed partial class SettingsJsonContext : JsonSerializerContext

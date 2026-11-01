@@ -1,5 +1,5 @@
 <Project>
-  <!-- Zentrale Paketversionen, fest eingetragen statt Wildcards (TECHNISCHE-BASIS 3) -->
+  <!-- Zentrale Paketversionen, fest eingetragen statt Wildcards -->
   <PropertyGroup>
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
     <AvaloniaVersion>12.1.3</AvaloniaVersion>

@@ -1,7 +1,7 @@
 namespace ChartAssist.Core.Data;
 
 /// <summary>
-/// Inhalt von <c>.ChartButler.xml</c> (TECHNISCHE-BASIS 4.3). Alle Listen behalten die Reihenfolge
+/// Inhalt von <c>.ChartButler.xml</c>. Alle Listen behalten die Reihenfolge
 /// der Datei, damit Lesen und Schreiben byteweise dieselbe Datei ergeben.
 /// </summary>
 public sealed class ChartDatabase

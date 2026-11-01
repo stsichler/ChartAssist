@@ -4,7 +4,7 @@ namespace ChartAssist.Core.Dfs;
 
 /// <summary>
 /// Adressen der BasicVFR AIP. Sie dienen ausschließlich als Links, die der Benutzer
-/// einzeln im Browser öffnet (IMPORT-MODUS 2, Leitplanken 1 und 2).
+/// einzeln im Browser öffnet, ein Klick öffnet eine Seite.
 /// ChartAssist ruft diese Adressen nie selbst ab.
 /// </summary>
 public static class DfsUrls
@@ -17,14 +17,14 @@ public static class DfsUrls
     /// <summary>Startseite der BasicVFR.</summary>
     public static Uri MainPage { get; } = new(PermalinkBaseUrl + PermalinkMain);
 
-    /// <summary>Flugplatzverzeichnis, Ausgangspunkt für "Neuer Flugplatz" (IMPORT-MODUS 3.3).</summary>
+    /// <summary>Flugplatzverzeichnis, Ausgangspunkt für "Neuer Flugplatz".</summary>
     public static Uri AirfieldDirectory { get; } = new(PermalinkBaseUrl + PermalinkAirfields);
 
     /// <summary>Flugplatzseite über ihren Permalink, wie er in <c>AFCharts.Crypt</c> steht (z. B. "C01A45.html").</summary>
     public static Uri AirfieldPage(string permalink) => new(PermalinkBaseUrl + permalink);
 
     /// <summary>
-    /// Kartenseite einer Ausgabe, abgeleitet aus Effective-Datum und Hash (IMPORT-MODUS 4, Frage 5).
+    /// Kartenseite einer Ausgabe, abgeleitet aus Effective-Datum und Hash.
     /// Nur für "nur HTML" gespeicherte Seiten nötig, bei "komplett" ist der href bereits absolut.
     /// Gilt nur bis zur nächsten Ausgabe und wird daher nicht gespeichert.
     /// </summary>

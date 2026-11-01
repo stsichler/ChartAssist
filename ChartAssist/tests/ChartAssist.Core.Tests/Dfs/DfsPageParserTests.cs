@@ -96,7 +96,7 @@ public class DfsPageParserTests
         Assert.Null(DfsPageParser.CreateDateFromString(text));
     }
 
-    // Lokale Tests gegen echte, von Hand gespeicherte Seiten (IMPORT-MODUS 4)
+    // Tests gegen echte, von Hand gespeicherte Seiten; übersprungen, wenn testdata/ fehlt
 
     [Fact]
     public void EchteSeiten_SeitenartUndEffective()

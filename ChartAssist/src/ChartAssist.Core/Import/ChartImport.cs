@@ -83,7 +83,7 @@ public sealed record PendingChart(string Icao, string ChartName, string ServerNa
 public sealed record UpdatedChart(string Name, string Path);
 
 /// <summary>
-/// Abgleich-Sitzung des Import-Modus (IMPORT-MODUS 5.4, bisher <c>DFS_CheckForNewCharts</c>, <c>DFS_UpdateCharts</c>,
+/// Abgleich-Sitzung des Import-Modus (bisher <c>DFS_CheckForNewCharts</c>, <c>DFS_UpdateCharts</c>,
 /// <c>DFS_AddNewField</c>, <c>DFS_DownloadAndCheckChart</c>, <c>DFS_RemoveOrphanCharts</c>). Wertet gespeicherte
 /// Seiten aus und pflegt Kartenverzeichnis und Datenbank. Synchron und UI-frei; die UI speichert nach jedem
 /// Aufruf die Datenbank über <see cref="ChartFolder.Save"/>. Der Zustand der Sitzung liegt nur im Speicher.
@@ -419,7 +419,7 @@ public sealed class ChartImport
         _database.DataSource = "DFS";
     }
 
-    /// <summary>Absoluter href ("komplett") oder aus Effective-Datum und Hash gebildet ("nur HTML", IMPORT-MODUS 4, Frage 5).</summary>
+    /// <summary>Absoluter href ("komplett") oder aus Effective-Datum und Hash gebildet ("nur HTML").</summary>
     private static Uri ChartLink(DfsChartEntry entry, DateOnly effective) =>
         entry.Href.StartsWith(DfsUrls.BaseUrl, StringComparison.OrdinalIgnoreCase) && Uri.TryCreate(entry.Href, UriKind.Absolute, out Uri? link)
             ? link

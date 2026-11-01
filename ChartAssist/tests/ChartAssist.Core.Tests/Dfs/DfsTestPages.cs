@@ -20,7 +20,7 @@ public enum SaveFormat
 public sealed record TestChart(string Name, string Hash, byte[] Preview);
 
 /// <summary>
-/// Synthetische Seiten mit derselben HTML-Struktur wie die BasicVFR (IMPORT-MODUS 5.2). Echte DFS-Seiten dürfen
+/// Synthetische Seiten mit derselben HTML-Struktur wie die BasicVFR. Echte DFS-Seiten dürfen
 /// nicht ins Repository (§11 der Nutzungsbedingungen); die Struktur ist aus den lokalen Testdaten abgeleitet.
 /// </summary>
 public static class DfsTestPages

@@ -7,7 +7,7 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
     <BuiltInComInteropSupport>false</BuiltInComInteropSupport>
-    <!-- Nur beim Veröffentlichen wirksam; halbiert die Download-Größe (TECHNISCHE-BASIS 8) -->
+    <!-- Nur beim Veröffentlichen wirksam; halbiert die Download-Größe -->
     <PublishTrimmed>true</PublishTrimmed>
   </PropertyGroup>
   <ItemGroup>
