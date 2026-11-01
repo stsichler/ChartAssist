@@ -1,4 +1,4 @@
-# Bauen und testen auf allen drei Plattformen (docs/TECHNISCHE-BASIS.md, 9)
+# Bauen und testen auf allen drei Plattformen
 name: Build
 
 on:

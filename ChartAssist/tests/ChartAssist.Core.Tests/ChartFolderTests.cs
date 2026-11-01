@@ -93,7 +93,7 @@ public sealed class ChartFolderTests : IDisposable
     [SupportedOSPlatform("linux")]
     public void Save_VerwendetNormaleDateirechte()
     {
-        // ChartButlerCS hat über Path.GetTempFileName() Dateien mit 0600 hinterlassen (TECHNISCHE-BASIS 10)
+        // ChartButlerCS hat über Path.GetTempFileName() Dateien mit 0600 hinterlassen
         Assert.SkipUnless(OperatingSystem.IsLinux(), "Nur unter Linux");
         var folder = new ChartFolder(_root);
 

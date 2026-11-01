@@ -1,5 +1,5 @@
 <Project>
-  <!-- Zentrale Paketversionen, fest eingetragen statt Wildcards (TECHNISCHE-BASIS 3) -->
+  <!-- Zentrale Paketversionen, fest eingetragen statt Wildcards -->
   <PropertyGroup>
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
     <!-- Erlaubt, indirekt eingebundene Pakete hier auf eine sichere Version anzuheben -->

@@ -18,7 +18,7 @@ public partial class App : Application
     {
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
-            // Beim ersten Start wird das Kartenverzeichnis aus ChartButlerCS übernommen (TECHNISCHE-BASIS 10)
+            // Beim ersten Start wird das Kartenverzeichnis aus ChartButlerCS übernommen
             Settings settings = Settings.LoadOrImport(Settings.DefaultPath, Settings.ChartButlerCSPath);
             desktop.MainWindow = new MainWindow
             {

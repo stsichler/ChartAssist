@@ -1,4 +1,4 @@
-# Pakete für alle Plattformen (docs/TECHNISCHE-BASIS.md, 8 und 9).
+# Pakete für alle Plattformen.
 # - Tag v<vierstellige Version>: Release-Entwurf mit den Paketen, von Hand zu veröffentlichen,
 #   nachdem die Release-Notes geprüft sind.
 # - Von Hand gestartet (Actions → "Run workflow", Branch wählbar): nur Testpakete als Download am
@@ -95,7 +95,7 @@ jobs:
           done
           iconutil -c icns "$iconset" -o "$app/Contents/Resources/ChartAssist.icns"
 
-          # Ad-hoc-Signatur, auf Apple Silicon Pflicht (TECHNISCHE-BASIS 6)
+          # Ad-hoc-Signatur, auf Apple Silicon Pflicht
           codesign --force --deep --sign - "$app"
           codesign --verify --deep --strict "$app"
 

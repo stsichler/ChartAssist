@@ -78,7 +78,7 @@ public sealed class AirfieldTask
 /// <summary>Aufgabe "Bitte speichern: Karte", zugeordnet über den Hash der Kartenseite.</summary>
 /// <param name="Link">
 /// Kartenseite, nur bei "Webseite, komplett" bekannt (dort ist der href absolut). Bei "nur HTML" null: Dann klickt der
-/// Benutzer die Karte auf der Flugplatzseite an (IMPORT-MODUS 4, Frage 5).
+/// Benutzer die Karte auf der Flugplatzseite an.
 /// </param>
 /// <param name="Position">Stelle auf der Flugplatzseite, für die Reihenfolge in der Aufgabenliste.</param>
 public sealed record PendingChart(string Icao, string ChartName, string ServerName, string AirfieldPermalink, string Hash, Uri? Link, byte[] Preview, int Position);
@@ -87,7 +87,7 @@ public sealed record PendingChart(string Icao, string ChartName, string ServerNa
 public sealed record UpdatedChart(string Name, string Path);
 
 /// <summary>
-/// Abgleich-Sitzung des Import-Modus (IMPORT-MODUS 5.4, bisher <c>DFS_CheckForNewCharts</c>, <c>DFS_UpdateCharts</c>,
+/// Abgleich-Sitzung des Import-Modus (bisher <c>DFS_CheckForNewCharts</c>, <c>DFS_UpdateCharts</c>,
 /// <c>DFS_AddNewField</c>, <c>DFS_DownloadAndCheckChart</c>, <c>DFS_RemoveOrphanCharts</c>). Wertet gespeicherte
 /// Seiten aus und pflegt Kartenverzeichnis und Datenbank. Synchron und UI-frei; die UI speichert nach jedem
 /// Aufruf die Datenbank über <see cref="ChartFolder.Save"/>. Der Zustand der Sitzung liegt nur im Speicher.

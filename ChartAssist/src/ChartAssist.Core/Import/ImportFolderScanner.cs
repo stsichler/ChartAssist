@@ -1,7 +1,7 @@
 namespace ChartAssist.Core.Import;
 
 /// <summary>
-/// Findet fertig gespeicherte Seiten im Import-Ordner (IMPORT-MODUS 5.3). Die UI ruft <see cref="Scan"/> etwa
+/// Findet fertig gespeicherte Seiten im Import-Ordner. Die UI ruft <see cref="Scan"/> etwa
 /// alle 1–2 Sekunden auf, solange das Abgleichfenster offen ist. Polling statt FileSystemWatcher: einfach und
 /// auf allen Plattformen zuverlässig.
 /// </summary>
@@ -44,7 +44,7 @@ public sealed class ImportFolderScanner(string folder)
 
     /// <summary>
     /// Löscht eine verarbeitete Datei samt Ressourcenordner (<c>&lt;Name&gt;_files</c> bei "Webseite, komplett"),
-    /// damit keine DFS-Seiten liegen bleiben (IMPORT-MODUS 2, Leitplanke 5).
+    /// damit keine DFS-Seiten liegen bleiben; im Kartenverzeichnis bleiben nur die Karten.
     /// </summary>
     public void Remove(string file)
     {

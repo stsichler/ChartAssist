@@ -11,7 +11,7 @@ namespace ChartAssist.Views;
 
 /// <summary>
 /// Nicht-modales Abgleichfenster. Der Import-Ordner wird nur abgefragt, solange das Fenster offen ist,
-/// und nie, während noch eine Datei verarbeitet wird (IMPORT-MODUS 5.3, 5.5).
+/// und nie, während noch eine Datei verarbeitet wird.
 /// </summary>
 public partial class AbgleichWindow : Window
 {
@@ -79,7 +79,7 @@ public partial class AbgleichWindow : Window
     private Task<bool> ConfirmNewAirfieldAsync(DfsAirfieldPage page) =>
         MessageDialog.AskAsync(this, "Neuer Flugplatz", $"Flugplatz {page.Icao} – {page.Name} abonnieren?");
 
-    /// <summary>Öffnet genau die eine Seite des markierten Eintrags (IMPORT-MODUS 2, Leitplanke 2).</summary>
+    /// <summary>Öffnet genau die eine Seite des markierten Eintrags, nur auf ausdrückliche Benutzeraktion.</summary>
     private async Task OpenSelectedAsync()
     {
         if (ViewModel.SelectedItem is { } item)

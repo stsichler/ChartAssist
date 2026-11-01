@@ -7,7 +7,7 @@ namespace ChartAssist.Core;
 /// Das Kartenverzeichnis mit seiner Datenbank <c>.ChartButler.xml</c>: laden, speichern und bei Bedarf
 /// aus den vorhandenen Dateien wiederherstellen (bisher <c>readDataBase</c>, <c>updateDataBase</c> und
 /// <c>rebuildDataBaseFromChartDir</c> in ChartButlerCS). Alle Pfade werden aus <see cref="Path"/> gebildet,
-/// das aktuelle Verzeichnis des Prozesses bleibt unberührt (TECHNISCHE-BASIS 4.4).
+/// das aktuelle Verzeichnis des Prozesses bleibt unberührt (prozessweiter Zustand, erschwert Tests).
 /// </summary>
 public sealed class ChartFolder(string path)
 {

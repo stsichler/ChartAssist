@@ -23,7 +23,7 @@ public sealed class TaskItemViewModel(string symbol, string text, Uri? link, boo
     public bool IsChart { get; } = isChart;
 }
 
-/// <summary>Abgleichfenster (IMPORT-MODUS 5.5): Aufgabenliste, Import-Ordner, Statuszeile.</summary>
+/// <summary>Abgleichfenster: Aufgabenliste, Import-Ordner, Statuszeile.</summary>
 public partial class AbgleichViewModel : ViewModelBase
 {
     private const string CompleteFormatTip = " Tipp: Als „Webseite, komplett“ speichern, dann führt ein Klick direkt zur Karte.";

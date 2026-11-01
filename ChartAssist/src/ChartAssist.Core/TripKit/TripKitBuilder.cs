@@ -11,7 +11,8 @@ public sealed record TripKitDocument(byte[] Pdf, byte[] PreviewJpeg, int PageCou
 /// <summary>
 /// Erzeugt das TripKit eines Flugplatzes (bisher <c>DFS_UpdateTripKitCharts</c>): alle Karten in einem PDF
 /// aus A4-Querformat-Seiten. Hochformat-Karten füllen je eine Seitenhälfte, Querformat-Karten eine ganze Seite.
-/// Die Karten werden nur skaliert und angeordnet, nicht verändert (IMPORT-MODUS 2, Leitplanke 7).
+/// Die Karten werden nur skaliert und angeordnet, nicht verändert: nichts wird zugeschnitten, übermalt
+/// oder eingeblendet.
 /// </summary>
 public static class TripKitBuilder
 {

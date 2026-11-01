@@ -7,7 +7,7 @@ using SkiaSharp;
 
 namespace ChartAssist.Core.Tests.Import;
 
-/// <summary>Abgleich-Sitzungen in einem temporären Kartenverzeichnis (TECHNISCHE-BASIS 11, Phase 3).</summary>
+/// <summary>Abgleich-Sitzungen in einem temporären Kartenverzeichnis.</summary>
 public sealed class ChartImportTests : IDisposable
 {
     private const string Version = "1.0.0.0";
@@ -445,7 +445,7 @@ public sealed class ChartImportTests : IDisposable
         Assert.Null(_database.AipLastUpdate);
     }
 
-    // Lokale Tests gegen echte Daten (IMPORT-MODUS 5.2)
+    // Tests gegen echte Daten; übersprungen, wenn testdata/ oder testcharts/ fehlt
 
     [Theory]
     [InlineData("AIP VFR Germany_Mannheim.html")]

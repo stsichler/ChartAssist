@@ -37,7 +37,7 @@ public sealed record DfsChartPage(DateOnly Effective, string Hash, string Name, 
 public sealed class DfsPageException(string message) : Exception(message);
 
 /// <summary>
-/// Wertet vom Benutzer gespeicherte Seiten der BasicVFR aus (IMPORT-MODUS 5.2), in beiden Speicherformaten
+/// Wertet vom Benutzer gespeicherte Seiten der BasicVFR aus, in beiden Speicherformaten
 /// von Firefox: "nur HTML" (Originalquelltext) und "komplett" (vom Browser serialisiertes DOM, z. B. mit nicht
 /// geschlossenem <c>&lt;img&gt;</c>). Deshalb durchgehend tolerante Regexe statt XML-Parser, unabhängig von
 /// Attributreihenfolge und zusätzlichen Attributen.

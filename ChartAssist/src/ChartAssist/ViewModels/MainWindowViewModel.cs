@@ -25,7 +25,7 @@ public enum BannerKind
 /// <summary>Zustand des Hauptfensters. Dialoge und weitere Fenster öffnet das Fenster selbst.</summary>
 public partial class MainWindowViewModel : ViewModelBase
 {
-    /// <summary>Die BasicVFR erscheint alle 28 Tage (IMPORT-MODUS 4).</summary>
+    /// <summary>Die BasicVFR erscheint alle 28 Tage.</summary>
     public const int EditionCycleDays = 28;
 
     public MainWindowViewModel(Settings settings)
@@ -91,10 +91,10 @@ public partial class MainWindowViewModel : ViewModelBase
 
     public bool CanUpdateCharts => CanStartSession && HasAirfields;
 
-    /// <summary>Während eines Abgleichs darf das Kartenverzeichnis nicht wechseln (IMPORT-MODUS 5.5).</summary>
+    /// <summary>Während eines Abgleichs darf das Kartenverzeichnis nicht wechseln.</summary>
     public bool CanChangeOptions => !IsSessionOpen;
 
-    /// <summary>Veraltete Datenbank mit GAT24 als Quelle; wird nicht mehr migriert (IMPORT-MODUS 5.6).</summary>
+    /// <summary>Veraltete Datenbank mit GAT24 als Quelle; wird nicht mehr migriert.</summary>
     public bool IsLegacyDatabase => Database.DataSource == "GAT24" || (Database.DataSource == null && Database.Version != null);
 
     /// <summary>Lädt die Datenbank des eingestellten Kartenverzeichnisses.</summary>
@@ -202,7 +202,7 @@ public partial class MainWindowViewModel : ViewModelBase
             ? Utility.BuildChartPath(Folder.Path, node.Airfield, node.Chart)
             : null;
 
-    /// <summary>Nächste planmäßige Ausgabe der BasicVFR nach der angegebenen (28-Tage-Zyklus, IMPORT-MODUS 4).</summary>
+    /// <summary>Nächste planmäßige Ausgabe der BasicVFR nach der angegebenen (28-Tage-Zyklus).</summary>
     public static DateOnly NextEdition(DateOnly edition) => edition.AddDays(EditionCycleDays);
 
     public void UpdateBanner()

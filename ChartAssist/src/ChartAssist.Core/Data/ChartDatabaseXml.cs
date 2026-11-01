@@ -7,8 +7,8 @@ using System.Xml.Linq;
 namespace ChartAssist.Core.Data;
 
 /// <summary>
-/// Liest und schreibt <c>.ChartButler.xml</c> exakt im Format von <c>DataSet.WriteXml</c> aus ChartButlerCS
-/// (TECHNISCHE-BASIS 4.3): ohne Namespace, Tabellen in der Reihenfolge AFCharts, Airfields, AIP, Updates,
+/// Liest und schreibt <c>.ChartButler.xml</c> exakt im Format von <c>DataSet.WriteXml</c> aus ChartButlerCS:
+/// ohne Namespace, Tabellen in der Reihenfolge AFCharts, Airfields, AIP, Updates,
 /// ChartButler, fehlende Werte als fehlendes Element, 2 Leerzeichen Einrückung, immer CRLF, UTF-8 ohne BOM.
 /// </summary>
 public static class ChartDatabaseXml

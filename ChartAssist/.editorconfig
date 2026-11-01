@@ -1,4 +1,4 @@
-# Gemeinsame Regeln für VS Code und dotnet format (docs/TECHNISCHE-BASIS.md, 7.4)
+# Gemeinsame Regeln für VS Code und dotnet format
 root = true
 
 [*]
