@@ -17,6 +17,7 @@ public partial class AbgleichWindow : Window
 {
     private readonly DispatcherTimer _timer = new() { Interval = TimeSpan.FromSeconds(1.5) };
     private bool _busy;
+    private bool _lastPressWasRightButton;
 
     public AbgleichWindow()
     {
@@ -26,6 +27,11 @@ public partial class AbgleichWindow : Window
         // Tastatur auf Fensterebene: Nach jedem Import wird die Liste neu aufgebaut, dabei geht der Fokus des
         // Listeneintrags verloren. Pfeiltasten und Enter sollen trotzdem immer funktionieren.
         AddHandler(KeyDownEvent, OnWindowKeyDown, RoutingStrategies.Tunnel);
+
+        // Welche Maustaste zuletzt gedrückt wurde: Ein Rechtsklick öffnet nur das Kontextmenü, nie die Seite
+        TaskList.AddHandler(PointerPressedEvent,
+            (_, e) => _lastPressWasRightButton = e.GetCurrentPoint(TaskList).Properties.IsRightButtonPressed,
+            RoutingStrategies.Tunnel);
     }
 
     private AbgleichViewModel ViewModel => (AbgleichViewModel)DataContext!;
@@ -61,7 +67,6 @@ public partial class AbgleichWindow : Window
                 // Kurz stehen lassen, damit der letzte Haken zu sehen ist
                 _timer.Stop();
                 await Task.Delay(TimeSpan.FromSeconds(1.5));
-                ViewModel.ClosedAutomatically = true;
                 Close();
             }
         }
@@ -77,9 +82,27 @@ public partial class AbgleichWindow : Window
     /// <summary>Öffnet genau die eine Seite des markierten Eintrags, nur auf ausdrückliche Benutzeraktion.</summary>
     private async Task OpenSelectedAsync()
     {
-        if (ViewModel.SelectedItem?.Link is Uri link)
+        if (ViewModel.SelectedItem is { } item)
+        {
+            await OpenAsync(item);
+        }
+    }
+
+    /// <summary>
+    /// Einträge ohne Link: Karten aus einer "nur HTML" gespeicherten Flugplatzseite (auf der Flugplatzseite anklicken)
+    /// und Flugplätze ohne bekannten Permalink (über das Flugplatzverzeichnis aufrufen).
+    /// </summary>
+    private async Task OpenAsync(TaskItemViewModel item)
+    {
+        if (item.Link is Uri link)
         {
             await Launch.UriAsync(this, link);
+        }
+        else
+        {
+            ViewModel.Status = item.IsChart
+                ? "Für diese Karte ist kein direkter Link bekannt. Bitte die Karte auf der Flugplatzseite im Browser anklicken und speichern."
+                : "Für diesen Flugplatz ist kein direkter Link bekannt. Bitte über das Flugplatzverzeichnis aufrufen und die Seite speichern.";
         }
     }
 
@@ -90,10 +113,34 @@ public partial class AbgleichWindow : Window
     /// </summary>
     private async void OnTaskTapped(object? sender, TappedEventArgs e)
     {
-        if ((e.Source as Control)?.FindAncestorOfType<ListBoxItem>(includeSelf: true)?.DataContext is TaskItemViewModel { Link: Uri link })
+        if (_lastPressWasRightButton)
         {
-            await Launch.UriAsync(this, link);
+            return;
         }
+        if ((e.Source as Control)?.FindAncestorOfType<ListBoxItem>(includeSelf: true)?.DataContext is TaskItemViewModel item)
+        {
+            await OpenAsync(item);
+        }
+    }
+
+    /// <summary>Kontextmenü "Link kopieren", z. B. zum Einfügen in die Adressleiste des Browsers.</summary>
+    private void OnTaskContextRequested(object? sender, ContextRequestedEventArgs e)
+    {
+        if ((e.Source as Control)?.FindAncestorOfType<ListBoxItem>(includeSelf: true) is not { DataContext: TaskItemViewModel { Link: Uri link } } container)
+        {
+            return;
+        }
+        var copy = new MenuItem { Header = "Link kopieren" };
+        copy.Click += async (_, _) =>
+        {
+            if (Clipboard is { } clipboard)
+            {
+                await clipboard.SetTextAsync(link.AbsoluteUri);
+                ViewModel.Status = "Link kopiert: " + link.AbsoluteUri;
+            }
+        };
+        new ContextMenu { ItemsSource = new[] { copy } }.Open(container);
+        e.Handled = true;
     }
 
     private async void OnCopyImportFolder(object? sender, RoutedEventArgs e)

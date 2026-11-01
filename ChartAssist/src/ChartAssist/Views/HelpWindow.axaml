@@ -24,7 +24,8 @@
         <ScrollViewer>
           <StackPanel Margin="4">
             <TextBlock Classes="heading" Text="Karten aktualisieren" />
-            <TextBlock Text="ChartAssist zeigt, welche Seiten der DFS Sie speichern müssen. Klick auf einen Eintrag öffnet die Seite im Browser. Dort mit Strg+S als „Webseite, nur HTML“ in den Import-Ordner speichern. Den Rest erledigt ChartAssist." />
+            <TextBlock Text="ChartAssist zeigt, welche Seiten der DFS Sie speichern müssen. Klick auf einen Eintrag öffnet die Seite im Browser. Dort mit Strg+S als „Webseite, komplett“ in den Import-Ordner speichern. Den Rest erledigt ChartAssist." />
+            <TextBlock Text="„Webseite, nur HTML“ geht auch. Dann sind die Karten aber auf der Flugplatzseite anzuklicken, weil ihre Adresse nicht in der gespeicherten Seite steht." Margin="0,4,0,0" />
             <TextBlock Text="Hat sich nichts geändert, genügt die erste Seite. Sonst folgt je Flugplatz eine Seite und je geänderter Karte eine weitere." Margin="0,4,0,0" />
 
             <TextBlock Classes="heading" Text="Flugplatz hinzufügen" />
@@ -37,7 +38,7 @@
             <TextBlock Text="Doppelklick auf eine Karte öffnet sie. Rechtsklick auf einen Flugplatz: löschen." />
 
             <TextBlock Classes="heading" Text="Optionen" />
-            <TextBlock Text="Kartenverzeichnis, Import-Ordner und ob je Flugplatz ein TripKit-PDF mit allen Karten entstehen soll." />
+            <TextBlock Text="Kartenverzeichnis, Import-Ordner und ob je Flugplatz ein TripKit-PDF mit allen Karten entstehen soll. Unter Windows und Linux außerdem Startmenü-Eintrag und Desktop-Verknüpfung anlegen." />
 
             <TextBlock Classes="heading" Text="Kartenverzeichnis" />
             <TextBlock Text="Karten und Datenbank liegen zusammen im Kartenverzeichnis. Sie können es kopieren oder synchronisieren und unter Windows, Linux und macOS verwenden. Kartenverzeichnisse von ChartButlerCS funktionieren weiter." />

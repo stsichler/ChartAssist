@@ -3,6 +3,7 @@ using System.Globalization;
 using Avalonia.Media.Imaging;
 using ChartAssist.Core;
 using ChartAssist.Core.Data;
+using ChartAssist.Core.Dfs;
 using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace ChartAssist.ViewModels;
@@ -61,6 +62,10 @@ public partial class MainWindowViewModel : ViewModelBase
     [ObservableProperty]
     public partial string BannerText { get; set; } = "";
 
+    /// <summary>Statusleiste: Ausgabe des Kartensatzes und nächste planmäßige Ausgabe.</summary>
+    [ObservableProperty]
+    public partial string StatusText { get; set; } = "";
+
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(CanStartSession), nameof(CanUpdateCharts), nameof(CanChangeOptions))]
     public partial bool IsSessionOpen { get; set; }
@@ -92,25 +97,35 @@ public partial class MainWindowViewModel : ViewModelBase
     /// <summary>Veraltete Datenbank mit GAT24 als Quelle; wird nicht mehr migriert.</summary>
     public bool IsLegacyDatabase => Database.DataSource == "GAT24" || (Database.DataSource == null && Database.Version != null);
 
-    public void ApplySettings(Settings settings)
-    {
-        Settings = settings;
-    }
-
     /// <summary>Lädt die Datenbank des eingestellten Kartenverzeichnisses.</summary>
     /// <returns>Das Ergebnis, oder null, wenn kein Verzeichnis eingestellt ist oder es fehlt.</returns>
     public ChartFolderLoadResult? LoadDatabase()
     {
         string path = Settings.ChartFolder;
         Folder = path.Length > 0 && Directory.Exists(path) ? new ChartFolder(path) : null;
-        HasFolder = Folder != null;
         Title = path.Length > 0 ? "ChartAssist – " + path : "ChartAssist";
+        LoadError = null;
 
-        ChartFolderLoadResult? result = Folder?.Load();
+        ChartFolderLoadResult? result = null;
+        try
+        {
+            result = Folder?.Load();
+        }
+        catch (Exception e) when (e is IOException or UnauthorizedAccessException)
+        {
+            // Z. B. Datenbank gesperrt oder Verzeichnis nicht lesbar. Das Verzeichnis dann nicht verwenden: Sonst würde
+            // die leere Datenbank beim nächsten Speichern die vorhandene überschreiben.
+            LoadError = e.Message;
+            Folder = null;
+        }
+        HasFolder = Folder != null;
         Database = result?.Database ?? new ChartDatabase();
         Refresh();
         return result;
     }
+
+    /// <summary>Fehler beim letzten <see cref="LoadDatabase"/>, sonst null.</summary>
+    public string? LoadError { get; private set; }
 
     /// <summary>Speichert die Datenbank, falls sie sich geändert hat.</summary>
     public void SaveDatabase()
@@ -187,21 +202,26 @@ public partial class MainWindowViewModel : ViewModelBase
             ? Utility.BuildChartPath(Folder.Path, node.Airfield, node.Chart)
             : null;
 
+    /// <summary>Nächste planmäßige Ausgabe der BasicVFR nach der angegebenen (28-Tage-Zyklus).</summary>
+    public static DateOnly NextEdition(DateOnly edition) => edition.AddDays(EditionCycleDays);
+
     public void UpdateBanner()
     {
+        UpdateStatus();
+
         if (HasAirfields && IsLegacyDatabase)
         {
             Show(BannerKind.Warning, "Diese Datenbank stammt noch von GAT24. Bitte die Flugplätze neu abonnieren.");
         }
-        else if (HasAirfields && (Database.AipLastUpdate == null || Database.Version != AppInfo.VersionText))
+        else if (HasAirfields && (Database.AipLastUpdate == null || Database.Version != AppInfo.DatabaseVersion))
         {
             Show(BannerKind.UpdateRequired, "Bitte führen Sie einen Kartenabgleich durch. Hier klicken zum Starten.");
         }
         else if (HasAirfields && Database.AipLastUpdate is DateOnly last
-            && DateOnly.FromDateTime(DateTime.Today) >= last.AddDays(EditionCycleDays))
+            && DateOnly.FromDateTime(DateTime.Today) >= NextEdition(last))
         {
-            string expected = last.AddDays(EditionCycleDays).ToString("dd.MM.yyyy", CultureInfo.InvariantCulture);
-            Show(BannerKind.UpdateRequired, $"Seit {expected} ist eine neue Ausgabe der BasicVFR zu erwarten. Hier klicken für den Kartenabgleich.");
+            string expected = Format(NextEdition(last));
+            Show(BannerKind.UpdateRequired, $"Neue Ausgabe der BasicVFR erwartet (Effective: {expected}). Hier klicken für den Kartenabgleich.");
         }
         else if (NewRelease != null)
         {
@@ -212,6 +232,27 @@ public partial class MainWindowViewModel : ViewModelBase
             Show(BannerKind.None, "");
         }
     }
+
+    private void UpdateStatus()
+    {
+        if (!HasFolder)
+        {
+            StatusText = "Kein Kartenverzeichnis gewählt";
+        }
+        else if (Database.AipLastUpdate is not DateOnly edition)
+        {
+            StatusText = "Effective: – (noch kein vollständiger Kartenabgleich)";
+        }
+        else
+        {
+            DateOnly next = NextEdition(edition);
+            string due = DateOnly.FromDateTime(DateTime.Today) >= next ? "fällig" : "voraussichtlich";
+            StatusText = $"Effective: {Format(edition)}  ·  Nächste Ausgabe: {Format(next)} ({due})";
+        }
+    }
+
+    /// <summary>Ausgaben in der Schreibweise der DFS ("Effective: 17 SEP 2026").</summary>
+    private static string Format(DateOnly date) => DfsPageParser.FormatDate(date);
 
     partial void OnSelectedNodeChanged(TreeNodeViewModel? value)
     {

@@ -89,13 +89,18 @@ public static partial class DfsPageParser
             throw new DfsPageException($"Die Überschrift \"{headline}\" enthält keinen ICAO-Code.");
         }
 
-        var charts = new List<DfsChartEntry>();
-        foreach (Match item in DocumentItemRegex().Matches(html))
+        // Jeder Karteneintrag muss lesbar sein. Würde ein Eintrag übergangen, hielte der Abgleich die Karte für
+        // entfallen und löschte sie. Deshalb ist die ganze Seite ein Fehler, sobald ein Eintrag nicht passt.
+        MatchCollection items = DocumentItemRegex().Matches(html);
+        if (items.Count != DocumentItemClassRegex().Count(html))
         {
-            if (ParseDocumentItem(item.Groups["content"].Value) is DfsChartEntry chart)
-            {
-                charts.Add(chart);
-            }
+            throw new DfsPageException("Die Kartenliste der Flugplatzseite ist unvollständig oder nicht lesbar.");
+        }
+        var charts = new List<DfsChartEntry>();
+        foreach (Match item in items)
+        {
+            charts.Add(ParseDocumentItem(item.Groups["content"].Value)
+                ?? throw new DfsPageException("Ein Karteneintrag der Flugplatzseite ist nicht lesbar (Link oder Name fehlt)."));
         }
 
         // Eine leere Liste wäre fatal: Beim Abgleich würden alle Karten als entfallen gelöscht
@@ -145,6 +150,9 @@ public static partial class DfsPageParser
         int year = int.Parse(match.Groups["year"].Value);
         return day <= DateTime.DaysInMonth(year, month) && day >= 1 ? new DateOnly(year, month, day) : null;
     }
+
+    /// <summary>Datum in der Schreibweise der DFS, z. B. "17 SEP 2026" wie in "Effective: 17 SEP 2026".</summary>
+    public static string FormatDate(DateOnly date) => $"{date.Day:00} {Months[date.Month - 1]} {date.Year}";
 
     private static readonly string[] Months = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
 
@@ -246,6 +254,9 @@ public static partial class DfsPageParser
 
     [GeneratedRegex(@"<li\b[^>]*\bclass\s*=\s*""document-item""[^>]*>(?<content>.*?)</li>", RegexOptions.Singleline)]
     private static partial Regex DocumentItemRegex();
+
+    [GeneratedRegex(@"\bclass\s*=\s*""document-item""")]
+    private static partial Regex DocumentItemClassRegex();
 
     [GeneratedRegex(@"const\s+myPermalink\s*=\s*[""'](?<permalink>[^""']+)[""']")]
     private static partial Regex PermalinkRegex();

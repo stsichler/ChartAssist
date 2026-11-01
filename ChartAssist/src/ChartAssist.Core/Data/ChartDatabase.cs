@@ -84,6 +84,9 @@ public sealed class Chart
     /// <summary>Kartenname der DFS, Teil von Crypt nach '#'.</summary>
     public string? ServerName { get; set; }
 
-    /// <summary>Das TripKit ist ebenfalls als Karte eingetragen, aber ohne Crypt.</summary>
-    public bool IsTripKit => AirfieldPermalink == null;
+    /// <summary>
+    /// Das TripKit ist ebenfalls als Karte eingetragen ("ICAO_TripKit_Charts.pdf"). Erkannt am Namen, nicht am fehlenden
+    /// Permalink: Auch aus dem Verzeichnis wiederhergestellte Karten haben keinen.
+    /// </summary>
+    public bool IsTripKit => Name == Icao + "_TripKit_Charts.pdf";
 }

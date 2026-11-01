@@ -157,8 +157,8 @@ public static class TripKitBuilder
         var entry = new Chart { Icao = airfield.Icao, Name = FileName(airfield.Icao) };
         string pdfPath = Utility.BuildChartPath(folder.Path, airfield, entry);
         bool existed = File.Exists(pdfPath) || database.FindChart(entry.Name) != null;
-        File.Delete(pdfPath);
-        File.Delete(Utility.BuildChartPreviewPath(folder.Path, airfield, entry, "jpg"));
+        Utility.DeleteFile(pdfPath);
+        Utility.DeleteFile(Utility.BuildChartPreviewPath(folder.Path, airfield, entry, "jpg"));
         database.Charts.RemoveAll(c => c.Name == entry.Name);
         return existed;
     }

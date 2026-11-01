@@ -1,5 +1,4 @@
 using System.Diagnostics;
-using System.Globalization;
 using ChartAssist.Core.Data;
 using ChartAssist.Core.Dfs;
 using ChartAssist.Core.TripKit;
@@ -73,11 +72,16 @@ public sealed class AirfieldTask
     internal Airfield Airfield { get; }
 
     /// <summary>Neu abonniert: alle Karten werden übernommen, ohne Einträge unter "Aktualisierungen".</summary>
-    internal bool IsNew { get; }
+    public bool IsNew { get; }
 }
 
 /// <summary>Aufgabe "Bitte speichern: Karte", zugeordnet über den Hash der Kartenseite.</summary>
-public sealed record PendingChart(string Icao, string ChartName, string ServerName, string AirfieldPermalink, string Hash, Uri Link, byte[] Preview);
+/// <param name="Link">
+/// Kartenseite, nur bei "Webseite, komplett" bekannt (dort ist der href absolut). Bei "nur HTML" null: Dann klickt der
+/// Benutzer die Karte auf der Flugplatzseite an.
+/// </param>
+/// <param name="Position">Stelle auf der Flugplatzseite, für die Reihenfolge in der Aufgabenliste.</param>
+public sealed record PendingChart(string Icao, string ChartName, string ServerName, string AirfieldPermalink, string Hash, Uri? Link, byte[] Preview, int Position);
 
 /// <summary>In dieser Sitzung aktualisierte Karte, für die Übersicht am Ende.</summary>
 public sealed record UpdatedChart(string Name, string Path);
@@ -96,9 +100,10 @@ public sealed class ChartImport
     private readonly bool _createTripKit;
     private readonly List<AirfieldTask> _airfields = [];
     private readonly List<PendingChart> _pendingCharts = [];
+    private readonly List<PendingChart> _completedCharts = [];
     private readonly List<UpdatedChart> _updatedCharts = [];
 
-    /// <param name="programVersion">Vierstellige Programmversion; eine andere Version in der Datenbank erzwingt einen vollständigen Abgleich.</param>
+    /// <param name="programVersion">Kennung für <c>ChartButler.Version</c>, z. B. "ChartAssist 1.0.0.0"; eine andere Kennung in der Datenbank erzwingt einen vollständigen Abgleich.</param>
     /// <param name="createTripKit">TripKit-PDF erzeugen (Einstellung). Ist es aus, wird ein vorhandenes TripKit entfernt, statt zu veralten.</param>
     public ChartImport(ChartFolder folder, ChartDatabase database, string programVersion, ImportMode mode, bool createTripKit = true)
     {
@@ -129,6 +134,9 @@ public sealed class ChartImport
 
     public IReadOnlyList<PendingChart> PendingCharts => _pendingCharts;
 
+    /// <summary>In dieser Sitzung angeforderte und übernommene Karten; sie bleiben abgehakt in der Aufgabenliste.</summary>
+    public IReadOnlyList<PendingChart> CompletedCharts => _completedCharts;
+
     public IReadOnlyList<UpdatedChart> UpdatedCharts => _updatedCharts;
 
     public bool IsFinished => State is ImportSessionState.NothingToDo or ImportSessionState.Completed or ImportSessionState.Aborted;
@@ -157,7 +165,7 @@ public sealed class ChartImport
             {
                 DfsPageKind.AirfieldPage => ApplyAirfieldPage(DfsPageParser.ParseAirfieldPage(html)),
                 DfsPageKind.ChartPage => ApplyChartPage(DfsPageParser.ParseChartPage(html)),
-                _ => new ImportResult(ImportOutcome.Processed, $"Ausgabe vom {Format(Effective!.Value)} erkannt. Bitte jetzt die Flugplatzseiten speichern."),
+                _ => ApplyOtherPage(),
             };
         }
         catch (DfsPageException e)
@@ -180,6 +188,11 @@ public sealed class ChartImport
         return CheckCharts(task, page, warning: null);
     }
 
+    /// <summary>Startseite oder Flugplatzverzeichnis: liefert nur das Effective-Datum, sonst wird die Seite nicht gebraucht.</summary>
+    private ImportResult ApplyOtherPage() => new(ImportOutcome.Processed, Mode == ImportMode.AddAirfield
+        ? "Diese Seite wird nicht gebraucht. Bitte im Browser zum Flugplatz wechseln und dessen Seite speichern."
+        : $"Effective: {Format(Effective!.Value)} erkannt. Bitte jetzt die Flugplatzseiten speichern.");
+
     private ImportResult? CheckEffectiveDate(DateOnly effective)
     {
         if (Effective == null)
@@ -190,7 +203,7 @@ public sealed class ChartImport
             {
                 State = ImportSessionState.NothingToDo;
                 return new ImportResult(ImportOutcome.Processed,
-                    $"Keine Aktualisierung notwendig: Die Karten entsprechen der Ausgabe vom {Format(effective)}.");
+                    $"Keine Aktualisierung notwendig: Die Karten sind aktuell (Effective: {Format(effective)}).");
             }
             return null;
         }
@@ -199,7 +212,7 @@ public sealed class ChartImport
         {
             State = ImportSessionState.Aborted;
             return new ImportResult(ImportOutcome.Processed,
-                $"Die DFS hat während des Abgleichs eine neue Ausgabe veröffentlicht ({Format(effective)}). Bitte den Abgleich neu starten.");
+                $"Die DFS hat während des Abgleichs eine neue Ausgabe veröffentlicht (Effective: {Format(effective)}). Bitte den Abgleich neu starten.");
         }
         return null;
     }
@@ -238,8 +251,9 @@ public sealed class ChartImport
         _pendingCharts.RemoveAll(p => p.Icao == airfield.Icao);
 
         var serverNames = new HashSet<string>(StringComparer.Ordinal);
-        foreach (DfsChartEntry entry in page.Charts)
+        for (int position = 0; position < page.Charts.Count; position++)
         {
+            DfsChartEntry entry = page.Charts[position];
             string serverName = entry.Name.StartsWith(airfield.Icao, StringComparison.Ordinal) ? entry.Name : airfield.Icao + " " + entry.Name;
             serverNames.Add(serverName);
 
@@ -256,14 +270,18 @@ public sealed class ChartImport
             }
             string chartName = chart?.Name ?? Utility.GetFilenameFor(serverName) + ".png";
 
+            // Auch bei neuen Flugplätzen vergleichen: Wird die Seite erneut gespeichert, sind schon übernommene
+            // Karten mit Datei und Vorschau vorhanden und werden nicht noch einmal angefordert
             var probe = new Chart { Icao = airfield.Icao, Name = chartName };
-            bool isCurrent = !task.IsNew && chart != null
+            bool isCurrent = chart != null
+                && entry.PreviewPng.Length > 0
                 && File.Exists(Utility.BuildChartPath(_folder.Path, airfield, probe))
                 && Utility.FileEquals(Utility.BuildChartPreviewPath(_folder.Path, airfield, probe, "png"), entry.PreviewPng);
             if (!isCurrent)
             {
+                _completedCharts.RemoveAll(c => c.Icao == airfield.Icao && c.ChartName == chartName);
                 _pendingCharts.Add(new PendingChart(airfield.Icao, chartName, serverName, page.Permalink, entry.Hash,
-                    ChartLink(entry, page.Effective), entry.PreviewPng));
+                    ChartLink(entry), entry.PreviewPng, position));
             }
         }
 
@@ -285,7 +303,9 @@ public sealed class ChartImport
         else
         {
             task.Status = AirfieldTaskStatus.WaitingForCharts;
-            message = $"{airfield.Icao}: {pending} Karte(n) bitte speichern.";
+            message = _pendingCharts.Any(p => p.Icao == airfield.Icao && p.Link == null)
+                ? $"{airfield.Icao}: {pending} Karte(n) bitte speichern. Dazu die Karten auf der Flugplatzseite anklicken."
+                : $"{airfield.Icao}: {pending} Karte(n) bitte speichern.";
         }
         return new ImportResult(ImportOutcome.Processed, warning == null ? message : warning + " " + message);
     }
@@ -296,7 +316,9 @@ public sealed class ChartImport
         PendingChart? pending = _pendingCharts.Find(p => string.Equals(p.Hash, page.Hash, StringComparison.OrdinalIgnoreCase));
         if (pending == null)
         {
-            return new ImportResult(ImportOutcome.Processed, $"Karte \"{page.Name}\" wurde nicht angefordert und wird übergangen.");
+            return _completedCharts.Any(c => string.Equals(c.Hash, page.Hash, StringComparison.OrdinalIgnoreCase))
+                ? new ImportResult(ImportOutcome.Processed, $"Karte \"{page.Name}\" ist bereits übernommen.")
+                : new ImportResult(ImportOutcome.Processed, $"Karte \"{page.Name}\" wurde nicht angefordert und wird übergangen.");
         }
         if (!string.Equals(page.Name, pending.ServerName, StringComparison.Ordinal)
             && !pending.ServerName.EndsWith(" " + page.Name, StringComparison.Ordinal))
@@ -306,25 +328,36 @@ public sealed class ChartImport
 
         AirfieldTask task = _airfields.First(t => t.Icao == pending.Icao);
         Airfield airfield = task.Airfield;
+
+        // Erst die Dateien, dann die Datenbank: Scheitert das Schreiben, bleibt die Datenbank unverändert.
+        // Die Vorschau erst nach der Karte: Bricht etwas ab, gilt die Karte beim nächsten Mal wieder als geändert.
+        Directory.CreateDirectory(Path.Combine(_folder.Path, Utility.AirfieldDirectoryName(airfield)));
+        var target = new Chart { Icao = airfield.Icao, Name = pending.ChartName };
+        string chartPath = Utility.BuildChartPath(_folder.Path, airfield, target);
+        string previewPath = Utility.BuildChartPreviewPath(_folder.Path, airfield, target, "png");
+        Utility.WriteFileAtomic(chartPath, page.Png);
+        if (pending.Preview.Length > 0)
+        {
+            Utility.WriteFileAtomic(previewPath, pending.Preview, hidden: true);
+        }
+        else
+        {
+            // Ohne Vorschau auf der Flugplatzseite keine leere Vorschaudatei: Die würde ewig als "aktuell" gelten
+            Utility.DeleteFile(previewPath);
+        }
+
         if (_database.FindAirfield(airfield.Icao) == null)
         {
             _database.Airfields.Add(airfield);
         }
-        Directory.CreateDirectory(Path.Combine(_folder.Path, Utility.AirfieldDirectoryName(airfield)));
-
         Chart? chart = _database.FindChart(pending.ChartName);
         if (chart == null)
         {
-            chart = new Chart { Icao = airfield.Icao, Name = pending.ChartName };
+            chart = target;
             _database.Charts.Add(chart);
         }
         chart.AirfieldPermalink = pending.AirfieldPermalink;
         chart.ServerName = pending.ServerName;
-
-        // Die Vorschau erst nach der Karte schreiben: Bricht etwas ab, gilt die Karte beim nächsten Mal wieder als geändert
-        string chartPath = Utility.BuildChartPath(_folder.Path, airfield, chart);
-        Utility.WriteFileAtomic(chartPath, page.Png);
-        Utility.WriteFileAtomic(Utility.BuildChartPreviewPath(_folder.Path, airfield, chart, "png"), pending.Preview, hidden: true);
 
         DateOnly chartUpdate = page.Date ?? Effective!.Value;
         chart.CreationDate = DateOnly.FromDateTime(DateTime.Now);
@@ -336,6 +369,7 @@ public sealed class ChartImport
         }
 
         _pendingCharts.Remove(pending);
+        _completedCharts.Add(pending);
         _updatedCharts.Add(new UpdatedChart(chart.Name, chartPath));
 
         int remaining = _pendingCharts.Count(p => p.Icao == airfield.Icao);
@@ -358,8 +392,8 @@ public sealed class ChartImport
             .ToList();
         foreach (Chart chart in orphans)
         {
-            File.Delete(Utility.BuildChartPath(_folder.Path, airfield, chart));
-            File.Delete(Utility.BuildChartPreviewPath(_folder.Path, airfield, chart, "png"));
+            Utility.DeleteFile(Utility.BuildChartPath(_folder.Path, airfield, chart));
+            Utility.DeleteFile(Utility.BuildChartPreviewPath(_folder.Path, airfield, chart, "png"));
             _database.Charts.Remove(chart);
         }
         return orphans.Count;
@@ -396,8 +430,11 @@ public sealed class ChartImport
 
         if (Mode == ImportMode.AddAirfield)
         {
-            // Wie ChartButlerCS: Das Datum der Ausgabe nur eintragen, wenn es noch keins gibt
-            if (_database.AipLastUpdate == null && _database.Charts.Count > 0)
+            // Wie ChartButlerCS: Das Datum der Ausgabe nur eintragen, wenn es noch keins gibt. Aber nur, wenn die
+            // Datenbank allein aus den in dieser Sitzung hinzugefügten Flugplätzen besteht: Andere Flugplätze (z. B.
+            // nach einer Wiederherstellung) sind nicht geprüft und dürfen nicht als aktuell gelten.
+            bool onlyNewAirfields = _database.Airfields.All(a => _airfields.Any(t => t.IsNew && t.Airfield == a));
+            if (_database.AipLastUpdate == null && _database.Charts.Count > 0 && onlyNewAirfields)
             {
                 MarkDatabaseCurrent();
             }
@@ -419,11 +456,15 @@ public sealed class ChartImport
         _database.DataSource = "DFS";
     }
 
-    /// <summary>Absoluter href ("komplett") oder aus Effective-Datum und Hash gebildet ("nur HTML").</summary>
-    private static Uri ChartLink(DfsChartEntry entry, DateOnly effective) =>
+    /// <summary>
+    /// Absoluter href aus einer "komplett" gespeicherten Seite, sonst null. Bei "nur HTML" ist der href relativ, und
+    /// der Ordner der Ausgabe steht nirgends in der Seite; er lässt sich auch nicht aus dem Effective-Datum ableiten
+    /// (Ausgabe vom 15 OCT 2026 lag unter 2026OCT20).
+    /// </summary>
+    private static Uri? ChartLink(DfsChartEntry entry) =>
         entry.Href.StartsWith(DfsUrls.BaseUrl, StringComparison.OrdinalIgnoreCase) && Uri.TryCreate(entry.Href, UriKind.Absolute, out Uri? link)
             ? link
-            : DfsUrls.ChartPage(effective, entry.Hash);
+            : null;
 
-    private static string Format(DateOnly date) => date.ToString("dd.MM.yyyy", CultureInfo.InvariantCulture);
+    private static string Format(DateOnly date) => DfsPageParser.FormatDate(date);
 }

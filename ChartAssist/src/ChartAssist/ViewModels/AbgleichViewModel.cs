@@ -26,7 +26,7 @@ public sealed class TaskItemViewModel(string symbol, string text, Uri? link, boo
 /// <summary>Abgleichfenster: Aufgabenliste, Import-Ordner, Statuszeile.</summary>
 public partial class AbgleichViewModel : ViewModelBase
 {
-    private const string CompleteFormatTip = " Tipp: Speichern Sie als „Webseite, nur HTML“.";
+    private const string CompleteFormatTip = " Tipp: Als „Webseite, komplett“ speichern, dann führt ein Klick direkt zur Karte.";
 
     private readonly Action _databaseChanged;
 
@@ -49,7 +49,7 @@ public partial class AbgleichViewModel : ViewModelBase
 
     public string Instructions =>
         "Klick auf einen Eintrag öffnet die Seite im Browser. Speichern Sie sie dort mit Strg+S "
-        + "als „Webseite, nur HTML“ in den Import-Ordner. Den Rest erledigt ChartAssist.";
+        + "als „Webseite, komplett“ in den Import-Ordner. Den Rest erledigt ChartAssist.";
 
     public string ImportFolder => Scanner.Folder;
 
@@ -71,9 +71,6 @@ public partial class AbgleichViewModel : ViewModelBase
     public bool IsComplete => Import.State is ImportSessionState.Completed or ImportSessionState.NothingToDo
         || (Import.Mode == ImportMode.AddAirfield && Import.Airfields.Count > 0
             && Import.Airfields.All(t => t.Status == AirfieldTaskStatus.Done) && Import.PendingCharts.Count == 0);
-
-    /// <summary>Das Fenster wurde geschlossen, weil alles erledigt war.</summary>
-    public bool ClosedAutomatically { get; set; }
 
     /// <summary>
     /// Verarbeitet die fertig gespeicherten Dateien im Import-Ordner nacheinander.
@@ -124,7 +121,7 @@ public partial class AbgleichViewModel : ViewModelBase
                     : new ImportResult(ImportOutcome.Processed, $"{page.Icao} wurde nicht abonniert.");
             }
         }
-        catch (Exception e) when (e is IOException or UnauthorizedAccessException or InvalidOperationException or ArgumentException)
+        catch (Exception e)
         {
             Debug.WriteLine(e);
             result = new ImportResult(ImportOutcome.Failed, "Fehler beim Übernehmen: " + e.Message);
@@ -148,39 +145,51 @@ public partial class AbgleichViewModel : ViewModelBase
 
         Status = result.Outcome == ImportOutcome.Failed
             ? result.Message + " Die Datei liegt jetzt im Ordner „Fehler“."
-            : result.Message + (savedComplete ? CompleteFormatTip : "");
+            : result.Message + (!savedComplete && Import.PendingCharts.Any(p => p.Link == null) ? CompleteFormatTip : "");
         _databaseChanged();
         RebuildItems();
     }
 
-    /// <summary>Baut die Aufgabenliste neu auf und markiert den nächsten offenen Eintrag, ohne ihn zu öffnen (Leitplanke 3).</summary>
+    /// <summary>
+    /// Baut die Aufgabenliste neu auf und markiert den nächsten offenen Eintrag, ohne ihn zu öffnen (Leitplanke 3).
+    /// Regel für alle Aufgaben: abgehakt, sobald die Seite, auf die der Link zeigt, übernommen ist.
+    /// </summary>
     public void RebuildItems()
     {
         Items.Clear();
-        if (Import.Mode == ImportMode.AddAirfield)
+
+        // Das Flugplatzverzeichnis ist nur ein Einstieg, um im Browser zum Flugplatz zu navigieren. Es muss nicht
+        // gespeichert werden und wird deshalb nie abgehakt. Beim Hinzufügen, und beim Abgleich für Flugplätze
+        // ohne bekannten Permalink.
+        TaskItemViewModel? directory = null;
+        if (Import.Mode == ImportMode.AddAirfield || Import.Airfields.Any(t => t.Link == null))
         {
-            Items.Add(new TaskItemViewModel("→", "Flugplatzverzeichnis", DfsUrls.AirfieldDirectory, isOpen: true, isChart: false));
+            directory = new TaskItemViewModel("→", "Flugplatzverzeichnis öffnen", DfsUrls.AirfieldDirectory, isOpen: false, isChart: false);
+            Items.Add(directory);
         }
 
         foreach (AirfieldTask task in Import.Airfields)
         {
-            string symbol = task.Status switch
-            {
-                AirfieldTaskStatus.Done => "✓",
-                AirfieldTaskStatus.WaitingForCharts => "…",
-                _ => "○",
-            };
-            Items.Add(new TaskItemViewModel(symbol, $"{task.Icao} – {task.Name}", task.Link ?? DfsUrls.AirfieldDirectory,
-                task.Status == AirfieldTaskStatus.Open && !Import.IsFinished, isChart: false));
+            // Abgehakt, sobald die Flugplatzseite verarbeitet ist; fehlende Karten stehen eingerückt darunter
+            bool pageSaved = task.Status != AirfieldTaskStatus.Open;
+            string text = task.Link == null ? $"{task.Icao} – {task.Name} (über Flugplatzverzeichnis)" : $"{task.Icao} – {task.Name}";
+            Items.Add(new TaskItemViewModel(pageSaved ? "✓" : "○", text, task.Link,
+                isOpen: !pageSaved && !Import.IsFinished, isChart: false));
 
-            foreach (PendingChart chart in Import.PendingCharts.Where(p => p.Icao == task.Icao))
+            // Übernommene Karten bleiben abgehakt stehen, in der Reihenfolge der Flugplatzseite. "Bitte speichern:"
+            // nur bei geänderten Karten; bei einem neuen Flugplatz ist ohnehin klar, dass alle zu speichern sind
+            var charts = Import.CompletedCharts.Where(c => c.Icao == task.Icao).Select(c => (Chart: c, Done: true))
+                .Concat(Import.PendingCharts.Where(p => p.Icao == task.Icao).Select(p => (Chart: p, Done: false)))
+                .OrderBy(c => c.Chart.Position);
+            foreach ((PendingChart chart, bool done) in charts)
             {
-                Items.Add(new TaskItemViewModel("○", "Bitte speichern: " + Path.GetFileNameWithoutExtension(chart.ChartName),
-                    chart.Link, isOpen: !Import.IsFinished, isChart: true));
+                string name = Path.GetFileNameWithoutExtension(chart.ChartName);
+                Items.Add(done
+                    ? new TaskItemViewModel("✓", name, chart.Link, isOpen: false, isChart: true)
+                    : new TaskItemViewModel("○", task.IsNew ? name : "Bitte speichern: " + name, chart.Link, isOpen: !Import.IsFinished, isChart: true));
             }
         }
 
-        SelectedItem = Items.FirstOrDefault(i => i.IsOpen && i.Link != DfsUrls.AirfieldDirectory)
-            ?? Items.FirstOrDefault(i => i.IsOpen);
+        SelectedItem = Items.FirstOrDefault(i => i.IsOpen) ?? directory;
     }
 }

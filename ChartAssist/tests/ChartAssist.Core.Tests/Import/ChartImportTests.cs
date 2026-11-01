@@ -95,7 +95,8 @@ public sealed class ChartImportTests : IDisposable
 
         PendingChart pending = Assert.Single(import.PendingCharts);
         Assert.Equal("EDXA Musterstadt 1.png", pending.ChartName);
-        Assert.Equal("https://aip.dfs.de/BasicVFR/2026SEP17/pages/h1.html", pending.Link.AbsoluteUri);
+        // Nur "komplett" enthält die Adresse der Kartenseite; bei "nur HTML" wird die Karte auf der Flugplatzseite angeklickt
+        Assert.Equal(format == SaveFormat.Complete ? "https://aip.dfs.de/BasicVFR/2026SEP17/pages/h1.html" : null, pending.Link?.AbsoluteUri);
         Assert.Equal(AirfieldTaskStatus.WaitingForCharts, import.Airfields.Single().Status);
         Assert.Equal(Preview1, File.ReadAllBytes(PreviewPath("EDXA Musterstadt 1.png"))); // Vorschau erst mit der Karte
 
@@ -112,6 +113,32 @@ public sealed class ChartImportTests : IDisposable
         Assert.Equal(new DateOnly(2026, 9, 10), _database.FindChart("EDXA_TripKit_Charts.pdf")!.LastUpdate);
         Assert.Equal(ImportSessionState.Completed, import.State);
         Assert.Equal(NewEdition, _database.AipLastUpdate);
+    }
+
+    [Fact]
+    public void Kartenlink_OrdnerAusDerSeite_NichtAusDemEffectiveDatum()
+    {
+        // Ausgabe vom 15 OCT 2026, von der DFS aber unter 2026OCT20 veröffentlicht (Test vom 27.10.2026)
+        var effective = new DateOnly(2026, 10, 15);
+        ChartImport import = StartUpdate();
+
+        ImportResult result = import.Import(DfsTestPages.AirfieldPage(effective, Permalink, "Musterstadt EDXA",
+            [new("EDXA Musterstadt 1", "H1", DfsTestPages.Png(SKColors.Orange)), new("AD 2-1", "h2", Preview2)],
+            SaveFormat.Complete, editionFolder: "2026OCT20"));
+
+        Assert.Equal("https://aip.dfs.de/BasicVFR/2026OCT20/pages/H1.html", Assert.Single(import.PendingCharts).Link?.AbsoluteUri);
+        Assert.DoesNotContain("anklicken", result.Message);
+    }
+
+    [Fact]
+    public void NurHtml_KeinRatenDesKartenlinks()
+    {
+        ChartImport import = StartUpdate();
+
+        ImportResult result = import.Import(AirfieldPage(NewEdition, ("EDXA Musterstadt 1", "h1", DfsTestPages.Png(SKColors.Orange)), ("AD 2-1", "h2", Preview2)));
+
+        Assert.Null(Assert.Single(import.PendingCharts).Link);
+        Assert.Contains("auf der Flugplatzseite anklicken", result.Message);
     }
 
     [Fact]
@@ -181,6 +208,9 @@ public sealed class ChartImportTests : IDisposable
         Assert.Equal(Chart1, File.ReadAllBytes(ChartPath("EDXA AD 2-1.png")));
         Assert.Equal(Chart2, File.ReadAllBytes(ChartPath("EDXA Musterstadt 1.png")));
         Assert.Equal(ImportSessionState.Completed, import.State);
+        Assert.Empty(import.PendingCharts);
+        Assert.Equal(["EDXA AD 2-1.png", "EDXA Musterstadt 1.png"], import.CompletedCharts.Select(c => c.ChartName));
+        Assert.Equal([1, 0], import.CompletedCharts.Select(c => c.Position)); // Stelle auf der Flugplatzseite
     }
 
     [Fact]
@@ -324,6 +354,120 @@ public sealed class ChartImportTests : IDisposable
         Assert.Null(_database.FindChart("EDXA_TripKit_Charts.pdf"));
         Assert.False(File.Exists(ChartPath("EDXA_TripKit_Charts.pdf")));
         Assert.Equal(ImportSessionState.Completed, import.State);
+    }
+
+    [Fact]
+    public void GleicheSeitenMehrfach_Abgleich()
+    {
+        byte[] newPreview = DfsTestPages.Png(SKColors.Orange);
+        string airfieldPage = AirfieldPage(NewEdition, ("EDXA Musterstadt 1", "h1", newPreview), ("AD 2-1", "h2", Preview2));
+        string chartPage = DfsTestPages.ChartPage(NewEdition, "h1", "EDXA Musterstadt 1", null, Chart2, SaveFormat.HtmlOnly);
+        ChartImport import = StartUpdate();
+
+        import.Import(airfieldPage);
+        import.Import(airfieldPage); // Flugplatzseite doppelt: dieselbe Karte bleibt angefordert, nicht doppelt
+        Assert.Single(import.PendingCharts);
+
+        import.Import(chartPage);
+        string before = Snapshot();
+        ImportResult again = import.Import(chartPage); // Kartenseite doppelt
+
+        Assert.Contains("bereits beendet", again.Message);
+        Assert.Equal(before, Snapshot());
+    }
+
+    [Fact]
+    public void GleicheSeitenMehrfach_NeuerFlugplatz()
+    {
+        var import = new ChartImport(_folder, _database, Version, ImportMode.AddAirfield);
+        string airfieldPage = DfsTestPages.AirfieldPage(NewEdition, "C0BBB2.html", "Beispiel EDXB",
+            [new("EDXB Beispiel 1", "b1", Preview1), new("AD 2-5", "b2", Preview2)], SaveFormat.HtmlOnly);
+        string chartPage = DfsTestPages.ChartPage(NewEdition, "b1", "EDXB Beispiel 1", null, Chart1, SaveFormat.HtmlOnly);
+        import.AddAirfield(import.Import(airfieldPage).NewAirfield!);
+        import.Import(chartPage);
+
+        import.Import(airfieldPage); // Flugplatzseite erneut: die übernommene Karte bleibt erledigt
+        Assert.Equal(["EDXB AD 2-5.png"], import.PendingCharts.Select(p => p.ChartName));
+        Assert.Equal(["EDXB Beispiel 1.png"], import.CompletedCharts.Select(p => p.ChartName));
+
+        string before = Snapshot();
+        ImportResult again = import.Import(chartPage); // Kartenseite doppelt
+        Assert.Contains("bereits übernommen", again.Message);
+        Assert.Equal(before, Snapshot());
+    }
+
+    [Fact]
+    public void NichtLesbarerKarteneintrag_LoeschtKeineKarte()
+    {
+        // Code-Review, Befund 2: AD 2-1 fehlt der deutsche Name; die Karte darf nicht als entfallen gelöscht werden
+        ChartImport import = StartUpdate();
+        string page = AirfieldPage(NewEdition, ("EDXA Musterstadt 1", "h1", Preview1), ("AD 2-1", "h2", Preview2))
+            .Replace("<span lang=\"de\" class=\"document-name\">AD 2-1</span>", "", StringComparison.Ordinal);
+
+        Assert.Equal(ImportOutcome.Failed, import.Import(page).Outcome);
+        Assert.NotNull(_database.FindChart("EDXA AD 2-1.png"));
+        Assert.True(File.Exists(ChartPath("EDXA AD 2-1.png")));
+    }
+
+    [Fact]
+    public void SchreibfehlerBeiNeuerKarte_DatenbankBleibtUnveraendert()
+    {
+        // Code-Review, Befund 1: Die Karte kam vor dem Schreiben in die Datenbank, mit CreationDate 0001-01-01
+        ChartImport import = StartUpdate();
+        import.Import(AirfieldPage(NewEdition, ("EDXA Musterstadt 1", "h1", Preview1), ("AD 2-1", "h2", Preview2), ("Neu", "h3", Preview2)));
+        Directory.CreateDirectory(ChartPath("EDXA Neu.png")); // Ziel ist ein Verzeichnis: Schreiben scheitert
+        string before = Convert.ToHexString(ChartDatabaseXml.ToBytes(_database));
+
+        Assert.ThrowsAny<Exception>(() => import.Import(DfsTestPages.ChartPage(NewEdition, "h3", "EDXA Neu", null, Chart1, SaveFormat.HtmlOnly)));
+
+        Assert.Null(_database.FindChart("EDXA Neu.png"));
+        Assert.Equal(before, Convert.ToHexString(ChartDatabaseXml.ToBytes(_database)));
+        Assert.Single(import.PendingCharts); // bleibt angefordert
+    }
+
+    [Fact]
+    public void LeereVorschau_KarteGiltNieAlsAktuell()
+    {
+        // Code-Review, Befund 6: Eine leere Vorschau stimmt sonst für immer mit einer leeren Vorschaudatei überein
+        ChartImport import = StartUpdate();
+        import.Import(AirfieldPage(NewEdition, ("EDXA Musterstadt 1", "h1", []), ("AD 2-1", "h2", Preview2)));
+        Assert.Equal("EDXA Musterstadt 1.png", Assert.Single(import.PendingCharts).ChartName);
+
+        import.Import(DfsTestPages.ChartPage(NewEdition, "h1", "EDXA Musterstadt 1", null, Chart2, SaveFormat.HtmlOnly));
+
+        Assert.False(File.Exists(PreviewPath("EDXA Musterstadt 1.png"))); // keine leere Vorschaudatei
+        ChartImport next = new(_folder, _database, Version, ImportMode.UpdateCharts);
+        next.Import(AirfieldPage(new DateOnly(2026, 10, 15), ("EDXA Musterstadt 1", "h1", []), ("AD 2-1", "h2", Preview2)));
+        Assert.Equal("EDXA Musterstadt 1.png", Assert.Single(next.PendingCharts).ChartName);
+    }
+
+    [Fact]
+    public void EntfalleneKarte_FlugplatzverzeichnisFehlt_KeinFehler()
+    {
+        // Code-Review, Befund 7: Verzeichnis von Hand gelöscht, Flugplatz noch in der Datenbank
+        Directory.Delete(Path.Combine(_root, "EDXA - Musterstadt"), recursive: true);
+        ChartImport import = StartUpdate();
+
+        ImportResult result = import.Import(AirfieldPage(NewEdition, ("EDXA Musterstadt 1", "h1", Preview1)));
+
+        Assert.Equal(ImportOutcome.Processed, result.Outcome);
+        Assert.Null(_database.FindChart("EDXA AD 2-1.png"));
+    }
+
+    [Fact]
+    public void NeuerFlugplatz_UngepruefteFlugplaetze_KartenstandBleibtLeer()
+    {
+        // Code-Review, Befund 3: Nach einer Wiederherstellung ist AipLastUpdate leer und EDXA ungeprüft
+        _database.AipLastUpdate = null;
+        var import = new ChartImport(_folder, _database, Version, ImportMode.AddAirfield);
+        ImportResult result = import.Import(DfsTestPages.AirfieldPage(NewEdition, "C0BBB2.html", "Beispiel EDXB",
+            [new("EDXB Beispiel 1", "b1", Preview1)], SaveFormat.HtmlOnly));
+        import.AddAirfield(result.NewAirfield!);
+
+        import.Import(DfsTestPages.ChartPage(NewEdition, "b1", "EDXB Beispiel 1", null, Chart1, SaveFormat.HtmlOnly));
+
+        Assert.NotNull(_database.FindAirfield("EDXB"));
+        Assert.Null(_database.AipLastUpdate);
     }
 
     // Tests gegen echte Daten; übersprungen, wenn testdata/ oder testcharts/ fehlt

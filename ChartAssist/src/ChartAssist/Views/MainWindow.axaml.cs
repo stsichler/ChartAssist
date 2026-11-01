@@ -33,9 +33,13 @@ public partial class MainWindow : Window
     protected override void OnClosed(EventArgs e)
     {
         // Das Abgleichfenster hat keinen Besitzer und würde sonst allein weiterlaufen
+        _isClosed = true;
         _sessionWindow?.Close();
         base.OnClosed(e);
     }
+
+    /// <summary>Das Hauptfenster ist geschlossen; danach keine weiteren Fenster mit ihm als Besitzer öffnen.</summary>
+    private bool _isClosed;
 
     protected override async void OnOpened(EventArgs e)
     {
@@ -59,7 +63,7 @@ public partial class MainWindow : Window
             await OpenOptionsAsync();
         }
 
-        await LinuxDesktopSetup.RunAsync(this, ViewModel.Settings, () => _ = SaveSettingsAsync());
+        await DesktopSetup.RunAsync(this, ViewModel.Settings, () => _ = SaveSettingsAsync());
 
 #if !DEBUG
         await CheckForNewReleaseAsync();
@@ -70,6 +74,12 @@ public partial class MainWindow : Window
     {
         ChartFolderLoadResult? result = ViewModel.LoadDatabase();
         string folder = ViewModel.Settings.ChartFolder;
+        if (ViewModel.LoadError is string error)
+        {
+            await MessageDialog.ShowAsync(this, $"Das Kartenverzeichnis konnte nicht gelesen werden:\n{folder}\n\n{error}\n\n"
+                + "Bitte prüfen Sie es und wählen Sie es unter „Optionen“ erneut.");
+            return;
+        }
         if (folder.Length > 0 && result == null)
         {
             await MessageDialog.ShowAsync(this, $"Das Kartenverzeichnis wurde nicht gefunden:\n{folder}\n\nBitte prüfen Sie es unter „Optionen“.");
@@ -117,7 +127,8 @@ public partial class MainWindow : Window
             ViewModel.Settings.CreateTripKit = options.CreateTripKit;
         }
         await SaveSettingsAsync();
-        if (folderChanged)
+        // Auch ohne geänderten Pfad neu laden, wenn das Verzeichnis bisher fehlte (z. B. USB-Laufwerk nicht angesteckt)
+        if (folderChanged || ViewModel.Folder == null)
         {
             await LoadDatabaseAsync();
         }
@@ -145,13 +156,17 @@ public partial class MainWindow : Window
             return;
         }
 
-        var import = new ChartImport(vm.Folder, vm.Database, AppInfo.VersionText, mode, vm.Settings.CreateTripKit);
+        var import = new ChartImport(vm.Folder, vm.Database, AppInfo.DatabaseVersion, mode, vm.Settings.CreateTripKit);
         var session = new AbgleichViewModel(import, new ImportFolderScanner(vm.Settings.EffectiveImportFolder), OnDatabaseChanged);
         var window = new AbgleichWindow { DataContext = session };
         vm.IsSessionOpen = true;
         window.Closed += async (_, _) =>
         {
             vm.IsSessionOpen = false;
+            if (_isClosed)
+            {
+                return; // Das Programm wird beendet
+            }
             vm.Refresh();
 
             // Das Hauptfenster liegt meist noch hinter dem Browser. Activate allein genügt nicht immer: GNOME lehnt
@@ -161,13 +176,11 @@ public partial class MainWindow : Window
             Topmost = true;
             await Task.Delay(TimeSpan.FromMilliseconds(300));
             Topmost = false;
-            if (import.UpdatedCharts.Count > 0)
+            // Nur wenn Karten aktualisiert wurden, z. B. zum Ausdrucken; sonst keine Meldung.
+            // Erneut prüfen: Das Hauptfenster kann während der Pause geschlossen worden sein.
+            if (!_isClosed && import.UpdatedCharts.Count > 0)
             {
                 new UpdateOverviewWindow(import.UpdatedCharts).Show(this);
-            }
-            else if (session.ClosedAutomatically)
-            {
-                await MessageDialog.ShowAsync(this, session.Status, session.Title);
             }
         };
         _sessionWindow = window;
