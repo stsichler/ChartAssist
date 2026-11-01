@@ -1,6 +1,4 @@
 using ChartAssist.Core.Data;
-using PdfSharp.Drawing;
-using PdfSharp.Pdf;
 using SkiaSharp;
 
 namespace ChartAssist.Core.TripKit;
@@ -21,13 +19,17 @@ public static class TripKitBuilder
 
     private const int PreviewJpegQuality = 75;
 
-    private static readonly XUnit PageWidth = XUnit.FromMillimeter(297);
-    private static readonly XUnit PageHeight = XUnit.FromMillimeter(210);
+    // A4 quer in Punkt (1/72 Zoll)
+    private const float PageWidth = 297 / 25.4f * 72;
+    private const float PageHeight = 210 / 25.4f * 72;
+
+    private static readonly SKSamplingOptions Sampling = new(SKFilterMode.Linear, SKMipmapMode.Linear);
 
     public static string FileName(string icao) => icao + "_TripKit_Charts.pdf";
 
     /// <summary>Baut das TripKit aus den Kartenbildern (PNG) in der angegebenen Reihenfolge.</summary>
     /// <exception cref="ArgumentException">Keine Karten angegeben.</exception>
+    /// <exception cref="InvalidDataException">Ein Kartenbild lässt sich nicht lesen.</exception>
     public static TripKitDocument Build(IReadOnlyList<byte[]> chartImages)
     {
         if (chartImages.Count == 0)
@@ -35,66 +37,98 @@ public static class TripKitBuilder
             throw new ArgumentException("Ein TripKit braucht mindestens eine Karte.", nameof(chartImages));
         }
 
-        using var document = new PdfDocument();
-        using var preview = new SKBitmap(new SKImageInfo(PreviewWidth, PreviewHeight, SKImageInfo.PlatformColorType, SKAlphaType.Opaque));
-        using var previewCanvas = new SKCanvas(preview);
-        previewCanvas.Clear(SKColors.White);
-
-        int halfPage = 0; // zählt A5-Hälften in A4-Querformat-Seiten
-        foreach (byte[] imageData in chartImages)
+        var images = new List<SKImage>();
+        try
         {
-            using XImage image = XImage.FromStream(new MemoryStream(imageData, writable: false));
-            bool isLandscape = image.PixelWidth > image.PixelHeight;
+            foreach (byte[] imageData in chartImages)
+            {
+                images.Add(SKImage.FromEncodedData(imageData)
+                    ?? throw new InvalidDataException("Eine Karte ist kein lesbares Bild."));
+            }
+
+            List<List<(SKImage Image, int Half)>> pages = Arrange(images);
+            return new TripKitDocument(WritePdf(pages), WritePreview(pages[0]), pages.Count);
+        }
+        finally
+        {
+            images.ForEach(image => image.Dispose());
+        }
+    }
+
+    /// <summary>
+    /// Verteilt die Karten auf Seiten. Half: 0 = linke Hälfte, 1 = rechte Hälfte, -1 = ganze Seite (Querformat).
+    /// </summary>
+    private static List<List<(SKImage Image, int Half)>> Arrange(List<SKImage> images)
+    {
+        var pages = new List<List<(SKImage, int)>>();
+        int halfPage = 0; // zählt A5-Hälften in A4-Querformat-Seiten
+        foreach (SKImage image in images)
+        {
+            bool isLandscape = image.Width > image.Height;
 
             // Querformat beginnt immer auf einer neuen Seite, die rechte Hälfte bleibt dann leer
             if (isLandscape && halfPage % 2 != 0)
             {
                 halfPage++;
             }
-
-            PdfPage page;
             if (halfPage % 2 == 0)
             {
-                page = document.AddPage();
-                page.Width = PageWidth;
-                page.Height = PageHeight;
-            }
-            else
-            {
-                page = document.Pages[halfPage / 2];
+                pages.Add([]);
             }
 
-            double width = page.Width.Point;
-            double height = page.Height.Point;
-            using (XGraphics graphics = XGraphics.FromPdfPage(page, XGraphicsPdfPageOptions.Append))
-            {
-                if (isLandscape)
-                {
-                    graphics.DrawImage(image, 0, 0, width, height);
-                }
-                else
-                {
-                    graphics.DrawImage(image, halfPage % 2 * width / 2, 0, width / 2, height);
-                }
-            }
-
-            if (halfPage < 2)
-            {
-                DrawPreview(previewCanvas, imageData, isLandscape, halfPage % 2);
-            }
-
+            pages[^1].Add((image, isLandscape ? -1 : halfPage % 2));
             halfPage += isLandscape ? 2 : 1;
         }
+        return pages;
+    }
 
-        int pageCount = document.PageCount; // nach dem Speichern nicht mehr abrufbar
+    private static byte[] WritePdf(List<List<(SKImage Image, int Half)>> pages)
+    {
+        // Von Default ausgehen: Es setzt EncodingQuality auf 101 (verlustfrei). Ein leeres Metadaten-Objekt hätte 0,
+        // dann würden die Karten als JPEG mit niedrigster Qualität eingebettet.
+        SKDocumentPdfMetadata metadata = SKDocumentPdfMetadata.Default;
+        metadata.Creator = "ChartAssist";
+
         using var pdf = new MemoryStream();
-        document.Save(pdf, closeStream: false);
+        using (SKDocument document = SKDocument.CreatePdf(pdf, metadata)
+            ?? throw new InvalidOperationException("Das TripKit-PDF konnte nicht angelegt werden."))
+        {
+            foreach (List<(SKImage Image, int Half)> page in pages)
+            {
+                SKCanvas canvas = document.BeginPage(PageWidth, PageHeight);
+                DrawPage(canvas, page, PageWidth, PageHeight);
+                document.EndPage();
+            }
+            document.Close();
+        }
+        return pdf.ToArray();
+    }
+
+    private static byte[] WritePreview(List<(SKImage Image, int Half)> firstPage)
+    {
+        using var preview = new SKBitmap(new SKImageInfo(PreviewWidth, PreviewHeight, SKImageInfo.PlatformColorType, SKAlphaType.Opaque));
+        using (var canvas = new SKCanvas(preview))
+        {
+            canvas.Clear(SKColors.White);
+            DrawPage(canvas, firstPage, PreviewWidth, PreviewHeight);
+        }
 
         using SKImage previewImage = SKImage.FromBitmap(preview);
         using SKData jpeg = previewImage.Encode(SKEncodedImageFormat.Jpeg, PreviewJpegQuality)
             ?? throw new InvalidOperationException("Die TripKit-Vorschau konnte nicht als JPEG gespeichert werden.");
+        return jpeg.ToArray();
+    }
 
-        return new TripKitDocument(pdf.ToArray(), jpeg.ToArray(), pageCount);
+    /// <summary>Zeichnet die Karten einer Seite in ihre Hälfte bzw. auf die ganze Seite.</summary>
+    private static void DrawPage(SKCanvas canvas, List<(SKImage Image, int Half)> page, float width, float height)
+    {
+        foreach ((SKImage image, int half) in page)
+        {
+            SKRect target = half < 0
+                ? SKRect.Create(0, 0, width, height)
+                : SKRect.Create(half * width / 2, 0, width / 2, height);
+            canvas.DrawImage(image, target, Sampling);
+        }
     }
 
     /// <summary>
@@ -153,19 +187,5 @@ public static class TripKitBuilder
             database.Charts.Add(entry);
         }
         return entry;
-    }
-
-    private static void DrawPreview(SKCanvas canvas, byte[] imageData, bool isLandscape, int half)
-    {
-        using SKImage? image = SKImage.FromEncodedData(imageData);
-        if (image == null)
-        {
-            return;
-        }
-
-        SKRect target = isLandscape
-            ? new SKRect(0, 0, PreviewWidth, PreviewHeight)
-            : SKRect.Create(half * PreviewWidth / 2f, 0, PreviewWidth / 2f, PreviewHeight);
-        canvas.DrawImage(image, target, new SKSamplingOptions(SKFilterMode.Linear, SKMipmapMode.Linear));
     }
 }

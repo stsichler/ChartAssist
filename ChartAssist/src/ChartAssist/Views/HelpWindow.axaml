@@ -63,9 +63,13 @@
             <TextBlock Text="DFS Deutsche Flugsicherung GmbH, BasicVFR AIP. ChartAssist greift nicht selbst darauf zu. Bitte beachten Sie die Nutzungsbedingungen der DFS. Sie sind selbst für die Aktualität Ihrer Karten verantwortlich." />
 
             <TextBlock Classes="heading" Text="Verwendete Bibliotheken" />
-            <TextBlock Text=".NET, Avalonia, SkiaSharp, PDFsharp, CommunityToolkit.Mvvm (jeweils MIT-Lizenz), Schrift Inter (SIL Open Font License)." />
+            <TextBlock Text=".NET, Avalonia, SkiaSharp, CommunityToolkit.Mvvm (jeweils MIT-Lizenz), Schrift Inter (SIL Open Font License). Lizenztexte: Reiter „Lizenzen“." />
           </StackPanel>
         </ScrollViewer>
+      </TabItem>
+
+      <TabItem Header="Lizenzen">
+        <TextBox x:Name="LicensesText" IsReadOnly="True" TextWrapping="Wrap" FontSize="12" />
       </TabItem>
     </TabControl>
   </DockPanel>

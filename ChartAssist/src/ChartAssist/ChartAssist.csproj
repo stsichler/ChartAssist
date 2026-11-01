@@ -13,6 +13,8 @@
   <ItemGroup>
     <!-- Icon.svg ist nur die Vorlage für die Icons -->
     <AvaloniaResource Include="Assets\**" Exclude="Assets\Icon.svg" />
+    <!-- Lizenztexte der Bibliotheken, angezeigt im Hilfe-Fenster -->
+    <EmbeddedResource Include="..\..\..\THIRD-PARTY-NOTICES.txt" LogicalName="THIRD-PARTY-NOTICES.txt" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Avalonia" />

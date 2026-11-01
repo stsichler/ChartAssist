@@ -36,6 +36,16 @@ public sealed partial class TripKitBuilderTests : IDisposable
     }
 
     [Fact]
+    public void Build_BettetKartenVerlustfreiEin()
+    {
+        TripKitDocument tripKit = TripKitBuilder.Build([Portrait, Landscape]);
+
+        string pdf = Encoding.Latin1.GetString(tripKit.Pdf);
+        Assert.DoesNotContain("/DCTDecode", pdf); // JPEG
+        Assert.Contains("/FlateDecode", pdf);
+    }
+
+    [Fact]
     public void Build_VorschauIstJpegInFesterGroesse()
     {
         TripKitDocument tripKit = TripKitBuilder.Build([Portrait, Portrait]);
@@ -134,7 +144,7 @@ public sealed partial class TripKitBuilderTests : IDisposable
         return data.ToArray();
     }
 
-    /// <summary>Zählt die Seitenobjekte, funktioniert für PDFsharp 1.32 (ChartButlerCS) und 6.x.</summary>
+    /// <summary>Zählt die Seitenobjekte, funktioniert für PDFsharp 1.32 (ChartButlerCS) und SkiaSharp.</summary>
     private static int CountPdfPages(byte[] pdf) => PageObjectRegex().Count(Encoding.Latin1.GetString(pdf));
 
     private static void AssertColorNear(SKColor expected, SKColor actual)
